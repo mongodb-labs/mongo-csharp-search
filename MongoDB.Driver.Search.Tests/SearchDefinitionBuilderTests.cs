@@ -16,15 +16,13 @@ namespace MongoDB.Driver.Search.Tests
                 subject.Text("foo", "x"),
                 "{ text: { query: \"foo\", path: \"x\" } }");
             AssertRendered(
-                subject.Text("foo", new FieldDefinition<BsonDocument>[] { "x", "y" }),
+                subject.Text("foo", new[] { "x", "y" }),
                 "{ text: { query: \"foo\", path: [\"x\", \"y\"] } }");
             AssertRendered(
                 subject.Text(new[] { "foo", "bar" }, "x"),
                 "{ text: { query: [\"foo\", \"bar\"], path: \"x\" } }");
             AssertRendered(
-                subject.Text(
-                    new[] { "foo", "bar" },
-                    new FieldDefinition<BsonDocument>[] { "x", "y" }),
+                subject.Text(new[] { "foo", "bar" }, new[] { "x", "y" }),
                 "{ text: { query: [\"foo\", \"bar\"], path: [\"x\", \"y\"] } }");
         }
 
@@ -50,7 +48,7 @@ namespace MongoDB.Driver.Search.Tests
                     }),
                 "{ text: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
             AssertRendered(
-                subject.Text("foo", new FieldDefinition<Person>[] { "FirstName", "LastName" }),
+                subject.Text("foo", new[] { "FirstName", "LastName" }),
                 "{ text: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
 
             AssertRendered(
@@ -70,9 +68,7 @@ namespace MongoDB.Driver.Search.Tests
                     }),
                 "{ text: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
             AssertRendered(
-                subject.Text(
-                    new[] { "foo", "bar" },
-                    new FieldDefinition<Person>[] { "FirstName", "LastName" }),
+                subject.Text(new[] { "foo", "bar" }, new[] { "FirstName", "LastName" }),
                 "{ text: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
         }
 

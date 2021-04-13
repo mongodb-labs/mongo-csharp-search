@@ -35,9 +35,19 @@ namespace MongoDB.Driver.Search
             return Text(query, new ExpressionFieldDefinition<TDocument, TField>(field));
         }
 
+        public SearchDefinition<TDocument> Text(string query, IEnumerable<string> path)
+        {
+            return Text(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
+        }
+
         public SearchDefinition<TDocument> Text<TField>(IEnumerable<string> query, Expression<Func<TDocument, TField>> field)
         {
             return Text(query, new ExpressionFieldDefinition<TDocument, TField>(field));
+        }
+
+        public SearchDefinition<TDocument> Text(IEnumerable<string> query, IEnumerable<string> path)
+        {
+            return Text(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
         }
     }
 
