@@ -17,8 +17,8 @@ namespace MongoDB.Driver.Search.Tests
             var result = pipeline.Search(builder.Text("foo", "bar"));
             var stages = RenderStages(result, BsonDocumentSerializer.Instance);
             Assert.Equal(
-                "{ \"$search\" : { \"text\" : { \"query\" : \"foo\", \"path\" : \"bar\" } } }",
-                stages[0].ToString());
+                BsonDocument.Parse("{ $search: { text: { query: \"foo\", path: \"bar\" } } }"),
+                stages[0]);
         }
 
         [Fact]
@@ -40,7 +40,6 @@ namespace MongoDB.Driver.Search.Tests
             Assert.Equal("query", argumentNullException.ParamName);
         }
 
-        // private methods
         private IList<BsonDocument> RenderStages<TInput, TOutput>(PipelineDefinition<TInput, TOutput> pipeline, IBsonSerializer<TInput> inputSerializer)
         {
             var renderedPipeline = pipeline.Render(inputSerializer, BsonSerializer.SerializerRegistry);

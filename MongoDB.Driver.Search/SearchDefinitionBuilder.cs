@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver.Core.Misc;
@@ -26,6 +28,16 @@ namespace MongoDB.Driver.Search
         public SearchDefinition<TDocument> Text(string query, FieldDefinition<TDocument> path)
         {
             return new TextSearchDefinition<TDocument>(new[] { query }, new[] { path });
+        }
+
+        public SearchDefinition<TDocument> Text<TField>(string query, Expression<Func<TDocument, TField>> field)
+        {
+            return Text(query, new ExpressionFieldDefinition<TDocument, TField>(field));
+        }
+
+        public SearchDefinition<TDocument> Text<TField>(IEnumerable<string> query, Expression<Func<TDocument, TField>> field)
+        {
+            return Text(query, new ExpressionFieldDefinition<TDocument, TField>(field));
         }
     }
 
