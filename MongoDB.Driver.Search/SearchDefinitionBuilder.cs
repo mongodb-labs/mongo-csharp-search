@@ -134,6 +134,16 @@ namespace MongoDB.Driver.Search
             return Phrase(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
         }
 
+        public SearchDefinition<TDocument> QueryString(FieldDefinition<TDocument> defaultPath, string query)
+        {
+            return new QueryStringSearchDefinition<TDocument>(defaultPath, query);
+        }
+
+        public SearchDefinition<TDocument> QueryString<TField>(Expression<Func<TDocument, TField>> defaultPath, string query)
+        {
+            return QueryString(new ExpressionFieldDefinition<TDocument>(defaultPath), query);
+        }
+
         public SearchDefinition<TDocument> Text(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
         {
             return new TextSearchDefinition<TDocument>(query, path);
@@ -218,7 +228,7 @@ namespace MongoDB.Driver.Search
                 }));
             }
 
-            BsonDocument doc = new BsonDocument();
+            var doc = new BsonDocument();
             doc.Add("query", queryVal);
             doc.Add("path", pathVal);
             if (_tokenOrder == AutocompleteTokenOrder.Sequential)
@@ -244,7 +254,7 @@ namespace MongoDB.Driver.Search
         {
             var renderedField = _path.Render(documentSerializer, serializerRegistry);
 
-            BsonDocument doc = new BsonDocument();
+            var doc = new BsonDocument();
             doc.Add("path", renderedField.FieldName);
             doc.Add("value", _value);
             return new BsonDocument("equals", doc);
@@ -289,10 +299,31 @@ namespace MongoDB.Driver.Search
                 }));
             }
 
-            BsonDocument doc = new BsonDocument();
+            var doc = new BsonDocument();
             doc.Add("query", queryVal);
             doc.Add("path", pathVal);
             return new BsonDocument("phrase", doc);
+        }
+    }
+
+    internal sealed class QueryStringSearchDefinition<TDocument> : SearchDefinition<TDocument>
+    {
+        private readonly FieldDefinition<TDocument> _defaultPath;
+        private readonly string _query;
+
+        public QueryStringSearchDefinition(FieldDefinition<TDocument> defaultPath, string query)
+        {
+            _defaultPath = Ensure.IsNotNull(defaultPath, nameof(defaultPath));
+            _query = Ensure.IsNotNull(query, nameof(query));
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var renderedField = _defaultPath.Render(documentSerializer, serializerRegistry);
+            var doc = new BsonDocument();
+            doc.Add("defaultPath", renderedField.FieldName);
+            doc.Add("query", _query);
+            return new BsonDocument("queryString", doc);
         }
     }
 
@@ -334,7 +365,7 @@ namespace MongoDB.Driver.Search
                 }));
             }
 
-            BsonDocument doc = new BsonDocument();
+            var doc = new BsonDocument();
             doc.Add("query", queryVal);
             doc.Add("path", pathVal);
             return new BsonDocument("text", doc);

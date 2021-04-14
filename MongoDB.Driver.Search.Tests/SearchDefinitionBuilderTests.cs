@@ -177,6 +177,29 @@ namespace MongoDB.Driver.Search.Tests
         }
 
         [Fact]
+        public void QueryString()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.QueryString("x", "foo"),
+                "{ queryString: { defaultPath: \"x\", query: \"foo\" } }");
+        }
+
+        [Fact]
+        public void QueryString_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.QueryString(x => x.FirstName, "foo"),
+                "{ queryString: { defaultPath: \"fn\", query: \"foo\" } }");
+            AssertRendered(
+                subject.QueryString("FirstName", "foo"),
+                "{ queryString: { defaultPath: \"fn\", query: \"foo\" } }");
+        }
+
+        [Fact]
         public void Text()
         {
             var subject = CreateSubject<BsonDocument>();
