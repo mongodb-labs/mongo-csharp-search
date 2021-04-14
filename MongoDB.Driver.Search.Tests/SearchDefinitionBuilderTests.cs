@@ -135,6 +135,42 @@ namespace MongoDB.Driver.Search.Tests
         }
 
         [Fact]
+        public void Filter()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Filter(
+                    subject.Exists("x"),
+                    subject.Exists("y")),
+                "{ compound: { filter: [{ exists: { path: \"x\" } }, { exists: { path: \"y\" } }] } }");
+        }
+
+        [Fact]
+        public void Must()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Must(
+                    subject.Exists("x"),
+                    subject.Exists("y")),
+                "{ compound: { must: [{ exists: { path: \"x\" } }, { exists: { path: \"y\" } }] } }");
+        }
+
+        [Fact]
+        public void MustNot()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.MustNot(
+                    subject.Exists("x"),
+                    subject.Exists("y")),
+                "{ compound: { mustNot: [{ exists: { path: \"x\" } }, { exists: { path: \"y\" } }] } }");
+        }
+
+        [Fact]
         public void Phrase()
         {
             var subject = CreateSubject<BsonDocument>();
@@ -292,6 +328,18 @@ namespace MongoDB.Driver.Search.Tests
             AssertRendered(
                 subject.Regex(new[] { "foo", "bar" }, new[] { "FirstName", "LastName" }),
                 "{ regex: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+        }
+
+        [Fact]
+        public void Should()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Should(
+                    subject.Exists("x"),
+                    subject.Exists("y")),
+                "{ compound: { should: [{ exists: { path: \"x\" } }, { exists: { path: \"y\" } }] } }");
         }
 
         [Fact]

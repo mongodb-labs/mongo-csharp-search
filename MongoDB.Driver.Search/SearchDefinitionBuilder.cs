@@ -104,6 +104,36 @@ namespace MongoDB.Driver.Search
             return Exists(new ExpressionFieldDefinition<TDocument>(path));
         }
 
+        public SearchDefinition<TDocument> Filter(IEnumerable<SearchDefinition<TDocument>> clauses)
+        {
+            return new CompoundSearchDefinition<TDocument>("filter", clauses);
+        }
+
+        public SearchDefinition<TDocument> Filter(params SearchDefinition<TDocument>[] clauses)
+        {
+            return Filter((IEnumerable<SearchDefinition<TDocument>>)clauses);
+        }
+
+        public SearchDefinition<TDocument> Must(IEnumerable<SearchDefinition<TDocument>> clauses)
+        {
+            return new CompoundSearchDefinition<TDocument>("must", clauses);
+        }
+
+        public SearchDefinition<TDocument> Must(params SearchDefinition<TDocument>[] clauses)
+        {
+            return Must((IEnumerable<SearchDefinition<TDocument>>)clauses);
+        }
+
+        public SearchDefinition<TDocument> MustNot(IEnumerable<SearchDefinition<TDocument>> clauses)
+        {
+            return new CompoundSearchDefinition<TDocument>("mustNot", clauses);
+        }
+
+        public SearchDefinition<TDocument> MustNot(params SearchDefinition<TDocument>[] clauses)
+        {
+            return MustNot((IEnumerable<SearchDefinition<TDocument>>)clauses);
+        }
+
         public SearchDefinition<TDocument> Phrase(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
         {
             return new PhraseSearchDefinition<TDocument>(query, path);
@@ -216,6 +246,16 @@ namespace MongoDB.Driver.Search
             bool allowAnalyzedField = false)
         {
             return Regex(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), allowAnalyzedField);
+        }
+
+        public SearchDefinition<TDocument> Should(IEnumerable<SearchDefinition<TDocument>> clauses)
+        {
+            return new CompoundSearchDefinition<TDocument>("should", clauses);
+        }
+
+        public SearchDefinition<TDocument> Should(params SearchDefinition<TDocument>[] clauses)
+        {
+            return Should((IEnumerable<SearchDefinition<TDocument>>)clauses);
         }
 
         public SearchDefinition<TDocument> Text(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
@@ -374,6 +414,25 @@ namespace MongoDB.Driver.Search
                 doc.Add("tokenOrder", "sequential");
             }
             return new BsonDocument("autocomplete", doc);
+        }
+    }
+
+    internal sealed class CompoundSearchDefinition<TDocument> : SearchDefinition<TDocument>
+    {
+        private readonly string _term;
+        private readonly List<SearchDefinition<TDocument>> _clauses;
+
+        public CompoundSearchDefinition(string term, IEnumerable<SearchDefinition<TDocument>> clauses)
+        {
+            _term = Ensure.IsNotNullOrEmpty(term, nameof(term));
+            _clauses = Ensure.IsNotNull(clauses, nameof(clauses)).ToList();
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var clauseDocs = _clauses.Select(clause => clause.Render(documentSerializer, serializerRegistry));
+            var doc = new BsonDocument(_term, new BsonArray(clauseDocs));
+            return new BsonDocument("compound", doc);
         }
     }
 
