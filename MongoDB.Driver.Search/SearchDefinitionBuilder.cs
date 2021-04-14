@@ -23,7 +23,7 @@ namespace MongoDB.Driver.Search
             FieldDefinition<TDocument> path,
             AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
         {
-            return new AutocompleteSearchDefinition<TDocument>(query, new[] { path }, tokenOrder);
+            return Autocomplete(query, new[] { path }, tokenOrder);
         }
 
         public SearchDefinition<TDocument> Autocomplete(
@@ -31,7 +31,7 @@ namespace MongoDB.Driver.Search
             IEnumerable<FieldDefinition<TDocument>> path,
             AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
         {
-            return new AutocompleteSearchDefinition<TDocument>(new[] { query }, path, tokenOrder);
+            return Autocomplete(new[] { query }, path, tokenOrder);
         }
 
         public SearchDefinition<TDocument> Autocomplete(
@@ -39,7 +39,7 @@ namespace MongoDB.Driver.Search
             FieldDefinition<TDocument> path,
             AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
         {
-            return new AutocompleteSearchDefinition<TDocument>(new[] { query }, new[] { path }, tokenOrder);
+            return Autocomplete(new[] { query }, new[] { path }, tokenOrder);
         }
 
         public SearchDefinition<TDocument> Autocomplete<TField>(
@@ -101,17 +101,17 @@ namespace MongoDB.Driver.Search
 
         public SearchDefinition<TDocument> Phrase(IEnumerable<string> query, FieldDefinition<TDocument> path)
         {
-            return new PhraseSearchDefinition<TDocument>(query, new[] { path });
+            return Phrase(query, new[] { path });
         }
 
         public SearchDefinition<TDocument> Phrase(string query, IEnumerable<FieldDefinition<TDocument>> path)
         {
-            return new PhraseSearchDefinition<TDocument>(new[] { query }, path);
+            return Phrase(new[] { query }, path);
         }
 
         public SearchDefinition<TDocument> Phrase(string query, FieldDefinition<TDocument> path)
         {
-            return new PhraseSearchDefinition<TDocument>(new[] { query }, new[] { path });
+            return Phrase(new[] { query }, new[] { path });
         }
 
         public SearchDefinition<TDocument> Phrase<TField>(string query, Expression<Func<TDocument, TField>> path)
@@ -157,7 +157,7 @@ namespace MongoDB.Driver.Search
             FieldDefinition<TDocument> path,
             bool allowAnalyzedField = false)
         {
-            return new RegexSearchDefinition<TDocument>(query, new[] { path }, allowAnalyzedField);
+            return Regex(query, new[] { path }, allowAnalyzedField);
         }
 
         public SearchDefinition<TDocument> Regex(
@@ -165,7 +165,7 @@ namespace MongoDB.Driver.Search
             IEnumerable<FieldDefinition<TDocument>> path,
             bool allowAnalyzedField = false)
         {
-            return new RegexSearchDefinition<TDocument>(new[] { query }, path, allowAnalyzedField);
+            return Regex(new[] { query }, path, allowAnalyzedField);
         }
 
         public SearchDefinition<TDocument> Regex(
@@ -173,7 +173,7 @@ namespace MongoDB.Driver.Search
             FieldDefinition<TDocument> path,
             bool allowAnalyzedField = false)
         {
-            return new RegexSearchDefinition<TDocument>(new[] { query }, new[] { path }, allowAnalyzedField);
+            return Regex(new[] { query }, new[] { path }, allowAnalyzedField);
         }
 
         public SearchDefinition<TDocument> Regex<TField>(
@@ -215,17 +215,17 @@ namespace MongoDB.Driver.Search
 
         public SearchDefinition<TDocument> Text(IEnumerable<string> query, FieldDefinition<TDocument> path)
         {
-            return new TextSearchDefinition<TDocument>(query, new[] { path });
+            return Text(query, new[] { path });
         }
 
         public SearchDefinition<TDocument> Text(string query, IEnumerable<FieldDefinition<TDocument>> path)
         {
-            return new TextSearchDefinition<TDocument>(new[] { query }, path);
+            return Text(new[] { query }, path);
         }
 
         public SearchDefinition<TDocument> Text(string query, FieldDefinition<TDocument> path)
         {
-            return new TextSearchDefinition<TDocument>(new[] { query }, new[] { path });
+            return Text(new[] { query }, new[] { path });
         }
 
         public SearchDefinition<TDocument> Text<TField>(string query, Expression<Func<TDocument, TField>> field)
@@ -246,6 +246,70 @@ namespace MongoDB.Driver.Search
         public SearchDefinition<TDocument> Text(IEnumerable<string> query, IEnumerable<string> path)
         {
             return Text(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
+        }
+
+        public SearchDefinition<TDocument> Wildcard(
+            IEnumerable<string> query,
+            IEnumerable<FieldDefinition<TDocument>> path,
+            bool allowAnalyzedField = false)
+        {
+            return new WildcardSearchDefinition<TDocument>(query, path, allowAnalyzedField);
+        }
+
+        public SearchDefinition<TDocument> Wildcard(
+            IEnumerable<string> query,
+            FieldDefinition<TDocument> path,
+            bool allowAnalyzedField = false)
+        {
+            return Wildcard(query, new[] { path }, allowAnalyzedField);
+        }
+
+        public SearchDefinition<TDocument> Wildcard(
+            string query,
+            IEnumerable<FieldDefinition<TDocument>> path,
+            bool allowAnalyzedField = false)
+        {
+            return Wildcard(new[] { query }, path, allowAnalyzedField);
+        }
+
+        public SearchDefinition<TDocument> Wildcard(
+            string query,
+            FieldDefinition<TDocument> path,
+            bool allowAnalyzedField = false)
+        {
+            return Wildcard(new[] { query }, new[] { path }, allowAnalyzedField);
+        }
+
+        public SearchDefinition<TDocument> Wildcard<TField>(
+            string query,
+            Expression<Func<TDocument, TField>> field,
+            bool allowAnalyzedField = false)
+        {
+            return Wildcard(query, new ExpressionFieldDefinition<TDocument, TField>(field), allowAnalyzedField);
+        }
+
+        public SearchDefinition<TDocument> Wildcard(
+            string query,
+            IEnumerable<string> path,
+            bool allowAnalyzedField = false)
+        {
+            return Wildcard(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), allowAnalyzedField);
+        }
+
+        public SearchDefinition<TDocument> Wildcard<TField>(
+            IEnumerable<string> query,
+            Expression<Func<TDocument, TField>> path,
+            bool allowAnalyzedField = false)
+        {
+            return Wildcard(query, new ExpressionFieldDefinition<TDocument, TField>(path), allowAnalyzedField);
+        }
+
+        public SearchDefinition<TDocument> Wildcard(
+            IEnumerable<string> query,
+            IEnumerable<string> path,
+            bool allowAnalyzedField = false)
+        {
+            return Wildcard(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), allowAnalyzedField);
         }
     }
 
@@ -487,6 +551,60 @@ namespace MongoDB.Driver.Search
             doc.Add("query", queryVal);
             doc.Add("path", pathVal);
             return new BsonDocument("text", doc);
+        }
+    }
+
+    internal sealed class WildcardSearchDefinition<TDocument> : SearchDefinition<TDocument>
+    {
+        private readonly List<string> _query;
+        private readonly List<FieldDefinition<TDocument>> _path;
+        private bool _allowAnalyzedField;
+
+        public WildcardSearchDefinition(
+            IEnumerable<string> query,
+            IEnumerable<FieldDefinition<TDocument>> path,
+            bool allowAnalyzedField)
+        {
+            _query = Ensure.IsNotNull(query, nameof(query)).ToList();
+            _path = Ensure.IsNotNull(path, nameof(path)).ToList();
+            _allowAnalyzedField = allowAnalyzedField;
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            BsonValue queryVal;
+            if (_query.Count == 1)
+            {
+                queryVal = new BsonString(_query[0]);
+            }
+            else
+            {
+                queryVal = new BsonArray(_query);
+            }
+
+            BsonValue pathVal;
+            if (_path.Count == 1)
+            {
+                var renderedField = _path[0].Render(documentSerializer, serializerRegistry);
+                pathVal = new BsonString(renderedField.FieldName);
+            }
+            else
+            {
+                pathVal = new BsonArray(_path.Select(field =>
+                {
+                    var renderedField = field.Render(documentSerializer, serializerRegistry);
+                    return new BsonString(renderedField.FieldName);
+                }));
+            }
+
+            var doc = new BsonDocument();
+            doc.Add("query", queryVal);
+            doc.Add("path", pathVal);
+            if (_allowAnalyzedField)
+            {
+                doc.Add("allowAnalyzedField", true);
+            }
+            return new BsonDocument("wildcard", doc);
         }
     }
 }

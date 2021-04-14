@@ -336,6 +336,78 @@ namespace MongoDB.Driver.Search.Tests
                 "{ text: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
         }
 
+        [Fact]
+        public void Wildcard()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Wildcard("foo", "x"),
+                "{ wildcard: { query: \"foo\", path: \"x\" } }");
+            AssertRendered(
+                subject.Wildcard("foo", new[] { "x", "y" }),
+                "{ wildcard: { query: \"foo\", path: [\"x\", \"y\"] } }");
+            AssertRendered(
+                subject.Wildcard(new[] { "foo", "bar" }, "x"),
+                "{ wildcard: { query: [\"foo\", \"bar\"], path: \"x\" } }");
+            AssertRendered(
+                subject.Wildcard(new[] { "foo", "bar" }, new[] { "x", "y" }),
+                "{ wildcard: { query: [\"foo\", \"bar\"], path: [\"x\", \"y\"] } }");
+
+            AssertRendered(
+                subject.Wildcard("foo", "x", false),
+                "{ wildcard: { query: \"foo\", path: \"x\" } }");
+            AssertRendered(
+                subject.Wildcard("foo", "x", true),
+                "{ wildcard: { query: \"foo\", path: \"x\", allowAnalyzedField: true } }");
+        }
+
+        [Fact]
+        public void Wildcard_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.Wildcard("foo", x => x.FirstName),
+                "{ wildcard: { query: \"foo\", path: \"fn\" } }");
+            AssertRendered(
+                subject.Wildcard("foo", "FirstName"),
+                "{ wildcard: { query: \"foo\", path: \"fn\" } }");
+
+            AssertRendered(
+                subject.Wildcard(
+                    "foo",
+                    new FieldDefinition<Person>[]
+                    {
+                        new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
+                        new ExpressionFieldDefinition<Person, string>(x => x.LastName)
+                    }),
+                "{ wildcard: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+            AssertRendered(
+                subject.Wildcard("foo", new[] { "FirstName", "LastName" }),
+                "{ wildcard: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+
+            AssertRendered(
+                subject.Wildcard(new[] { "foo", "bar" }, x => x.FirstName),
+                "{ wildcard: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+            AssertRendered(
+                subject.Wildcard(new[] { "foo", "bar" }, "FirstName"),
+                "{ wildcard: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+
+            AssertRendered(
+                subject.Wildcard(
+                    new[] { "foo", "bar" },
+                    new FieldDefinition<Person>[]
+                    {
+                        new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
+                        new ExpressionFieldDefinition<Person, string>(x => x.LastName)
+                    }),
+                "{ wildcard: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+            AssertRendered(
+                subject.Wildcard(new[] { "foo", "bar" }, new[] { "FirstName", "LastName" }),
+                "{ wildcard: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+        }
+
         private void AssertRendered<TDocument>(SearchDefinition<TDocument> query, string expected)
         {
             AssertRendered(query, BsonDocument.Parse(expected));
