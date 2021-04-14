@@ -200,6 +200,71 @@ namespace MongoDB.Driver.Search.Tests
         }
 
         [Fact]
+        public void Regex()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Regex("foo", "x"),
+                "{ regex: { query: \"foo\", path: \"x\" } }");
+            AssertRendered(
+                subject.Regex("foo", new[] { "x", "y" }),
+                "{ regex: { query: \"foo\", path: [\"x\", \"y\"] } }");
+            AssertRendered(
+                subject.Regex(new[] { "foo", "bar" }, "x"),
+                "{ regex: { query: [\"foo\", \"bar\"], path: \"x\" } }");
+            AssertRendered(
+                subject.Regex(new[] { "foo", "bar" }, new[] { "x", "y" }),
+                "{ regex: { query: [\"foo\", \"bar\"], path: [\"x\", \"y\"] } }");
+        }
+
+        [Fact]
+        public void Regex_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.Regex("foo", x => x.FirstName),
+                "{ regex: { query: \"foo\", path: \"fn\" } }");
+            AssertRendered(
+                subject.Regex("foo", "FirstName"),
+                "{ regex: { query: \"foo\", path: \"fn\" } }");
+
+            AssertRendered(
+                subject.Regex(
+                    "foo",
+                    new FieldDefinition<Person>[]
+                    {
+                        new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
+                        new ExpressionFieldDefinition<Person, string>(x => x.LastName)
+                    }),
+                "{ regex: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+            AssertRendered(
+                subject.Regex("foo", new[] { "FirstName", "LastName" }),
+                "{ regex: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+
+            AssertRendered(
+                subject.Regex(new[] { "foo", "bar" }, x => x.FirstName),
+                "{ regex: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+            AssertRendered(
+                subject.Regex(new[] { "foo", "bar" }, "FirstName"),
+                "{ regex: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+
+            AssertRendered(
+                subject.Regex(
+                    new[] { "foo", "bar" },
+                    new FieldDefinition<Person>[]
+                    {
+                        new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
+                        new ExpressionFieldDefinition<Person, string>(x => x.LastName)
+                    }),
+                "{ regex: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+            AssertRendered(
+                subject.Regex(new[] { "foo", "bar" }, new[] { "FirstName", "LastName" }),
+                "{ regex: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+        }
+
+        [Fact]
         public void Text()
         {
             var subject = CreateSubject<BsonDocument>();
