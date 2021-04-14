@@ -74,6 +74,26 @@ namespace MongoDB.Driver.Search
             return Autocomplete(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), tokenOrder);
         }
 
+        public SearchDefinition<TDocument> Eq(FieldDefinition<TDocument, bool> path, bool @value)
+        {
+            return new EqSearchDefinition<TDocument>(path, new BsonBoolean(@value));
+        }
+
+        public SearchDefinition<TDocument> Eq(FieldDefinition<TDocument, ObjectId> path, ObjectId @value)
+        {
+            return new EqSearchDefinition<TDocument>(path, @value);
+        }
+
+        public SearchDefinition<TDocument> Eq(Expression<Func<TDocument, bool>> path, bool @value)
+        {
+            return Eq(new ExpressionFieldDefinition<TDocument, bool>(path), @value);
+        }
+
+        public SearchDefinition<TDocument> Eq(Expression<Func<TDocument, ObjectId>> path, ObjectId @value)
+        {
+            return Eq(new ExpressionFieldDefinition<TDocument, ObjectId>(path), @value);
+        }
+
         public SearchDefinition<TDocument> Phrase(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
         {
             return new PhraseSearchDefinition<TDocument>(query, path);
@@ -206,6 +226,28 @@ namespace MongoDB.Driver.Search
                 doc.Add("tokenOrder", "sequential");
             }
             return new BsonDocument("autocomplete", doc);
+        }
+    }
+
+    internal sealed class EqSearchDefinition<TDocument> : SearchDefinition<TDocument>
+    {
+        private readonly FieldDefinition<TDocument> _path;
+        private readonly BsonValue _value;
+
+        public EqSearchDefinition(FieldDefinition<TDocument> path, BsonValue @value)
+        {
+            _path = Ensure.IsNotNull(path, nameof(path));
+            _value = @value;
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var renderedField = _path.Render(documentSerializer, serializerRegistry);
+
+            BsonDocument doc = new BsonDocument();
+            doc.Add("path", renderedField.FieldName);
+            doc.Add("value", _value);
+            return new BsonDocument("equals", doc);
         }
     }
 

@@ -79,6 +79,39 @@ namespace MongoDB.Driver.Search.Tests
         }
 
         [Fact]
+        public void Eq()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Eq("x", true),
+                "{ equals: { path: \"x\", value: true } }");
+            AssertRendered(
+                subject.Eq("x", ObjectId.Empty),
+                "{ equals: { path: \"x\", value: { $oid: \"000000000000000000000000\" } } }");
+        }
+
+        [Fact]
+        public void Eq_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.Eq(x => x.Retired, true),
+                "{ equals: { path: \"ret\", value: true } }");
+            AssertRendered(
+                subject.Eq("Retired", true),
+                "{ equals: { path: \"ret\", value: true } }");
+
+            AssertRendered(
+                subject.Eq(x => x.Id, ObjectId.Empty),
+                "{ equals: { path: \"_id\", value: { $oid: \"000000000000000000000000\" } } }");
+            AssertRendered(
+                subject.Eq(x => x.Id, ObjectId.Empty),
+                "{ equals: { path: \"_id\", value: { $oid: \"000000000000000000000000\" } } }");
+        }
+
+        [Fact]
         public void Phrase()
         {
             var subject = CreateSubject<BsonDocument>();
@@ -228,11 +261,17 @@ namespace MongoDB.Driver.Search.Tests
 
         private class Person
         {
+            [BsonId]
+            public ObjectId Id { get; set; }
+
             [BsonElement("fn")]
             public string FirstName { get; set; }
 
             [BsonElement("ln")]
             public string LastName { get; set; }
+
+            [BsonElement("ret")]
+            public bool Retired { get; set; }
         }
     }
 }
