@@ -94,6 +94,16 @@ namespace MongoDB.Driver.Search
             return Eq(new ExpressionFieldDefinition<TDocument, ObjectId>(path), @value);
         }
 
+        public SearchDefinition<TDocument> Exists(FieldDefinition<TDocument> path)
+        {
+            return new ExistsSearchDefinition<TDocument>(path);
+        }
+
+        public SearchDefinition<TDocument> Exists<TField>(Expression<Func<TDocument, TField>> path)
+        {
+            return Exists(new ExpressionFieldDefinition<TDocument>(path));
+        }
+
         public SearchDefinition<TDocument> Phrase(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
         {
             return new PhraseSearchDefinition<TDocument>(query, path);
@@ -381,11 +391,27 @@ namespace MongoDB.Driver.Search
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
             var renderedField = _path.Render(documentSerializer, serializerRegistry);
-
             var doc = new BsonDocument();
             doc.Add("path", renderedField.FieldName);
             doc.Add("value", _value);
             return new BsonDocument("equals", doc);
+        }
+    }
+
+    internal sealed class ExistsSearchDefinition<TDocument> : SearchDefinition<TDocument>
+    {
+        private readonly FieldDefinition<TDocument> _path;
+
+        public ExistsSearchDefinition(FieldDefinition<TDocument> path)
+        {
+            _path = path;
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var renderedField = _path.Render(documentSerializer, serializerRegistry);
+            var doc = new BsonDocument("path", renderedField.FieldName);
+            return new BsonDocument("exists", doc);
         }
     }
 

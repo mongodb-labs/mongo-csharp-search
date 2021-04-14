@@ -112,6 +112,29 @@ namespace MongoDB.Driver.Search.Tests
         }
 
         [Fact]
+        public void Exists()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Exists("x"),
+                "{ exists: { path: \"x\" } }");
+        }
+
+        [Fact]
+        public void Exists_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.Exists(x => x.FirstName),
+                "{ exists: { path: \"fn\" } }");
+            AssertRendered(
+                subject.Exists("FirstName"),
+                "{ exists: { path: \"fn\" } }");
+        }
+
+        [Fact]
         public void Phrase()
         {
             var subject = CreateSubject<BsonDocument>();
