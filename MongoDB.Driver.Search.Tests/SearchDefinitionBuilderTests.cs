@@ -216,6 +216,13 @@ namespace MongoDB.Driver.Search.Tests
             AssertRendered(
                 subject.Regex(new[] { "foo", "bar" }, new[] { "x", "y" }),
                 "{ regex: { query: [\"foo\", \"bar\"], path: [\"x\", \"y\"] } }");
+
+            AssertRendered(
+                subject.Regex("foo", "x", false),
+                "{ regex: { query: \"foo\", path: \"x\" } }");
+            AssertRendered(
+                subject.Regex("foo", "x", true),
+                "{ regex: { query: \"foo\", path: \"x\", allowAnalyzedField: true } }");
         }
 
         [Fact]

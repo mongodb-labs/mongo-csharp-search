@@ -144,44 +144,68 @@ namespace MongoDB.Driver.Search
             return QueryString(new ExpressionFieldDefinition<TDocument>(defaultPath), query);
         }
 
-        public SearchDefinition<TDocument> Regex(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
+        public SearchDefinition<TDocument> Regex(
+            IEnumerable<string> query,
+            IEnumerable<FieldDefinition<TDocument>> path,
+            bool allowAnalyzedField = false)
         {
-            return new RegexSearchDefinition<TDocument>(query, path);
+            return new RegexSearchDefinition<TDocument>(query, path, allowAnalyzedField);
         }
 
-        public SearchDefinition<TDocument> Regex(IEnumerable<string> query, FieldDefinition<TDocument> path)
+        public SearchDefinition<TDocument> Regex(
+            IEnumerable<string> query,
+            FieldDefinition<TDocument> path,
+            bool allowAnalyzedField = false)
         {
-            return new RegexSearchDefinition<TDocument>(query, new[] { path });
+            return new RegexSearchDefinition<TDocument>(query, new[] { path }, allowAnalyzedField);
         }
 
-        public SearchDefinition<TDocument> Regex(string query, IEnumerable<FieldDefinition<TDocument>> path)
+        public SearchDefinition<TDocument> Regex(
+            string query,
+            IEnumerable<FieldDefinition<TDocument>> path,
+            bool allowAnalyzedField = false)
         {
-            return new RegexSearchDefinition<TDocument>(new[] { query }, path);
+            return new RegexSearchDefinition<TDocument>(new[] { query }, path, allowAnalyzedField);
         }
 
-        public SearchDefinition<TDocument> Regex(string query, FieldDefinition<TDocument> path)
+        public SearchDefinition<TDocument> Regex(
+            string query,
+            FieldDefinition<TDocument> path,
+            bool allowAnalyzedField = false)
         {
-            return new RegexSearchDefinition<TDocument>(new[] { query }, new[] { path });
+            return new RegexSearchDefinition<TDocument>(new[] { query }, new[] { path }, allowAnalyzedField);
         }
 
-        public SearchDefinition<TDocument> Regex<TField>(string query, Expression<Func<TDocument, TField>> field)
+        public SearchDefinition<TDocument> Regex<TField>(
+            string query,
+            Expression<Func<TDocument, TField>> field,
+            bool allowAnalyzedField = false)
         {
-            return Regex(query, new ExpressionFieldDefinition<TDocument, TField>(field));
+            return Regex(query, new ExpressionFieldDefinition<TDocument, TField>(field), allowAnalyzedField);
         }
 
-        public SearchDefinition<TDocument> Regex(string query, IEnumerable<string> path)
+        public SearchDefinition<TDocument> Regex(
+            string query,
+            IEnumerable<string> path,
+            bool allowAnalyzedField = false)
         {
-            return Regex(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
+            return Regex(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), allowAnalyzedField);
         }
 
-        public SearchDefinition<TDocument> Regex<TField>(IEnumerable<string> query, Expression<Func<TDocument, TField>> path)
+        public SearchDefinition<TDocument> Regex<TField>(
+            IEnumerable<string> query,
+            Expression<Func<TDocument, TField>> path,
+            bool allowAnalyzedField = false)
         {
-            return Regex(query, new ExpressionFieldDefinition<TDocument, TField>(path));
+            return Regex(query, new ExpressionFieldDefinition<TDocument, TField>(path), allowAnalyzedField);
         }
 
-        public SearchDefinition<TDocument> Regex(IEnumerable<string> query, IEnumerable<string> path)
+        public SearchDefinition<TDocument> Regex(
+            IEnumerable<string> query,
+            IEnumerable<string> path,
+            bool allowAnalyzedField = false)
         {
-            return Regex(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
+            return Regex(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), allowAnalyzedField);
         }
 
         public SearchDefinition<TDocument> Text(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
@@ -371,11 +395,16 @@ namespace MongoDB.Driver.Search
     {
         private readonly List<string> _query;
         private readonly List<FieldDefinition<TDocument>> _path;
+        private bool _allowAnalyzedField;
 
-        public RegexSearchDefinition(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
+        public RegexSearchDefinition(
+            IEnumerable<string> query,
+            IEnumerable<FieldDefinition<TDocument>> path,
+            bool allowAnalyzedField)
         {
             _query = Ensure.IsNotNull(query, nameof(query)).ToList();
             _path = Ensure.IsNotNull(path, nameof(path)).ToList();
+            _allowAnalyzedField = allowAnalyzedField;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
@@ -408,6 +437,10 @@ namespace MongoDB.Driver.Search
             var doc = new BsonDocument();
             doc.Add("query", queryVal);
             doc.Add("path", pathVal);
+            if (_allowAnalyzedField)
+            {
+                doc.Add("allowAnalyzedField", true);
+            }
             return new BsonDocument("regex", doc);
         }
     }
