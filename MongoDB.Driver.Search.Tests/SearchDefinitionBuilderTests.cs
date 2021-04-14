@@ -24,6 +24,13 @@ namespace MongoDB.Driver.Search.Tests
             AssertRendered(
                 subject.Autocomplete(new[] { "foo", "bar" }, new[] { "x", "y" }),
                 "{ autocomplete: { query: [\"foo\", \"bar\"], path: [\"x\", \"y\"] } }");
+
+            AssertRendered(
+                subject.Autocomplete("foo", "x", AutocompleteTokenOrder.Any),
+                "{ autocomplete: { query: \"foo\", path: \"x\" } }");
+            AssertRendered(
+                subject.Autocomplete("foo", "x", AutocompleteTokenOrder.Sequential),
+                "{ autocomplete: { query: \"foo\", path: \"x\", tokenOrder: \"sequential\" } }");
         }
 
         [Fact]

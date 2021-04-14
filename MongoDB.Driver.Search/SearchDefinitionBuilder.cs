@@ -10,44 +10,68 @@ namespace MongoDB.Driver.Search
 {
     public sealed class SearchDefinitionBuilder<TDocument>
     {
-        public SearchDefinition<TDocument> Autocomplete(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
+        public SearchDefinition<TDocument> Autocomplete(
+            IEnumerable<string> query,
+            IEnumerable<FieldDefinition<TDocument>> path,
+            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
         {
-            return new AutocompleteSearchDefinition<TDocument>(query, path);
+            return new AutocompleteSearchDefinition<TDocument>(query, path, tokenOrder);
         }
 
-        public SearchDefinition<TDocument> Autocomplete(IEnumerable<string> query, FieldDefinition<TDocument> path)
+        public SearchDefinition<TDocument> Autocomplete(
+            IEnumerable<string> query,
+            FieldDefinition<TDocument> path,
+            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
         {
-            return new AutocompleteSearchDefinition<TDocument>(query, new[] { path });
+            return new AutocompleteSearchDefinition<TDocument>(query, new[] { path }, tokenOrder);
         }
 
-        public SearchDefinition<TDocument> Autocomplete(string query, IEnumerable<FieldDefinition<TDocument>> path)
+        public SearchDefinition<TDocument> Autocomplete(
+            string query,
+            IEnumerable<FieldDefinition<TDocument>> path,
+            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
         {
-            return new AutocompleteSearchDefinition<TDocument>(new[] { query }, path);
+            return new AutocompleteSearchDefinition<TDocument>(new[] { query }, path, tokenOrder);
         }
 
-        public SearchDefinition<TDocument> Autocomplete(string query, FieldDefinition<TDocument> path)
+        public SearchDefinition<TDocument> Autocomplete(
+            string query,
+            FieldDefinition<TDocument> path,
+            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
         {
-            return new AutocompleteSearchDefinition<TDocument>(new[] { query }, new[] { path });
+            return new AutocompleteSearchDefinition<TDocument>(new[] { query }, new[] { path }, tokenOrder);
         }
 
-        public SearchDefinition<TDocument> Autocomplete<TField>(string query, Expression<Func<TDocument, TField>> path)
+        public SearchDefinition<TDocument> Autocomplete<TField>(
+            string query,
+            Expression<Func<TDocument, TField>> path,
+            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
         {
-            return Autocomplete(query, new ExpressionFieldDefinition<TDocument, TField>(path));
+            return Autocomplete(query, new ExpressionFieldDefinition<TDocument, TField>(path), tokenOrder);
         }
 
-        public SearchDefinition<TDocument> Autocomplete(string query, IEnumerable<string> path)
+        public SearchDefinition<TDocument> Autocomplete(
+            string query,
+            IEnumerable<string> path,
+            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
         {
-            return Autocomplete(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
+            return Autocomplete(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), tokenOrder);
         }
 
-        public SearchDefinition<TDocument> Autocomplete<TField>(IEnumerable<string> query, Expression<Func<TDocument, TField>> path)
+        public SearchDefinition<TDocument> Autocomplete<TField>(
+            IEnumerable<string> query,
+            Expression<Func<TDocument, TField>> path,
+            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
         {
-            return Autocomplete(query, new ExpressionFieldDefinition<TDocument, TField>(path));
+            return Autocomplete(query, new ExpressionFieldDefinition<TDocument, TField>(path), tokenOrder);
         }
 
-        public SearchDefinition<TDocument> Autocomplete(IEnumerable<string> query, IEnumerable<string> path)
+        public SearchDefinition<TDocument> Autocomplete(
+            IEnumerable<string> query,
+            IEnumerable<string> path,
+            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
         {
-            return Autocomplete(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
+            return Autocomplete(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), tokenOrder);
         }
 
         public SearchDefinition<TDocument> Phrase(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
@@ -135,11 +159,16 @@ namespace MongoDB.Driver.Search
     {
         private readonly List<string> _query;
         private readonly List<FieldDefinition<TDocument>> _path;
+        private readonly AutocompleteTokenOrder _tokenOrder;
 
-        public AutocompleteSearchDefinition(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
+        public AutocompleteSearchDefinition(
+            IEnumerable<string> query,
+            IEnumerable<FieldDefinition<TDocument>> path,
+            AutocompleteTokenOrder tokenOrder)
         {
             _query = Ensure.IsNotNull(query, nameof(query)).ToList();
             _path = Ensure.IsNotNull(path, nameof(path)).ToList();
+            _tokenOrder = tokenOrder;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
@@ -172,6 +201,10 @@ namespace MongoDB.Driver.Search
             BsonDocument doc = new BsonDocument();
             doc.Add("query", queryVal);
             doc.Add("path", pathVal);
+            if (_tokenOrder == AutocompleteTokenOrder.Sequential)
+            {
+                doc.Add("tokenOrder", "sequential");
+            }
             return new BsonDocument("autocomplete", doc);
         }
     }
