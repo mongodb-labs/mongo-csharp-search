@@ -8,6 +8,70 @@ namespace MongoDB.Driver.Search.Tests
     public class SearchDefinitionBuildTests
     {
         [Fact]
+        public void Autocomplete()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Autocomplete("foo", "x"),
+                "{ autocomplete: { query: \"foo\", path: \"x\" } }");
+            AssertRendered(
+                subject.Autocomplete("foo", new[] { "x", "y" }),
+                "{ autocomplete: { query: \"foo\", path: [\"x\", \"y\"] } }");
+            AssertRendered(
+                subject.Autocomplete(new[] { "foo", "bar" }, "x"),
+                "{ autocomplete: { query: [\"foo\", \"bar\"], path: \"x\" } }");
+            AssertRendered(
+                subject.Autocomplete(new[] { "foo", "bar" }, new[] { "x", "y" }),
+                "{ autocomplete: { query: [\"foo\", \"bar\"], path: [\"x\", \"y\"] } }");
+        }
+
+        [Fact]
+        public void Autocomplete_Typed()
+        {
+            var subject = CreateSubject<Person>();
+            AssertRendered(
+                subject.Autocomplete("foo", x => x.FirstName),
+                "{ autocomplete: { query: \"foo\", path: \"fn\" } }");
+            AssertRendered(
+                subject.Autocomplete("foo", "FirstName"),
+                "{ autocomplete: { query: \"foo\", path: \"fn\" } }");
+
+            AssertRendered(
+                subject.Autocomplete(
+                    "foo",
+                    new FieldDefinition<Person>[]
+                    {
+                        new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
+                        new ExpressionFieldDefinition<Person, string>(x => x.LastName)
+                    }),
+                "{ autocomplete: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+            AssertRendered(
+                subject.Autocomplete("foo", new[] { "FirstName", "LastName" }),
+                "{ autocomplete: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+
+            AssertRendered(
+                subject.Autocomplete(new[] { "foo", "bar" }, x => x.FirstName),
+                "{ autocomplete: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+            AssertRendered(
+                subject.Autocomplete(new[] { "foo", "bar" }, "FirstName"),
+                "{ autocomplete: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+
+            AssertRendered(
+                subject.Autocomplete(
+                    new[] { "foo", "bar" },
+                    new FieldDefinition<Person>[]
+                    {
+                        new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
+                        new ExpressionFieldDefinition<Person, string>(x => x.LastName)
+                    }),
+                "{ autocomplete: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+            AssertRendered(
+                subject.Autocomplete(new[] { "foo", "bar" }, new[] { "FirstName", "LastName" }),
+                "{ autocomplete: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+        }
+
+        [Fact]
         public void Phrase()
         {
             var subject = CreateSubject<BsonDocument>();

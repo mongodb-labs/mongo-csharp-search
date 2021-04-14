@@ -10,6 +10,46 @@ namespace MongoDB.Driver.Search
 {
     public sealed class SearchDefinitionBuilder<TDocument>
     {
+        public SearchDefinition<TDocument> Autocomplete(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
+        {
+            return new AutocompleteSearchDefinition<TDocument>(query, path);
+        }
+
+        public SearchDefinition<TDocument> Autocomplete(IEnumerable<string> query, FieldDefinition<TDocument> path)
+        {
+            return new AutocompleteSearchDefinition<TDocument>(query, new[] { path });
+        }
+
+        public SearchDefinition<TDocument> Autocomplete(string query, IEnumerable<FieldDefinition<TDocument>> path)
+        {
+            return new AutocompleteSearchDefinition<TDocument>(new[] { query }, path);
+        }
+
+        public SearchDefinition<TDocument> Autocomplete(string query, FieldDefinition<TDocument> path)
+        {
+            return new AutocompleteSearchDefinition<TDocument>(new[] { query }, new[] { path });
+        }
+
+        public SearchDefinition<TDocument> Autocomplete<TField>(string query, Expression<Func<TDocument, TField>> path)
+        {
+            return Autocomplete(query, new ExpressionFieldDefinition<TDocument, TField>(path));
+        }
+
+        public SearchDefinition<TDocument> Autocomplete(string query, IEnumerable<string> path)
+        {
+            return Autocomplete(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
+        }
+
+        public SearchDefinition<TDocument> Autocomplete<TField>(IEnumerable<string> query, Expression<Func<TDocument, TField>> path)
+        {
+            return Autocomplete(query, new ExpressionFieldDefinition<TDocument, TField>(path));
+        }
+
+        public SearchDefinition<TDocument> Autocomplete(IEnumerable<string> query, IEnumerable<string> path)
+        {
+            return Autocomplete(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
+        }
+
         public SearchDefinition<TDocument> Phrase(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
         {
             return new PhraseSearchDefinition<TDocument>(query, path);
@@ -30,9 +70,9 @@ namespace MongoDB.Driver.Search
             return new PhraseSearchDefinition<TDocument>(new[] { query }, new[] { path });
         }
 
-        public SearchDefinition<TDocument> Phrase<TField>(string query, Expression<Func<TDocument, TField>> field)
+        public SearchDefinition<TDocument> Phrase<TField>(string query, Expression<Func<TDocument, TField>> path)
         {
-            return Phrase(query, new ExpressionFieldDefinition<TDocument, TField>(field));
+            return Phrase(query, new ExpressionFieldDefinition<TDocument, TField>(path));
         }
 
         public SearchDefinition<TDocument> Phrase(string query, IEnumerable<string> path)
@@ -88,6 +128,51 @@ namespace MongoDB.Driver.Search
         public SearchDefinition<TDocument> Text(IEnumerable<string> query, IEnumerable<string> path)
         {
             return Text(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
+        }
+    }
+
+    internal sealed class AutocompleteSearchDefinition<TDocument> : SearchDefinition<TDocument>
+    {
+        private readonly List<string> _query;
+        private readonly List<FieldDefinition<TDocument>> _path;
+
+        public AutocompleteSearchDefinition(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
+        {
+            _query = Ensure.IsNotNull(query, nameof(query)).ToList();
+            _path = Ensure.IsNotNull(path, nameof(path)).ToList();
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            BsonValue queryVal;
+            if (_query.Count == 1)
+            {
+                queryVal = new BsonString(_query[0]);
+            }
+            else
+            {
+                queryVal = new BsonArray(_query);
+            }
+
+            BsonValue pathVal;
+            if (_path.Count == 1)
+            {
+                var renderedField = _path[0].Render(documentSerializer, serializerRegistry);
+                pathVal = new BsonString(renderedField.FieldName);
+            }
+            else
+            {
+                pathVal = new BsonArray(_path.Select(field =>
+                {
+                    var renderedField = field.Render(documentSerializer, serializerRegistry);
+                    return new BsonString(renderedField.FieldName);
+                }));
+            }
+
+            BsonDocument doc = new BsonDocument();
+            doc.Add("query", queryVal);
+            doc.Add("path", pathVal);
+            return new BsonDocument("autocomplete", doc);
         }
     }
 
