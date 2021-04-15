@@ -11,67 +11,19 @@ namespace MongoDB.Driver.Search
     public sealed class SearchDefinitionBuilder<TDocument>
     {
         public SearchDefinition<TDocument> Autocomplete(
-            IEnumerable<string> query,
-            IEnumerable<FieldDefinition<TDocument>> path,
+            QueryDefinition query,
+            PathDefinition<TDocument> path,
             AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
         {
             return new AutocompleteSearchDefinition<TDocument>(query, path, tokenOrder);
         }
 
-        public SearchDefinition<TDocument> Autocomplete(
-            IEnumerable<string> query,
-            FieldDefinition<TDocument> path,
-            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
-        {
-            return Autocomplete(query, new[] { path }, tokenOrder);
-        }
-
-        public SearchDefinition<TDocument> Autocomplete(
-            string query,
-            IEnumerable<FieldDefinition<TDocument>> path,
-            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
-        {
-            return Autocomplete(new[] { query }, path, tokenOrder);
-        }
-
-        public SearchDefinition<TDocument> Autocomplete(
-            string query,
-            FieldDefinition<TDocument> path,
-            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
-        {
-            return Autocomplete(new[] { query }, new[] { path }, tokenOrder);
-        }
-
         public SearchDefinition<TDocument> Autocomplete<TField>(
-            string query,
+            QueryDefinition query,
             Expression<Func<TDocument, TField>> path,
             AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
         {
-            return Autocomplete(query, new ExpressionFieldDefinition<TDocument, TField>(path), tokenOrder);
-        }
-
-        public SearchDefinition<TDocument> Autocomplete(
-            string query,
-            IEnumerable<string> path,
-            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
-        {
-            return Autocomplete(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), tokenOrder);
-        }
-
-        public SearchDefinition<TDocument> Autocomplete<TField>(
-            IEnumerable<string> query,
-            Expression<Func<TDocument, TField>> path,
-            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
-        {
-            return Autocomplete(query, new ExpressionFieldDefinition<TDocument, TField>(path), tokenOrder);
-        }
-
-        public SearchDefinition<TDocument> Autocomplete(
-            IEnumerable<string> query,
-            IEnumerable<string> path,
-            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
-        {
-            return Autocomplete(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), tokenOrder);
+            return Autocomplete(query, new ExpressionFieldDefinition<TDocument>(path), tokenOrder);
         }
 
         public SearchDefinition<TDocument> Eq(FieldDefinition<TDocument, bool> path, bool value)
@@ -134,14 +86,9 @@ namespace MongoDB.Driver.Search
             return MustNot((IEnumerable<SearchDefinition<TDocument>>)clauses);
         }
 
-        public SearchDefinition<TDocument> Near(IEnumerable<FieldDefinition<TDocument>> path, double origin, double pivot)
+        public SearchDefinition<TDocument> Near(PathDefinition<TDocument> path, double origin, double pivot)
         {
             return new NearSearchDefinition<TDocument>(path, new BsonDouble(origin), new BsonDouble(pivot));
-        }
-
-        public SearchDefinition<TDocument> Near(FieldDefinition<TDocument> path, double origin, double pivot)
-        {
-            return Near(new[] { path }, origin, pivot);
         }
 
         public SearchDefinition<TDocument> Near<TField>(Expression<Func<TDocument, TField>> path, double origin, double pivot)
@@ -149,14 +96,9 @@ namespace MongoDB.Driver.Search
             return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot);
         }
 
-        public SearchDefinition<TDocument> Near(IEnumerable<FieldDefinition<TDocument>> path, int origin, int pivot)
+        public SearchDefinition<TDocument> Near(PathDefinition<TDocument> path, int origin, int pivot)
         {
             return new NearSearchDefinition<TDocument>(path, new BsonInt32(origin), new BsonInt32(pivot));
-        }
-
-        public SearchDefinition<TDocument> Near(FieldDefinition<TDocument> path, int origin, int pivot)
-        {
-            return Near(new[] { path }, origin, pivot);
         }
 
         public SearchDefinition<TDocument> Near<TField>(Expression<Func<TDocument, TField>> path, int origin, int pivot)
@@ -164,14 +106,9 @@ namespace MongoDB.Driver.Search
             return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot);
         }
 
-        public SearchDefinition<TDocument> Near(IEnumerable<FieldDefinition<TDocument>> path, long origin, long pivot)
+        public SearchDefinition<TDocument> Near(PathDefinition<TDocument> path, long origin, long pivot)
         {
             return new NearSearchDefinition<TDocument>(path, new BsonInt64(origin), new BsonInt64(pivot));
-        }
-
-        public SearchDefinition<TDocument> Near(FieldDefinition<TDocument> path, long origin, long pivot)
-        {
-            return Near(new[] { path }, origin, pivot);
         }
 
         public SearchDefinition<TDocument> Near<TField>(Expression<Func<TDocument, TField>> path, long origin, long pivot)
@@ -179,14 +116,9 @@ namespace MongoDB.Driver.Search
             return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot);
         }
 
-        public SearchDefinition<TDocument> Near(IEnumerable<FieldDefinition<TDocument>> path, DateTime origin, long pivot)
+        public SearchDefinition<TDocument> Near(PathDefinition<TDocument> path, DateTime origin, long pivot)
         {
             return new NearSearchDefinition<TDocument>(path, new BsonDateTime(origin), new BsonInt64(pivot));
-        }
-
-        public SearchDefinition<TDocument> Near(FieldDefinition<TDocument> path, DateTime origin, long pivot)
-        {
-            return Near(new[] { path }, origin, pivot);
         }
 
         public SearchDefinition<TDocument> Near<TField>(Expression<Func<TDocument, TField>> path, DateTime origin, long pivot)
@@ -194,44 +126,14 @@ namespace MongoDB.Driver.Search
             return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot);
         }
 
-        public SearchDefinition<TDocument> Phrase(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
+        public SearchDefinition<TDocument> Phrase(QueryDefinition query, PathDefinition<TDocument> path)
         {
             return new PhraseSearchDefinition<TDocument>(query, path);
         }
 
-        public SearchDefinition<TDocument> Phrase(IEnumerable<string> query, FieldDefinition<TDocument> path)
+        public SearchDefinition<TDocument> Phrase<TField>(QueryDefinition query, Expression<Func<TDocument, TField>> path)
         {
-            return Phrase(query, new[] { path });
-        }
-
-        public SearchDefinition<TDocument> Phrase(string query, IEnumerable<FieldDefinition<TDocument>> path)
-        {
-            return Phrase(new[] { query }, path);
-        }
-
-        public SearchDefinition<TDocument> Phrase(string query, FieldDefinition<TDocument> path)
-        {
-            return Phrase(new[] { query }, new[] { path });
-        }
-
-        public SearchDefinition<TDocument> Phrase<TField>(string query, Expression<Func<TDocument, TField>> path)
-        {
-            return Phrase(query, new ExpressionFieldDefinition<TDocument, TField>(path));
-        }
-
-        public SearchDefinition<TDocument> Phrase(string query, IEnumerable<string> path)
-        {
-            return Phrase(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
-        }
-
-        public SearchDefinition<TDocument> Phrase<TField>(IEnumerable<string> query, Expression<Func<TDocument, TField>> path)
-        {
-            return Phrase(query, new ExpressionFieldDefinition<TDocument, TField>(path));
-        }
-
-        public SearchDefinition<TDocument> Phrase(IEnumerable<string> query, IEnumerable<string> path)
-        {
-            return Phrase(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
+            return Phrase(query, new ExpressionFieldDefinition<TDocument>(path));
         }
 
         public SearchDefinition<TDocument> QueryString(FieldDefinition<TDocument> defaultPath, string query)
@@ -245,67 +147,19 @@ namespace MongoDB.Driver.Search
         }
 
         public SearchDefinition<TDocument> Regex(
-            IEnumerable<string> query,
-            IEnumerable<FieldDefinition<TDocument>> path,
+            QueryDefinition query,
+            PathDefinition<TDocument> path,
             bool allowAnalyzedField = false)
         {
             return new RegexSearchDefinition<TDocument>(query, path, allowAnalyzedField);
         }
 
-        public SearchDefinition<TDocument> Regex(
-            IEnumerable<string> query,
-            FieldDefinition<TDocument> path,
-            bool allowAnalyzedField = false)
-        {
-            return Regex(query, new[] { path }, allowAnalyzedField);
-        }
-
-        public SearchDefinition<TDocument> Regex(
-            string query,
-            IEnumerable<FieldDefinition<TDocument>> path,
-            bool allowAnalyzedField = false)
-        {
-            return Regex(new[] { query }, path, allowAnalyzedField);
-        }
-
-        public SearchDefinition<TDocument> Regex(
-            string query,
-            FieldDefinition<TDocument> path,
-            bool allowAnalyzedField = false)
-        {
-            return Regex(new[] { query }, new[] { path }, allowAnalyzedField);
-        }
-
         public SearchDefinition<TDocument> Regex<TField>(
-            string query,
-            Expression<Func<TDocument, TField>> field,
-            bool allowAnalyzedField = false)
-        {
-            return Regex(query, new ExpressionFieldDefinition<TDocument, TField>(field), allowAnalyzedField);
-        }
-
-        public SearchDefinition<TDocument> Regex(
-            string query,
-            IEnumerable<string> path,
-            bool allowAnalyzedField = false)
-        {
-            return Regex(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), allowAnalyzedField);
-        }
-
-        public SearchDefinition<TDocument> Regex<TField>(
-            IEnumerable<string> query,
+            QueryDefinition query,
             Expression<Func<TDocument, TField>> path,
             bool allowAnalyzedField = false)
         {
-            return Regex(query, new ExpressionFieldDefinition<TDocument, TField>(path), allowAnalyzedField);
-        }
-
-        public SearchDefinition<TDocument> Regex(
-            IEnumerable<string> query,
-            IEnumerable<string> path,
-            bool allowAnalyzedField = false)
-        {
-            return Regex(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), allowAnalyzedField);
+            return Regex(query, new ExpressionFieldDefinition<TDocument>(path), allowAnalyzedField);
         }
 
         public SearchDefinition<TDocument> Should(IEnumerable<SearchDefinition<TDocument>> clauses)
@@ -318,162 +172,59 @@ namespace MongoDB.Driver.Search
             return Should((IEnumerable<SearchDefinition<TDocument>>)clauses);
         }
 
-        public SearchDefinition<TDocument> Text(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
+        public SearchDefinition<TDocument> Text(QueryDefinition query, PathDefinition<TDocument> path)
         {
             return new TextSearchDefinition<TDocument>(query, path);
         }
 
-        public SearchDefinition<TDocument> Text(IEnumerable<string> query, FieldDefinition<TDocument> path)
+        public SearchDefinition<TDocument> Text<TField>(QueryDefinition query, Expression<Func<TDocument, TField>> path)
         {
-            return Text(query, new[] { path });
-        }
-
-        public SearchDefinition<TDocument> Text(string query, IEnumerable<FieldDefinition<TDocument>> path)
-        {
-            return Text(new[] { query }, path);
-        }
-
-        public SearchDefinition<TDocument> Text(string query, FieldDefinition<TDocument> path)
-        {
-            return Text(new[] { query }, new[] { path });
-        }
-
-        public SearchDefinition<TDocument> Text<TField>(string query, Expression<Func<TDocument, TField>> field)
-        {
-            return Text(query, new ExpressionFieldDefinition<TDocument, TField>(field));
-        }
-
-        public SearchDefinition<TDocument> Text(string query, IEnumerable<string> path)
-        {
-            return Text(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
-        }
-
-        public SearchDefinition<TDocument> Text<TField>(IEnumerable<string> query, Expression<Func<TDocument, TField>> path)
-        {
-            return Text(query, new ExpressionFieldDefinition<TDocument, TField>(path));
-        }
-
-        public SearchDefinition<TDocument> Text(IEnumerable<string> query, IEnumerable<string> path)
-        {
-            return Text(query, path.Select(field => new StringFieldDefinition<TDocument>(field)));
+            return Text(query, new ExpressionFieldDefinition<TDocument>(path));
         }
 
         public SearchDefinition<TDocument> Wildcard(
-            IEnumerable<string> query,
-            IEnumerable<FieldDefinition<TDocument>> path,
+            QueryDefinition query,
+            PathDefinition<TDocument> path,
             bool allowAnalyzedField = false)
         {
             return new WildcardSearchDefinition<TDocument>(query, path, allowAnalyzedField);
         }
 
-        public SearchDefinition<TDocument> Wildcard(
-            IEnumerable<string> query,
-            FieldDefinition<TDocument> path,
-            bool allowAnalyzedField = false)
-        {
-            return Wildcard(query, new[] { path }, allowAnalyzedField);
-        }
-
-        public SearchDefinition<TDocument> Wildcard(
-            string query,
-            IEnumerable<FieldDefinition<TDocument>> path,
-            bool allowAnalyzedField = false)
-        {
-            return Wildcard(new[] { query }, path, allowAnalyzedField);
-        }
-
-        public SearchDefinition<TDocument> Wildcard(
-            string query,
-            FieldDefinition<TDocument> path,
-            bool allowAnalyzedField = false)
-        {
-            return Wildcard(new[] { query }, new[] { path }, allowAnalyzedField);
-        }
-
         public SearchDefinition<TDocument> Wildcard<TField>(
-            string query,
-            Expression<Func<TDocument, TField>> field,
-            bool allowAnalyzedField = false)
-        {
-            return Wildcard(query, new ExpressionFieldDefinition<TDocument, TField>(field), allowAnalyzedField);
-        }
-
-        public SearchDefinition<TDocument> Wildcard(
-            string query,
-            IEnumerable<string> path,
-            bool allowAnalyzedField = false)
-        {
-            return Wildcard(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), allowAnalyzedField);
-        }
-
-        public SearchDefinition<TDocument> Wildcard<TField>(
-            IEnumerable<string> query,
+            QueryDefinition query,
             Expression<Func<TDocument, TField>> path,
             bool allowAnalyzedField = false)
         {
-            return Wildcard(query, new ExpressionFieldDefinition<TDocument, TField>(path), allowAnalyzedField);
-        }
-
-        public SearchDefinition<TDocument> Wildcard(
-            IEnumerable<string> query,
-            IEnumerable<string> path,
-            bool allowAnalyzedField = false)
-        {
-            return Wildcard(query, path.Select(field => new StringFieldDefinition<TDocument>(field)), allowAnalyzedField);
+            return Wildcard(query, new ExpressionFieldDefinition<TDocument>(path), allowAnalyzedField);
         }
     }
 
     internal sealed class AutocompleteSearchDefinition<TDocument> : SearchDefinition<TDocument>
     {
-        private readonly List<string> _query;
-        private readonly List<FieldDefinition<TDocument>> _path;
+        private readonly QueryDefinition _query;
+        private readonly PathDefinition<TDocument> _path;
         private readonly AutocompleteTokenOrder _tokenOrder;
 
         public AutocompleteSearchDefinition(
-            IEnumerable<string> query,
-            IEnumerable<FieldDefinition<TDocument>> path,
+            QueryDefinition query,
+            PathDefinition<TDocument> path,
             AutocompleteTokenOrder tokenOrder)
         {
-            _query = Ensure.IsNotNull(query, nameof(query)).ToList();
-            _path = Ensure.IsNotNull(path, nameof(path)).ToList();
+            _query = Ensure.IsNotNull(query, nameof(query));
+            _path = Ensure.IsNotNull(path, nameof(path));
             _tokenOrder = tokenOrder;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            BsonValue queryVal;
-            if (_query.Count == 1)
-            {
-                queryVal = new BsonString(_query[0]);
-            }
-            else
-            {
-                queryVal = new BsonArray(_query);
-            }
-
-            BsonValue pathVal;
-            if (_path.Count == 1)
-            {
-                var renderedField = _path[0].Render(documentSerializer, serializerRegistry);
-                pathVal = new BsonString(renderedField.FieldName);
-            }
-            else
-            {
-                pathVal = new BsonArray(_path.Select(field =>
-                {
-                    var renderedField = field.Render(documentSerializer, serializerRegistry);
-                    return new BsonString(renderedField.FieldName);
-                }));
-            }
-
-            var doc = new BsonDocument();
-            doc.Add("query", queryVal);
-            doc.Add("path", pathVal);
+            var document = new BsonDocument();
+            document.Add("query", _query.Render());
+            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
             if (_tokenOrder == AutocompleteTokenOrder.Sequential)
             {
-                doc.Add("tokenOrder", "sequential");
+                document.Add("tokenOrder", "sequential");
             }
-            return new BsonDocument("autocomplete", doc);
+            return new BsonDocument("autocomplete", document);
         }
     }
 
@@ -491,8 +242,8 @@ namespace MongoDB.Driver.Search
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
             var clauseDocs = _clauses.Select(clause => clause.Render(documentSerializer, serializerRegistry));
-            var doc = new BsonDocument(_term, new BsonArray(clauseDocs));
-            return new BsonDocument("compound", doc);
+            var document = new BsonDocument(_term, new BsonArray(clauseDocs));
+            return new BsonDocument("compound", document);
         }
     }
 
@@ -510,10 +261,10 @@ namespace MongoDB.Driver.Search
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
             var renderedField = _path.Render(documentSerializer, serializerRegistry);
-            var doc = new BsonDocument();
-            doc.Add("path", renderedField.FieldName);
-            doc.Add("value", _value);
-            return new BsonDocument("equals", doc);
+            var document = new BsonDocument();
+            document.Add("path", renderedField.FieldName);
+            document.Add("value", _value);
+            return new BsonDocument("equals", document);
         }
     }
 
@@ -529,91 +280,51 @@ namespace MongoDB.Driver.Search
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
             var renderedField = _path.Render(documentSerializer, serializerRegistry);
-            var doc = new BsonDocument("path", renderedField.FieldName);
-            return new BsonDocument("exists", doc);
+            var document = new BsonDocument("path", renderedField.FieldName);
+            return new BsonDocument("exists", document);
         }
     }
 
     internal sealed class NearSearchDefinition<TDocument> : SearchDefinition<TDocument>
     {
-        private readonly List<FieldDefinition<TDocument>> _path;
+        private readonly PathDefinition<TDocument> _path;
         private readonly BsonValue _origin;
         private readonly BsonValue _pivot;
 
-        public NearSearchDefinition(IEnumerable<FieldDefinition<TDocument>> path, BsonValue origin, BsonValue pivot)
+        public NearSearchDefinition(PathDefinition<TDocument> path, BsonValue origin, BsonValue pivot)
         {
-            _path = Ensure.IsNotNull(path, nameof(path)).ToList();
+            _path = Ensure.IsNotNull(path, nameof(path));
             _origin = origin;
             _pivot = pivot;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            BsonValue pathVal;
-            if (_path.Count == 1)
-            {
-                var renderedField = _path[0].Render(documentSerializer, serializerRegistry);
-                pathVal = new BsonString(renderedField.FieldName);
-            }
-            else
-            {
-                pathVal = new BsonArray(_path.Select(field =>
-                {
-                    var renderedField = field.Render(documentSerializer, serializerRegistry);
-                    return new BsonString(renderedField.FieldName);
-                }));
-            }
-
-            var doc = new BsonDocument();
-            doc.Add("path", pathVal);
-            doc.Add("origin", _origin);
-            doc.Add("pivot", _pivot);
-            return new BsonDocument("near", doc);
+            var document = new BsonDocument();
+            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            document.Add("origin", _origin);
+            document.Add("pivot", _pivot);
+            return new BsonDocument("near", document);
         }
     }
 
     internal sealed class PhraseSearchDefinition<TDocument> : SearchDefinition<TDocument>
     {
-        private readonly List<string> _query;
-        private readonly List<FieldDefinition<TDocument>> _path;
+        private readonly QueryDefinition _query;
+        private readonly PathDefinition<TDocument> _path;
 
-        public PhraseSearchDefinition(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
+        public PhraseSearchDefinition(QueryDefinition query, PathDefinition<TDocument> path)
         {
-            _query = Ensure.IsNotNull(query, nameof(query)).ToList();
-            _path = Ensure.IsNotNull(path, nameof(path)).ToList();
+            _query = Ensure.IsNotNull(query, nameof(query));
+            _path = Ensure.IsNotNull(path, nameof(path));
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            BsonValue queryVal;
-            if (_query.Count == 1)
-            {
-                queryVal = new BsonString(_query[0]);
-            }
-            else
-            {
-                queryVal = new BsonArray(_query);
-            }
-
-            BsonValue pathVal;
-            if (_path.Count == 1)
-            {
-                var renderedField = _path[0].Render(documentSerializer, serializerRegistry);
-                pathVal = new BsonString(renderedField.FieldName);
-            }
-            else
-            {
-                pathVal = new BsonArray(_path.Select(field =>
-                {
-                    var renderedField = field.Render(documentSerializer, serializerRegistry);
-                    return new BsonString(renderedField.FieldName);
-                }));
-            }
-
-            var doc = new BsonDocument();
-            doc.Add("query", queryVal);
-            doc.Add("path", pathVal);
-            return new BsonDocument("phrase", doc);
+            var document = new BsonDocument();
+            document.Add("query", _query.Render());
+            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            return new BsonDocument("phrase", document);
         }
     }
 
@@ -631,163 +342,88 @@ namespace MongoDB.Driver.Search
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
             var renderedField = _defaultPath.Render(documentSerializer, serializerRegistry);
-            var doc = new BsonDocument();
-            doc.Add("defaultPath", renderedField.FieldName);
-            doc.Add("query", _query);
-            return new BsonDocument("queryString", doc);
+            var document = new BsonDocument();
+            document.Add("defaultPath", renderedField.FieldName);
+            document.Add("query", _query);
+            return new BsonDocument("queryString", document);
         }
     }
 
     internal sealed class RegexSearchDefinition<TDocument> : SearchDefinition<TDocument>
     {
-        private readonly List<string> _query;
-        private readonly List<FieldDefinition<TDocument>> _path;
+        private readonly QueryDefinition _query;
+        private readonly PathDefinition<TDocument> _path;
         private bool _allowAnalyzedField;
 
         public RegexSearchDefinition(
-            IEnumerable<string> query,
-            IEnumerable<FieldDefinition<TDocument>> path,
+            QueryDefinition query,
+            PathDefinition<TDocument> path,
             bool allowAnalyzedField)
         {
-            _query = Ensure.IsNotNull(query, nameof(query)).ToList();
-            _path = Ensure.IsNotNull(path, nameof(path)).ToList();
+            _query = Ensure.IsNotNull(query, nameof(query));
+            _path = Ensure.IsNotNull(path, nameof(path));
             _allowAnalyzedField = allowAnalyzedField;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            BsonValue queryVal;
-            if (_query.Count == 1)
-            {
-                queryVal = new BsonString(_query[0]);
-            }
-            else
-            {
-                queryVal = new BsonArray(_query);
-            }
-
-            BsonValue pathVal;
-            if (_path.Count == 1)
-            {
-                var renderedField = _path[0].Render(documentSerializer, serializerRegistry);
-                pathVal = new BsonString(renderedField.FieldName);
-            }
-            else
-            {
-                pathVal = new BsonArray(_path.Select(field =>
-                {
-                    var renderedField = field.Render(documentSerializer, serializerRegistry);
-                    return new BsonString(renderedField.FieldName);
-                }));
-            }
-
-            var doc = new BsonDocument();
-            doc.Add("query", queryVal);
-            doc.Add("path", pathVal);
+            var document = new BsonDocument();
+            document.Add("query", _query.Render());
+            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
             if (_allowAnalyzedField)
             {
-                doc.Add("allowAnalyzedField", true);
+                document.Add("allowAnalyzedField", true);
             }
-            return new BsonDocument("regex", doc);
+            return new BsonDocument("regex", document);
         }
     }
 
     internal sealed class TextSearchDefinition<TDocument> : SearchDefinition<TDocument>
     {
-        private readonly List<string> _query;
-        private readonly List<FieldDefinition<TDocument>> _path;
+        private readonly QueryDefinition _query;
+        private readonly PathDefinition<TDocument> _path;
 
-        public TextSearchDefinition(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
+        public TextSearchDefinition(QueryDefinition query, PathDefinition<TDocument> path)
         {
-            _query = Ensure.IsNotNull(query, nameof(query)).ToList();
-            _path = Ensure.IsNotNull(path, nameof(path)).ToList();
+            _query = Ensure.IsNotNull(query, nameof(query));
+            _path = Ensure.IsNotNull(path, nameof(path));
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            BsonValue queryVal;
-            if (_query.Count == 1)
-            {
-                queryVal = new BsonString(_query[0]);
-            }
-            else
-            {
-                queryVal = new BsonArray(_query);
-            }
-
-            BsonValue pathVal;
-            if (_path.Count == 1)
-            {
-                var renderedField = _path[0].Render(documentSerializer, serializerRegistry);
-                pathVal = new BsonString(renderedField.FieldName);
-            }
-            else
-            {
-                pathVal = new BsonArray(_path.Select(field =>
-                {
-                    var renderedField = field.Render(documentSerializer, serializerRegistry);
-                    return new BsonString(renderedField.FieldName);
-                }));
-            }
-
-            var doc = new BsonDocument();
-            doc.Add("query", queryVal);
-            doc.Add("path", pathVal);
-            return new BsonDocument("text", doc);
+            var document = new BsonDocument();
+            document.Add("query", _query.Render());
+            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            return new BsonDocument("text", document);
         }
     }
 
     internal sealed class WildcardSearchDefinition<TDocument> : SearchDefinition<TDocument>
     {
-        private readonly List<string> _query;
-        private readonly List<FieldDefinition<TDocument>> _path;
+        private readonly QueryDefinition _query;
+        private readonly PathDefinition<TDocument> _path;
         private bool _allowAnalyzedField;
 
         public WildcardSearchDefinition(
-            IEnumerable<string> query,
-            IEnumerable<FieldDefinition<TDocument>> path,
+            QueryDefinition query,
+            PathDefinition<TDocument> path,
             bool allowAnalyzedField)
         {
-            _query = Ensure.IsNotNull(query, nameof(query)).ToList();
-            _path = Ensure.IsNotNull(path, nameof(path)).ToList();
+            _query = Ensure.IsNotNull(query, nameof(query));
+            _path = Ensure.IsNotNull(path, nameof(path));
             _allowAnalyzedField = allowAnalyzedField;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            BsonValue queryVal;
-            if (_query.Count == 1)
-            {
-                queryVal = new BsonString(_query[0]);
-            }
-            else
-            {
-                queryVal = new BsonArray(_query);
-            }
-
-            BsonValue pathVal;
-            if (_path.Count == 1)
-            {
-                var renderedField = _path[0].Render(documentSerializer, serializerRegistry);
-                pathVal = new BsonString(renderedField.FieldName);
-            }
-            else
-            {
-                pathVal = new BsonArray(_path.Select(field =>
-                {
-                    var renderedField = field.Render(documentSerializer, serializerRegistry);
-                    return new BsonString(renderedField.FieldName);
-                }));
-            }
-
-            var doc = new BsonDocument();
-            doc.Add("query", queryVal);
-            doc.Add("path", pathVal);
+            var document = new BsonDocument();
+            document.Add("query", _query.Render());
+            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
             if (_allowAnalyzedField)
             {
-                doc.Add("allowAnalyzedField", true);
+                document.Add("allowAnalyzedField", true);
             }
-            return new BsonDocument("wildcard", doc);
+            return new BsonDocument("wildcard", document);
         }
     }
 }
