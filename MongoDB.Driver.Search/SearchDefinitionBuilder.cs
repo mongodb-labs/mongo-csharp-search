@@ -134,6 +134,66 @@ namespace MongoDB.Driver.Search
             return MustNot((IEnumerable<SearchDefinition<TDocument>>)clauses);
         }
 
+        public SearchDefinition<TDocument> Near(IEnumerable<FieldDefinition<TDocument>> path, double origin, double pivot)
+        {
+            return new NearSearchDefinition<TDocument>(path, new BsonDouble(origin), new BsonDouble(pivot));
+        }
+
+        public SearchDefinition<TDocument> Near(FieldDefinition<TDocument> path, double origin, double pivot)
+        {
+            return Near(new[] { path }, origin, pivot);
+        }
+
+        public SearchDefinition<TDocument> Near<TField>(Expression<Func<TDocument, TField>> path, double origin, double pivot)
+        {
+            return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot);
+        }
+
+        public SearchDefinition<TDocument> Near(IEnumerable<FieldDefinition<TDocument>> path, int origin, int pivot)
+        {
+            return new NearSearchDefinition<TDocument>(path, new BsonInt32(origin), new BsonInt32(pivot));
+        }
+
+        public SearchDefinition<TDocument> Near(FieldDefinition<TDocument> path, int origin, int pivot)
+        {
+            return Near(new[] { path }, origin, pivot);
+        }
+
+        public SearchDefinition<TDocument> Near<TField>(Expression<Func<TDocument, TField>> path, int origin, int pivot)
+        {
+            return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot);
+        }
+
+        public SearchDefinition<TDocument> Near(IEnumerable<FieldDefinition<TDocument>> path, long origin, long pivot)
+        {
+            return new NearSearchDefinition<TDocument>(path, new BsonInt64(origin), new BsonInt64(pivot));
+        }
+
+        public SearchDefinition<TDocument> Near(FieldDefinition<TDocument> path, long origin, long pivot)
+        {
+            return Near(new[] { path }, origin, pivot);
+        }
+
+        public SearchDefinition<TDocument> Near<TField>(Expression<Func<TDocument, TField>> path, long origin, long pivot)
+        {
+            return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot);
+        }
+
+        public SearchDefinition<TDocument> Near(IEnumerable<FieldDefinition<TDocument>> path, DateTime origin, long pivot)
+        {
+            return new NearSearchDefinition<TDocument>(path, new BsonDateTime(origin), new BsonInt64(pivot));
+        }
+
+        public SearchDefinition<TDocument> Near(FieldDefinition<TDocument> path, DateTime origin, long pivot)
+        {
+            return Near(new[] { path }, origin, pivot);
+        }
+
+        public SearchDefinition<TDocument> Near<TField>(Expression<Func<TDocument, TField>> path, DateTime origin, long pivot)
+        {
+            return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot);
+        }
+
         public SearchDefinition<TDocument> Phrase(IEnumerable<string> query, IEnumerable<FieldDefinition<TDocument>> path)
         {
             return new PhraseSearchDefinition<TDocument>(query, path);
@@ -471,6 +531,44 @@ namespace MongoDB.Driver.Search
             var renderedField = _path.Render(documentSerializer, serializerRegistry);
             var doc = new BsonDocument("path", renderedField.FieldName);
             return new BsonDocument("exists", doc);
+        }
+    }
+
+    internal sealed class NearSearchDefinition<TDocument> : SearchDefinition<TDocument>
+    {
+        private readonly List<FieldDefinition<TDocument>> _path;
+        private readonly BsonValue _origin;
+        private readonly BsonValue _pivot;
+
+        public NearSearchDefinition(IEnumerable<FieldDefinition<TDocument>> path, BsonValue origin, BsonValue pivot)
+        {
+            _path = Ensure.IsNotNull(path, nameof(path)).ToList();
+            _origin = origin;
+            _pivot = pivot;
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            BsonValue pathVal;
+            if (_path.Count == 1)
+            {
+                var renderedField = _path[0].Render(documentSerializer, serializerRegistry);
+                pathVal = new BsonString(renderedField.FieldName);
+            }
+            else
+            {
+                pathVal = new BsonArray(_path.Select(field =>
+                {
+                    var renderedField = field.Render(documentSerializer, serializerRegistry);
+                    return new BsonString(renderedField.FieldName);
+                }));
+            }
+
+            var doc = new BsonDocument();
+            doc.Add("path", pathVal);
+            doc.Add("origin", _origin);
+            doc.Add("pivot", _pivot);
+            return new BsonDocument("near", doc);
         }
     }
 

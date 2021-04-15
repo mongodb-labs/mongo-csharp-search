@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
 using Xunit;
 
 namespace MongoDB.Driver.Search.Tests
@@ -168,6 +169,59 @@ namespace MongoDB.Driver.Search.Tests
                     subject.Exists("x"),
                     subject.Exists("y")),
                 "{ compound: { mustNot: [{ exists: { path: \"x\" } }, { exists: { path: \"y\" } }] } }");
+        }
+
+        [Fact]
+        public void Near()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Near("x", 5.0, 1.0),
+                "{ near: { path: \"x\", origin: 5.0, pivot: 1.0 } }");
+            AssertRendered(
+                subject.Near("x", 5, 1),
+                "{ near: { path: \"x\", origin: 5, pivot: 1 } }");
+            AssertRendered(
+                subject.Near("x", 5L, 1L),
+                "{ near: { path: \"x\", origin: { $numberLong: \"5\" }, pivot: { $numberLong: \"1\" } } }");
+            AssertRendered(
+                subject.Near("x", new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), 1000L),
+                "{ near: { path: \"x\", origin: { $date: \"2000-01-01T00:00:00Z\" }, pivot: { $numberLong: \"1000\" } } }");
+        }
+
+        [Fact]
+        public void Near_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.Near(x => x.Age, 35.0, 5.0),
+                "{ near: { path: \"age\", origin: 35.0, pivot: 5.0 } }");
+            AssertRendered(
+                subject.Near("Age", 35.0, 5.0),
+                "{ near: { path: \"age\", origin: 35.0, pivot: 5.0 } }");
+
+            AssertRendered(
+                subject.Near(x => x.Age, 35, 5),
+                "{ near: { path: \"age\", origin: 35, pivot: 5 } }");
+            AssertRendered(
+                subject.Near("Age", 35, 5),
+                "{ near: { path: \"age\", origin: 35, pivot: 5 } }");
+
+            AssertRendered(
+                subject.Near(x => x.Age, 35L, 5L),
+                "{ near: { path: \"age\", origin: { $numberLong: \"35\" }, pivot: { $numberLong: \"5\" } } }");
+            AssertRendered(
+                subject.Near("Age", 35L, 5L),
+                "{ near: { path: \"age\", origin: { $numberLong: \"35\" }, pivot: { $numberLong: \"5\" } } }");
+
+            AssertRendered(
+                subject.Near(x => x.Birthday, new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), 1000L),
+                "{ near: { path: \"dob\", origin: { $date: \"2000-01-01T00:00:00Z\" }, pivot: { $numberLong: \"1000\" } } }");
+            AssertRendered(
+                subject.Near("Birthday", new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), 1000L),
+                "{ near: { path: \"dob\", origin: { $date: \"2000-01-01T00:00:00Z\" }, pivot: { $numberLong: \"1000\" } } }");
         }
 
         [Fact]
@@ -508,8 +562,14 @@ namespace MongoDB.Driver.Search.Tests
             [BsonElement("ln")]
             public string LastName { get; set; }
 
+            [BsonElement("age")]
+            public int Age { get; set; }
+
             [BsonElement("ret")]
             public bool Retired { get; set; }
+
+            [BsonElement("dob")]
+            public DateTime Birthday { get; set; }
         }
     }
 }
