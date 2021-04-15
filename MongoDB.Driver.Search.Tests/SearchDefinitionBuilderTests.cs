@@ -15,23 +15,23 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Autocomplete("foo", "x"),
-                "{ autocomplete: { query: \"foo\", path: \"x\" } }");
+                "{ autocomplete: { query: 'foo', path: 'x' } }");
             AssertRendered(
                 subject.Autocomplete("foo", new[] { "x", "y" }),
-                "{ autocomplete: { query: \"foo\", path: [\"x\", \"y\"] } }");
+                "{ autocomplete: { query: 'foo', path: ['x', 'y'] } }");
             AssertRendered(
                 subject.Autocomplete(new[] { "foo", "bar" }, "x"),
-                "{ autocomplete: { query: [\"foo\", \"bar\"], path: \"x\" } }");
+                "{ autocomplete: { query: ['foo', 'bar'], path: 'x' } }");
             AssertRendered(
                 subject.Autocomplete(new[] { "foo", "bar" }, new[] { "x", "y" }),
-                "{ autocomplete: { query: [\"foo\", \"bar\"], path: [\"x\", \"y\"] } }");
+                "{ autocomplete: { query: ['foo', 'bar'], path: ['x', 'y'] } }");
 
             AssertRendered(
                 subject.Autocomplete("foo", "x", AutocompleteTokenOrder.Any),
-                "{ autocomplete: { query: \"foo\", path: \"x\" } }");
+                "{ autocomplete: { query: 'foo', path: 'x' } }");
             AssertRendered(
                 subject.Autocomplete("foo", "x", AutocompleteTokenOrder.Sequential),
-                "{ autocomplete: { query: \"foo\", path: \"x\", tokenOrder: \"sequential\" } }");
+                "{ autocomplete: { query: 'foo', path: 'x', tokenOrder: 'sequential' } }");
         }
 
         [Fact]
@@ -40,10 +40,10 @@ namespace MongoDB.Driver.Search.Tests
             var subject = CreateSubject<Person>();
             AssertRendered(
                 subject.Autocomplete("foo", x => x.FirstName),
-                "{ autocomplete: { query: \"foo\", path: \"fn\" } }");
+                "{ autocomplete: { query: 'foo', path: 'fn' } }");
             AssertRendered(
                 subject.Autocomplete("foo", "FirstName"),
-                "{ autocomplete: { query: \"foo\", path: \"fn\" } }");
+                "{ autocomplete: { query: 'foo', path: 'fn' } }");
 
             AssertRendered(
                 subject.Autocomplete(
@@ -53,17 +53,17 @@ namespace MongoDB.Driver.Search.Tests
                         new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
                         new ExpressionFieldDefinition<Person, string>(x => x.LastName)
                     }),
-                "{ autocomplete: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+                "{ autocomplete: { query: 'foo', path: ['fn', 'ln'] } }");
             AssertRendered(
                 subject.Autocomplete("foo", new[] { "FirstName", "LastName" }),
-                "{ autocomplete: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+                "{ autocomplete: { query: 'foo', path: ['fn', 'ln'] } }");
 
             AssertRendered(
                 subject.Autocomplete(new[] { "foo", "bar" }, x => x.FirstName),
-                "{ autocomplete: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+                "{ autocomplete: { query: ['foo', 'bar'], path: 'fn' } }");
             AssertRendered(
                 subject.Autocomplete(new[] { "foo", "bar" }, "FirstName"),
-                "{ autocomplete: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+                "{ autocomplete: { query: ['foo', 'bar'], path: 'fn' } }");
 
             AssertRendered(
                 subject.Autocomplete(
@@ -73,10 +73,10 @@ namespace MongoDB.Driver.Search.Tests
                         new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
                         new ExpressionFieldDefinition<Person, string>(x => x.LastName)
                     }),
-                "{ autocomplete: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+                "{ autocomplete: { query: ['foo', 'bar'], path: ['fn', 'ln'] } }");
             AssertRendered(
                 subject.Autocomplete(new[] { "foo", "bar" }, new[] { "FirstName", "LastName" }),
-                "{ autocomplete: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+                "{ autocomplete: { query: ['foo', 'bar'], path: ['fn', 'ln'] } }");
         }
 
         [Fact]
@@ -86,10 +86,10 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Eq("x", true),
-                "{ equals: { path: \"x\", value: true } }");
+                "{ equals: { path: 'x', value: true } }");
             AssertRendered(
                 subject.Eq("x", ObjectId.Empty),
-                "{ equals: { path: \"x\", value: { $oid: \"000000000000000000000000\" } } }");
+                "{ equals: { path: 'x', value: { $oid: '000000000000000000000000' } } }");
         }
 
         [Fact]
@@ -99,17 +99,17 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Eq(x => x.Retired, true),
-                "{ equals: { path: \"ret\", value: true } }");
+                "{ equals: { path: 'ret', value: true } }");
             AssertRendered(
                 subject.Eq("Retired", true),
-                "{ equals: { path: \"ret\", value: true } }");
+                "{ equals: { path: 'ret', value: true } }");
 
             AssertRendered(
                 subject.Eq(x => x.Id, ObjectId.Empty),
-                "{ equals: { path: \"_id\", value: { $oid: \"000000000000000000000000\" } } }");
+                "{ equals: { path: '_id', value: { $oid: '000000000000000000000000' } } }");
             AssertRendered(
                 subject.Eq(x => x.Id, ObjectId.Empty),
-                "{ equals: { path: \"_id\", value: { $oid: \"000000000000000000000000\" } } }");
+                "{ equals: { path: '_id', value: { $oid: '000000000000000000000000' } } }");
         }
 
         [Fact]
@@ -119,7 +119,7 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Exists("x"),
-                "{ exists: { path: \"x\" } }");
+                "{ exists: { path: 'x' } }");
         }
 
         [Fact]
@@ -129,10 +129,10 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Exists(x => x.FirstName),
-                "{ exists: { path: \"fn\" } }");
+                "{ exists: { path: 'fn' } }");
             AssertRendered(
                 subject.Exists("FirstName"),
-                "{ exists: { path: \"fn\" } }");
+                "{ exists: { path: 'fn' } }");
         }
 
         [Fact]
@@ -144,7 +144,7 @@ namespace MongoDB.Driver.Search.Tests
                 subject.Filter(
                     subject.Exists("x"),
                     subject.Exists("y")),
-                "{ compound: { filter: [{ exists: { path: \"x\" } }, { exists: { path: \"y\" } }] } }");
+                "{ compound: { filter: [{ exists: { path: 'x' } }, { exists: { path: 'y' } }] } }");
         }
 
         [Fact]
@@ -156,7 +156,7 @@ namespace MongoDB.Driver.Search.Tests
                 subject.Must(
                     subject.Exists("x"),
                     subject.Exists("y")),
-                "{ compound: { must: [{ exists: { path: \"x\" } }, { exists: { path: \"y\" } }] } }");
+                "{ compound: { must: [{ exists: { path: 'x' } }, { exists: { path: 'y' } }] } }");
         }
 
         [Fact]
@@ -168,7 +168,7 @@ namespace MongoDB.Driver.Search.Tests
                 subject.MustNot(
                     subject.Exists("x"),
                     subject.Exists("y")),
-                "{ compound: { mustNot: [{ exists: { path: \"x\" } }, { exists: { path: \"y\" } }] } }");
+                "{ compound: { mustNot: [{ exists: { path: 'x' } }, { exists: { path: 'y' } }] } }");
         }
 
         [Fact]
@@ -178,16 +178,16 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Near("x", 5.0, 1.0),
-                "{ near: { path: \"x\", origin: 5.0, pivot: 1.0 } }");
+                "{ near: { path: 'x', origin: 5.0, pivot: 1.0 } }");
             AssertRendered(
                 subject.Near("x", 5, 1),
-                "{ near: { path: \"x\", origin: 5, pivot: 1 } }");
+                "{ near: { path: 'x', origin: 5, pivot: 1 } }");
             AssertRendered(
                 subject.Near("x", 5L, 1L),
-                "{ near: { path: \"x\", origin: { $numberLong: \"5\" }, pivot: { $numberLong: \"1\" } } }");
+                "{ near: { path: 'x', origin: { $numberLong: '5' }, pivot: { $numberLong: '1' } } }");
             AssertRendered(
                 subject.Near("x", new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), 1000L),
-                "{ near: { path: \"x\", origin: { $date: \"2000-01-01T00:00:00Z\" }, pivot: { $numberLong: \"1000\" } } }");
+                "{ near: { path: 'x', origin: { $date: '2000-01-01T00:00:00Z' }, pivot: { $numberLong: '1000' } } }");
         }
 
         [Fact]
@@ -197,31 +197,31 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Near(x => x.Age, 35.0, 5.0),
-                "{ near: { path: \"age\", origin: 35.0, pivot: 5.0 } }");
+                "{ near: { path: 'age', origin: 35.0, pivot: 5.0 } }");
             AssertRendered(
                 subject.Near("Age", 35.0, 5.0),
-                "{ near: { path: \"age\", origin: 35.0, pivot: 5.0 } }");
+                "{ near: { path: 'age', origin: 35.0, pivot: 5.0 } }");
 
             AssertRendered(
                 subject.Near(x => x.Age, 35, 5),
-                "{ near: { path: \"age\", origin: 35, pivot: 5 } }");
+                "{ near: { path: 'age', origin: 35, pivot: 5 } }");
             AssertRendered(
                 subject.Near("Age", 35, 5),
-                "{ near: { path: \"age\", origin: 35, pivot: 5 } }");
+                "{ near: { path: 'age', origin: 35, pivot: 5 } }");
 
             AssertRendered(
                 subject.Near(x => x.Age, 35L, 5L),
-                "{ near: { path: \"age\", origin: { $numberLong: \"35\" }, pivot: { $numberLong: \"5\" } } }");
+                "{ near: { path: 'age', origin: { $numberLong: '35' }, pivot: { $numberLong: '5' } } }");
             AssertRendered(
                 subject.Near("Age", 35L, 5L),
-                "{ near: { path: \"age\", origin: { $numberLong: \"35\" }, pivot: { $numberLong: \"5\" } } }");
+                "{ near: { path: 'age', origin: { $numberLong: '35' }, pivot: { $numberLong: '5' } } }");
 
             AssertRendered(
                 subject.Near(x => x.Birthday, new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), 1000L),
-                "{ near: { path: \"dob\", origin: { $date: \"2000-01-01T00:00:00Z\" }, pivot: { $numberLong: \"1000\" } } }");
+                "{ near: { path: 'dob', origin: { $date: '2000-01-01T00:00:00Z' }, pivot: { $numberLong: '1000' } } }");
             AssertRendered(
                 subject.Near("Birthday", new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), 1000L),
-                "{ near: { path: \"dob\", origin: { $date: \"2000-01-01T00:00:00Z\" }, pivot: { $numberLong: \"1000\" } } }");
+                "{ near: { path: 'dob', origin: { $date: '2000-01-01T00:00:00Z' }, pivot: { $numberLong: '1000' } } }");
         }
 
         [Fact]
@@ -231,16 +231,16 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Phrase("foo", "x"),
-                "{ phrase: { query: \"foo\", path: \"x\" } }");
+                "{ phrase: { query: 'foo', path: 'x' } }");
             AssertRendered(
                 subject.Phrase("foo", new[] { "x", "y" }),
-                "{ phrase: { query: \"foo\", path: [\"x\", \"y\"] } }");
+                "{ phrase: { query: 'foo', path: ['x', 'y'] } }");
             AssertRendered(
                 subject.Phrase(new[] { "foo", "bar" }, "x"),
-                "{ phrase: { query: [\"foo\", \"bar\"], path: \"x\" } }");
+                "{ phrase: { query: ['foo', 'bar'], path: 'x' } }");
             AssertRendered(
                 subject.Phrase(new[] { "foo", "bar" }, new[] { "x", "y" }),
-                "{ phrase: { query: [\"foo\", \"bar\"], path: [\"x\", \"y\"] } }");
+                "{ phrase: { query: ['foo', 'bar'], path: ['x', 'y'] } }");
         }
 
         [Fact]
@@ -250,10 +250,10 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Phrase("foo", x => x.FirstName),
-                "{ phrase: { query: \"foo\", path: \"fn\" } }");
+                "{ phrase: { query: 'foo', path: 'fn' } }");
             AssertRendered(
                 subject.Phrase("foo", "FirstName"),
-                "{ phrase: { query: \"foo\", path: \"fn\" } }");
+                "{ phrase: { query: 'foo', path: 'fn' } }");
 
             AssertRendered(
                 subject.Phrase(
@@ -263,17 +263,17 @@ namespace MongoDB.Driver.Search.Tests
                         new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
                         new ExpressionFieldDefinition<Person, string>(x => x.LastName)
                     }),
-                "{ phrase: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+                "{ phrase: { query: 'foo', path: ['fn', 'ln'] } }");
             AssertRendered(
                 subject.Phrase("foo", new[] { "FirstName", "LastName" }),
-                "{ phrase: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+                "{ phrase: { query: 'foo', path: ['fn', 'ln'] } }");
 
             AssertRendered(
                 subject.Phrase(new[] { "foo", "bar" }, x => x.FirstName),
-                "{ phrase: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+                "{ phrase: { query: ['foo', 'bar'], path: 'fn' } }");
             AssertRendered(
                 subject.Phrase(new[] { "foo", "bar" }, "FirstName"),
-                "{ phrase: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+                "{ phrase: { query: ['foo', 'bar'], path: 'fn' } }");
 
             AssertRendered(
                 subject.Phrase(
@@ -283,10 +283,10 @@ namespace MongoDB.Driver.Search.Tests
                         new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
                         new ExpressionFieldDefinition<Person, string>(x => x.LastName)
                     }),
-                "{ phrase: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+                "{ phrase: { query: ['foo', 'bar'], path: ['fn', 'ln'] } }");
             AssertRendered(
                 subject.Phrase(new[] { "foo", "bar" }, new[] { "FirstName", "LastName" }),
-                "{ phrase: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+                "{ phrase: { query: ['foo', 'bar'], path: ['fn', 'ln'] } }");
         }
 
         [Fact]
@@ -296,7 +296,7 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.QueryString("x", "foo"),
-                "{ queryString: { defaultPath: \"x\", query: \"foo\" } }");
+                "{ queryString: { defaultPath: 'x', query: 'foo' } }");
         }
 
         [Fact]
@@ -306,10 +306,10 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.QueryString(x => x.FirstName, "foo"),
-                "{ queryString: { defaultPath: \"fn\", query: \"foo\" } }");
+                "{ queryString: { defaultPath: 'fn', query: 'foo' } }");
             AssertRendered(
                 subject.QueryString("FirstName", "foo"),
-                "{ queryString: { defaultPath: \"fn\", query: \"foo\" } }");
+                "{ queryString: { defaultPath: 'fn', query: 'foo' } }");
         }
 
         [Fact]
@@ -319,23 +319,23 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Regex("foo", "x"),
-                "{ regex: { query: \"foo\", path: \"x\" } }");
+                "{ regex: { query: 'foo', path: 'x' } }");
             AssertRendered(
                 subject.Regex("foo", new[] { "x", "y" }),
-                "{ regex: { query: \"foo\", path: [\"x\", \"y\"] } }");
+                "{ regex: { query: 'foo', path: ['x', 'y'] } }");
             AssertRendered(
                 subject.Regex(new[] { "foo", "bar" }, "x"),
-                "{ regex: { query: [\"foo\", \"bar\"], path: \"x\" } }");
+                "{ regex: { query: ['foo', 'bar'], path: 'x' } }");
             AssertRendered(
                 subject.Regex(new[] { "foo", "bar" }, new[] { "x", "y" }),
-                "{ regex: { query: [\"foo\", \"bar\"], path: [\"x\", \"y\"] } }");
+                "{ regex: { query: ['foo', 'bar'], path: ['x', 'y'] } }");
 
             AssertRendered(
                 subject.Regex("foo", "x", false),
-                "{ regex: { query: \"foo\", path: \"x\" } }");
+                "{ regex: { query: 'foo', path: 'x' } }");
             AssertRendered(
                 subject.Regex("foo", "x", true),
-                "{ regex: { query: \"foo\", path: \"x\", allowAnalyzedField: true } }");
+                "{ regex: { query: 'foo', path: 'x', allowAnalyzedField: true } }");
         }
 
         [Fact]
@@ -345,10 +345,10 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Regex("foo", x => x.FirstName),
-                "{ regex: { query: \"foo\", path: \"fn\" } }");
+                "{ regex: { query: 'foo', path: 'fn' } }");
             AssertRendered(
                 subject.Regex("foo", "FirstName"),
-                "{ regex: { query: \"foo\", path: \"fn\" } }");
+                "{ regex: { query: 'foo', path: 'fn' } }");
 
             AssertRendered(
                 subject.Regex(
@@ -358,17 +358,17 @@ namespace MongoDB.Driver.Search.Tests
                         new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
                         new ExpressionFieldDefinition<Person, string>(x => x.LastName)
                     }),
-                "{ regex: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+                "{ regex: { query: 'foo', path: ['fn', 'ln'] } }");
             AssertRendered(
                 subject.Regex("foo", new[] { "FirstName", "LastName" }),
-                "{ regex: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+                "{ regex: { query: 'foo', path: ['fn', 'ln'] } }");
 
             AssertRendered(
                 subject.Regex(new[] { "foo", "bar" }, x => x.FirstName),
-                "{ regex: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+                "{ regex: { query: ['foo', 'bar'], path: 'fn' } }");
             AssertRendered(
                 subject.Regex(new[] { "foo", "bar" }, "FirstName"),
-                "{ regex: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+                "{ regex: { query: ['foo', 'bar'], path: 'fn' } }");
 
             AssertRendered(
                 subject.Regex(
@@ -378,10 +378,10 @@ namespace MongoDB.Driver.Search.Tests
                         new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
                         new ExpressionFieldDefinition<Person, string>(x => x.LastName)
                     }),
-                "{ regex: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+                "{ regex: { query: ['foo', 'bar'], path: ['fn', 'ln'] } }");
             AssertRendered(
                 subject.Regex(new[] { "foo", "bar" }, new[] { "FirstName", "LastName" }),
-                "{ regex: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+                "{ regex: { query: ['foo', 'bar'], path: ['fn', 'ln'] } }");
         }
 
         [Fact]
@@ -393,7 +393,7 @@ namespace MongoDB.Driver.Search.Tests
                 subject.Should(
                     subject.Exists("x"),
                     subject.Exists("y")),
-                "{ compound: { should: [{ exists: { path: \"x\" } }, { exists: { path: \"y\" } }] } }");
+                "{ compound: { should: [{ exists: { path: 'x' } }, { exists: { path: 'y' } }] } }");
         }
 
         [Fact]
@@ -403,16 +403,16 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Text("foo", "x"),
-                "{ text: { query: \"foo\", path: \"x\" } }");
+                "{ text: { query: 'foo', path: 'x' } }");
             AssertRendered(
                 subject.Text("foo", new[] { "x", "y" }),
-                "{ text: { query: \"foo\", path: [\"x\", \"y\"] } }");
+                "{ text: { query: 'foo', path: ['x', 'y'] } }");
             AssertRendered(
                 subject.Text(new[] { "foo", "bar" }, "x"),
-                "{ text: { query: [\"foo\", \"bar\"], path: \"x\" } }");
+                "{ text: { query: ['foo', 'bar'], path: 'x' } }");
             AssertRendered(
                 subject.Text(new[] { "foo", "bar" }, new[] { "x", "y" }),
-                "{ text: { query: [\"foo\", \"bar\"], path: [\"x\", \"y\"] } }");
+                "{ text: { query: ['foo', 'bar'], path: ['x', 'y'] } }");
         }
 
         [Fact]
@@ -422,10 +422,10 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Text("foo", x => x.FirstName),
-                "{ text: { query: \"foo\", path: \"fn\" } }");
+                "{ text: { query: 'foo', path: 'fn' } }");
             AssertRendered(
                 subject.Text("foo", "FirstName"),
-                "{ text: { query: \"foo\", path: \"fn\" } }");
+                "{ text: { query: 'foo', path: 'fn' } }");
 
             AssertRendered(
                 subject.Text(
@@ -435,17 +435,17 @@ namespace MongoDB.Driver.Search.Tests
                         new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
                         new ExpressionFieldDefinition<Person, string>(x => x.LastName)
                     }),
-                "{ text: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+                "{ text: { query: 'foo', path: ['fn', 'ln'] } }");
             AssertRendered(
                 subject.Text("foo", new[] { "FirstName", "LastName" }),
-                "{ text: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+                "{ text: { query: 'foo', path: ['fn', 'ln'] } }");
 
             AssertRendered(
                 subject.Text(new[] { "foo", "bar" }, x => x.FirstName),
-                "{ text: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+                "{ text: { query: ['foo', 'bar'], path: 'fn' } }");
             AssertRendered(
                 subject.Text(new[] { "foo", "bar" }, "FirstName"),
-                "{ text: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+                "{ text: { query: ['foo', 'bar'], path: 'fn' } }");
 
             AssertRendered(
                 subject.Text(
@@ -455,10 +455,10 @@ namespace MongoDB.Driver.Search.Tests
                         new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
                         new ExpressionFieldDefinition<Person, string>(x => x.LastName)
                     }),
-                "{ text: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+                "{ text: { query: ['foo', 'bar'], path: ['fn', 'ln'] } }");
             AssertRendered(
                 subject.Text(new[] { "foo", "bar" }, new[] { "FirstName", "LastName" }),
-                "{ text: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+                "{ text: { query: ['foo', 'bar'], path: ['fn', 'ln'] } }");
         }
 
         [Fact]
@@ -468,23 +468,23 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Wildcard("foo", "x"),
-                "{ wildcard: { query: \"foo\", path: \"x\" } }");
+                "{ wildcard: { query: 'foo', path: 'x' } }");
             AssertRendered(
                 subject.Wildcard("foo", new[] { "x", "y" }),
-                "{ wildcard: { query: \"foo\", path: [\"x\", \"y\"] } }");
+                "{ wildcard: { query: 'foo', path: ['x', 'y'] } }");
             AssertRendered(
                 subject.Wildcard(new[] { "foo", "bar" }, "x"),
-                "{ wildcard: { query: [\"foo\", \"bar\"], path: \"x\" } }");
+                "{ wildcard: { query: ['foo', 'bar'], path: 'x' } }");
             AssertRendered(
                 subject.Wildcard(new[] { "foo", "bar" }, new[] { "x", "y" }),
-                "{ wildcard: { query: [\"foo\", \"bar\"], path: [\"x\", \"y\"] } }");
+                "{ wildcard: { query: ['foo', 'bar'], path: ['x', 'y'] } }");
 
             AssertRendered(
                 subject.Wildcard("foo", "x", false),
-                "{ wildcard: { query: \"foo\", path: \"x\" } }");
+                "{ wildcard: { query: 'foo', path: 'x' } }");
             AssertRendered(
                 subject.Wildcard("foo", "x", true),
-                "{ wildcard: { query: \"foo\", path: \"x\", allowAnalyzedField: true } }");
+                "{ wildcard: { query: 'foo', path: 'x', allowAnalyzedField: true } }");
         }
 
         [Fact]
@@ -494,10 +494,10 @@ namespace MongoDB.Driver.Search.Tests
 
             AssertRendered(
                 subject.Wildcard("foo", x => x.FirstName),
-                "{ wildcard: { query: \"foo\", path: \"fn\" } }");
+                "{ wildcard: { query: 'foo', path: 'fn' } }");
             AssertRendered(
                 subject.Wildcard("foo", "FirstName"),
-                "{ wildcard: { query: \"foo\", path: \"fn\" } }");
+                "{ wildcard: { query: 'foo', path: 'fn' } }");
 
             AssertRendered(
                 subject.Wildcard(
@@ -507,17 +507,17 @@ namespace MongoDB.Driver.Search.Tests
                         new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
                         new ExpressionFieldDefinition<Person, string>(x => x.LastName)
                     }),
-                "{ wildcard: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+                "{ wildcard: { query: 'foo', path: ['fn', 'ln'] } }");
             AssertRendered(
                 subject.Wildcard("foo", new[] { "FirstName", "LastName" }),
-                "{ wildcard: { query: \"foo\", path: [\"fn\", \"ln\"] } }");
+                "{ wildcard: { query: 'foo', path: ['fn', 'ln'] } }");
 
             AssertRendered(
                 subject.Wildcard(new[] { "foo", "bar" }, x => x.FirstName),
-                "{ wildcard: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+                "{ wildcard: { query: ['foo', 'bar'], path: 'fn' } }");
             AssertRendered(
                 subject.Wildcard(new[] { "foo", "bar" }, "FirstName"),
-                "{ wildcard: { query: [\"foo\", \"bar\"], path: \"fn\" } }");
+                "{ wildcard: { query: ['foo', 'bar'], path: 'fn' } }");
 
             AssertRendered(
                 subject.Wildcard(
@@ -527,10 +527,10 @@ namespace MongoDB.Driver.Search.Tests
                         new ExpressionFieldDefinition<Person, string>(x => x.FirstName),
                         new ExpressionFieldDefinition<Person, string>(x => x.LastName)
                     }),
-                "{ wildcard: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+                "{ wildcard: { query: ['foo', 'bar'], path: ['fn', 'ln'] } }");
             AssertRendered(
                 subject.Wildcard(new[] { "foo", "bar" }, new[] { "FirstName", "LastName" }),
-                "{ wildcard: { query: [\"foo\", \"bar\"], path: [\"fn\", \"ln\"] } }");
+                "{ wildcard: { query: ['foo', 'bar'], path: ['fn', 'ln'] } }");
         }
 
         private void AssertRendered<TDocument>(SearchDefinition<TDocument> query, string expected)

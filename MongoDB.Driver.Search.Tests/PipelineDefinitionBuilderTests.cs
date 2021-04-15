@@ -17,7 +17,7 @@ namespace MongoDB.Driver.Search.Tests
             var result = pipeline.Search(builder.Text("foo", "bar"));
             var stages = RenderStages(result, BsonDocumentSerializer.Instance);
             Assert.Equal(
-                BsonDocument.Parse("{ $search: { text: { query: \"foo\", path: \"bar\" } } }"),
+                BsonDocument.Parse("{ $search: { text: { query: 'foo', path: 'bar' } } }"),
                 stages[0]);
         }
 
