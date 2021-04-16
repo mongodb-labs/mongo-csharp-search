@@ -2,7 +2,7 @@
 {
     public static class ProjectionDefinitionExtensions
     {
-        public static ProjectionDefinition<TDocument> MetaTextScore<TDocument>(
+        public static ProjectionDefinition<TDocument> MetaSearchScore<TDocument>(
             this ProjectionDefinition<TDocument> projection,
             string field)
         {
