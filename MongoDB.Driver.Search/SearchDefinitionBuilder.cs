@@ -13,17 +13,19 @@ namespace MongoDB.Driver.Search
         public SearchDefinition<TDocument> Autocomplete(
             QueryDefinition query,
             PathDefinition<TDocument> path,
-            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
+            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any,
+            FuzzyOptions fuzzy = null)
         {
-            return new AutocompleteSearchDefinition<TDocument>(query, path, tokenOrder);
+            return new AutocompleteSearchDefinition<TDocument>(query, path, tokenOrder, fuzzy);
         }
 
         public SearchDefinition<TDocument> Autocomplete<TField>(
             QueryDefinition query,
             Expression<Func<TDocument, TField>> path,
-            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any)
+            AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any,
+            FuzzyOptions fuzzy = null)
         {
-            return Autocomplete(query, new ExpressionFieldDefinition<TDocument>(path), tokenOrder);
+            return Autocomplete(query, new ExpressionFieldDefinition<TDocument>(path), tokenOrder, fuzzy);
         }
 
         public SearchDefinition<TDocument> Eq(FieldDefinition<TDocument, bool> path, bool value)
@@ -172,14 +174,20 @@ namespace MongoDB.Driver.Search
             return Should((IEnumerable<SearchDefinition<TDocument>>)clauses);
         }
 
-        public SearchDefinition<TDocument> Text(QueryDefinition query, PathDefinition<TDocument> path)
+        public SearchDefinition<TDocument> Text(
+            QueryDefinition query,
+            PathDefinition<TDocument> path,
+            FuzzyOptions fuzzy = null)
         {
-            return new TextSearchDefinition<TDocument>(query, path);
+            return new TextSearchDefinition<TDocument>(query, path, fuzzy);
         }
 
-        public SearchDefinition<TDocument> Text<TField>(QueryDefinition query, Expression<Func<TDocument, TField>> path)
+        public SearchDefinition<TDocument> Text<TField>(
+            QueryDefinition query,
+            Expression<Func<TDocument, TField>> path,
+            FuzzyOptions fuzzy = null)
         {
-            return Text(query, new ExpressionFieldDefinition<TDocument>(path));
+            return Text(query, new ExpressionFieldDefinition<TDocument>(path), fuzzy);
         }
 
         public SearchDefinition<TDocument> Wildcard(
@@ -204,15 +212,18 @@ namespace MongoDB.Driver.Search
         private readonly QueryDefinition _query;
         private readonly PathDefinition<TDocument> _path;
         private readonly AutocompleteTokenOrder _tokenOrder;
+        private readonly FuzzyOptions _fuzzy;
 
         public AutocompleteSearchDefinition(
             QueryDefinition query,
             PathDefinition<TDocument> path,
-            AutocompleteTokenOrder tokenOrder)
+            AutocompleteTokenOrder tokenOrder,
+            FuzzyOptions fuzzy)
         {
             _query = Ensure.IsNotNull(query, nameof(query));
             _path = Ensure.IsNotNull(path, nameof(path));
             _tokenOrder = tokenOrder;
+            _fuzzy = fuzzy;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
@@ -223,6 +234,10 @@ namespace MongoDB.Driver.Search
             if (_tokenOrder == AutocompleteTokenOrder.Sequential)
             {
                 document.Add("tokenOrder", "sequential");
+            }
+            if (_fuzzy != null)
+            {
+                document.Add("fuzzy", _fuzzy.Render());
             }
             return new BsonDocument("autocomplete", document);
         }
@@ -382,11 +397,13 @@ namespace MongoDB.Driver.Search
     {
         private readonly QueryDefinition _query;
         private readonly PathDefinition<TDocument> _path;
+        private readonly FuzzyOptions _fuzzy;
 
-        public TextSearchDefinition(QueryDefinition query, PathDefinition<TDocument> path)
+        public TextSearchDefinition(QueryDefinition query, PathDefinition<TDocument> path, FuzzyOptions fuzzy)
         {
             _query = Ensure.IsNotNull(query, nameof(query));
             _path = Ensure.IsNotNull(path, nameof(path));
+            _fuzzy = fuzzy;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
@@ -394,6 +411,10 @@ namespace MongoDB.Driver.Search
             var document = new BsonDocument();
             document.Add("query", _query.Render());
             document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            if (_fuzzy != null)
+            {
+                document.Add("fuzzy", _fuzzy.Render());
+            }
             return new BsonDocument("text", document);
         }
     }

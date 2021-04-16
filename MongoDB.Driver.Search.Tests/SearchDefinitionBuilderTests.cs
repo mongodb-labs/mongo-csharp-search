@@ -32,6 +32,18 @@ namespace MongoDB.Driver.Search.Tests
             AssertRendered(
                 subject.Autocomplete("foo", "x", AutocompleteTokenOrder.Sequential),
                 "{ autocomplete: { query: 'foo', path: 'x', tokenOrder: 'sequential' } }");
+
+            AssertRendered(
+                subject.Autocomplete("foo", "x", fuzzy: new FuzzyOptions()),
+                "{ autocomplete: { query: 'foo', path: 'x', fuzzy: {} } }");
+            AssertRendered(
+                subject.Autocomplete("foo", "x", fuzzy: new FuzzyOptions()
+                {
+                    MaxEdits = 1,
+                    PrefixLength = 5,
+                    MaxExpansions = 25
+                }),
+                "{ autocomplete: { query: 'foo', path: 'x', fuzzy: { maxEdits: 1, prefixLength: 5, maxExpansions: 25 } } }");
         }
 
         [Fact]
@@ -413,6 +425,18 @@ namespace MongoDB.Driver.Search.Tests
             AssertRendered(
                 subject.Text(new[] { "foo", "bar" }, new[] { "x", "y" }),
                 "{ text: { query: ['foo', 'bar'], path: ['x', 'y'] } }");
+
+            AssertRendered(
+                subject.Text("foo", "x", new FuzzyOptions()),
+                "{ text: { query: 'foo', path: 'x', fuzzy: {} } }");
+            AssertRendered(
+                subject.Text("foo", "x", new FuzzyOptions()
+                {
+                    MaxEdits = 1,
+                    PrefixLength = 5,
+                    MaxExpansions = 25
+                }),
+                "{ text: { query: 'foo', path: 'x', fuzzy: { maxEdits: 1, prefixLength: 5, maxExpansions: 25 } } }");
         }
 
         [Fact]
