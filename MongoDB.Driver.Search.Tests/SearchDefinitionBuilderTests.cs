@@ -44,6 +44,11 @@ namespace MongoDB.Driver.Search.Tests
                     MaxExpansions = 25
                 }),
                 "{ autocomplete: { query: 'foo', path: 'x', fuzzy: { maxEdits: 1, prefixLength: 5, maxExpansions: 25 } } }");
+
+            var scoreBuilder = new ScoreDefinitionBuilder<BsonDocument>();
+            AssertRendered(
+                subject.Autocomplete("foo", "x", score: scoreBuilder.Constant(1)),
+                "{ autocomplete: { query: 'foo', path: 'x', score: { constant: { value: 1 } } } }");
         }
 
         [Fact]
@@ -102,6 +107,11 @@ namespace MongoDB.Driver.Search.Tests
             AssertRendered(
                 subject.Eq("x", ObjectId.Empty),
                 "{ equals: { path: 'x', value: { $oid: '000000000000000000000000' } } }");
+
+            var scoreBuilder = new ScoreDefinitionBuilder<BsonDocument>();
+            AssertRendered(
+                subject.Eq("x", true, scoreBuilder.Constant(1)),
+                "{ equals: { path: 'x', value: true, score: { constant: { value: 1 } } } }");
         }
 
         [Fact]
@@ -200,6 +210,11 @@ namespace MongoDB.Driver.Search.Tests
             AssertRendered(
                 subject.Near("x", new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), 1000L),
                 "{ near: { path: 'x', origin: { $date: '2000-01-01T00:00:00Z' }, pivot: { $numberLong: '1000' } } }");
+
+            var scoreBuilder = new ScoreDefinitionBuilder<BsonDocument>();
+            AssertRendered(
+                subject.Near("x", 5.0, 1.0, scoreBuilder.Constant(1)),
+                "{ near: { path: 'x', origin: 5, pivot: 1, score: { constant: { value: 1 } } } }");
         }
 
         [Fact]
@@ -253,6 +268,11 @@ namespace MongoDB.Driver.Search.Tests
             AssertRendered(
                 subject.Phrase(new[] { "foo", "bar" }, new[] { "x", "y" }),
                 "{ phrase: { query: ['foo', 'bar'], path: ['x', 'y'] } }");
+
+            var scoreBuilder = new ScoreDefinitionBuilder<BsonDocument>();
+            AssertRendered(
+                subject.Phrase("foo", "x", scoreBuilder.Constant(1)),
+                "{ phrase: { query: 'foo', path: 'x', score: { constant: { value: 1 } } } }");
         }
 
         [Fact]
@@ -309,6 +329,11 @@ namespace MongoDB.Driver.Search.Tests
             AssertRendered(
                 subject.QueryString("x", "foo"),
                 "{ queryString: { defaultPath: 'x', query: 'foo' } }");
+
+            var scoreBuilder = new ScoreDefinitionBuilder<BsonDocument>();
+            AssertRendered(
+                subject.QueryString("x", "foo", scoreBuilder.Constant(1)),
+                "{ queryString: { defaultPath: 'x', query: 'foo', score: { constant: { value: 1 } } } }");
         }
 
         [Fact]
@@ -348,6 +373,11 @@ namespace MongoDB.Driver.Search.Tests
             AssertRendered(
                 subject.Regex("foo", "x", true),
                 "{ regex: { query: 'foo', path: 'x', allowAnalyzedField: true } }");
+
+            var scoreBuilder = new ScoreDefinitionBuilder<BsonDocument>();
+            AssertRendered(
+                subject.Regex("foo", "x", score: scoreBuilder.Constant(1)),
+                "{ regex: { query: 'foo', path: 'x', score: { constant: { value: 1 } } } }");
         }
 
         [Fact]
@@ -437,6 +467,11 @@ namespace MongoDB.Driver.Search.Tests
                     MaxExpansions = 25
                 }),
                 "{ text: { query: 'foo', path: 'x', fuzzy: { maxEdits: 1, prefixLength: 5, maxExpansions: 25 } } }");
+
+            var scoreBuilder = new ScoreDefinitionBuilder<BsonDocument>();
+            AssertRendered(
+                subject.Text("foo", "x", score: scoreBuilder.Constant(1)),
+                "{ text: { query: 'foo', path: 'x', score: { constant: { value: 1 } } } }");
         }
 
         [Fact]
@@ -509,6 +544,11 @@ namespace MongoDB.Driver.Search.Tests
             AssertRendered(
                 subject.Wildcard("foo", "x", true),
                 "{ wildcard: { query: 'foo', path: 'x', allowAnalyzedField: true } }");
+
+            var scoreBuilder = new ScoreDefinitionBuilder<BsonDocument>();
+            AssertRendered(
+                subject.Wildcard("foo", "x", score: scoreBuilder.Constant(1)),
+                "{ wildcard: { query: 'foo', path: 'x', score: { constant: { value: 1 } } } }");
         }
 
         [Fact]

@@ -14,38 +14,52 @@ namespace MongoDB.Driver.Search
             QueryDefinition query,
             PathDefinition<TDocument> path,
             AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any,
-            FuzzyOptions fuzzy = null)
+            FuzzyOptions fuzzy = null,
+            ScoreDefinition<TDocument> score = null)
         {
-            return new AutocompleteSearchDefinition<TDocument>(query, path, tokenOrder, fuzzy);
+            return new AutocompleteSearchDefinition<TDocument>(query, path, tokenOrder, fuzzy, score);
         }
 
         public SearchDefinition<TDocument> Autocomplete<TField>(
             QueryDefinition query,
             Expression<Func<TDocument, TField>> path,
             AutocompleteTokenOrder tokenOrder = AutocompleteTokenOrder.Any,
-            FuzzyOptions fuzzy = null)
+            FuzzyOptions fuzzy = null,
+            ScoreDefinition<TDocument> score = null)
         {
-            return Autocomplete(query, new ExpressionFieldDefinition<TDocument>(path), tokenOrder, fuzzy);
+            return Autocomplete(query, new ExpressionFieldDefinition<TDocument>(path), tokenOrder, fuzzy, score);
         }
 
-        public SearchDefinition<TDocument> Eq(FieldDefinition<TDocument, bool> path, bool value)
+        public SearchDefinition<TDocument> Eq(
+            FieldDefinition<TDocument, bool> path,
+            bool value,
+            ScoreDefinition<TDocument> score = null)
         {
-            return new EqSearchDefinition<TDocument>(path, new BsonBoolean(value));
+            return new EqSearchDefinition<TDocument>(path, new BsonBoolean(value), score);
         }
 
-        public SearchDefinition<TDocument> Eq(FieldDefinition<TDocument, ObjectId> path, ObjectId value)
+        public SearchDefinition<TDocument> Eq(
+            FieldDefinition<TDocument, ObjectId> path,
+            ObjectId value,
+            ScoreDefinition<TDocument> score = null)
         {
-            return new EqSearchDefinition<TDocument>(path, value);
+            return new EqSearchDefinition<TDocument>(path, value, score);
         }
 
-        public SearchDefinition<TDocument> Eq(Expression<Func<TDocument, bool>> path, bool value)
+        public SearchDefinition<TDocument> Eq(
+            Expression<Func<TDocument, bool>> path,
+            bool value,
+            ScoreDefinition<TDocument> score = null)
         {
-            return Eq(new ExpressionFieldDefinition<TDocument, bool>(path), value);
+            return Eq(new ExpressionFieldDefinition<TDocument, bool>(path), value, score);
         }
 
-        public SearchDefinition<TDocument> Eq(Expression<Func<TDocument, ObjectId>> path, ObjectId value)
+        public SearchDefinition<TDocument> Eq(
+            Expression<Func<TDocument, ObjectId>> path,
+            ObjectId value,
+            ScoreDefinition<TDocument> score = null)
         {
-            return Eq(new ExpressionFieldDefinition<TDocument, ObjectId>(path), value);
+            return Eq(new ExpressionFieldDefinition<TDocument, ObjectId>(path), value, score);
         }
 
         public SearchDefinition<TDocument> Exists(FieldDefinition<TDocument> path)
@@ -88,80 +102,126 @@ namespace MongoDB.Driver.Search
             return MustNot((IEnumerable<SearchDefinition<TDocument>>)clauses);
         }
 
-        public SearchDefinition<TDocument> Near(PathDefinition<TDocument> path, double origin, double pivot)
+        public SearchDefinition<TDocument> Near(
+            PathDefinition<TDocument> path,
+            double origin,
+            double pivot,
+            ScoreDefinition<TDocument> score = null)
         {
-            return new NearSearchDefinition<TDocument>(path, new BsonDouble(origin), new BsonDouble(pivot));
+            return new NearSearchDefinition<TDocument>(path, new BsonDouble(origin), new BsonDouble(pivot), score);
         }
 
-        public SearchDefinition<TDocument> Near<TField>(Expression<Func<TDocument, TField>> path, double origin, double pivot)
+        public SearchDefinition<TDocument> Near<TField>(
+            Expression<Func<TDocument, TField>> path,
+            double origin,
+            double pivot,
+            ScoreDefinition<TDocument> score = null)
         {
-            return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot);
+            return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot, score);
         }
 
-        public SearchDefinition<TDocument> Near(PathDefinition<TDocument> path, int origin, int pivot)
+        public SearchDefinition<TDocument> Near(
+            PathDefinition<TDocument> path,
+            int origin,
+            int pivot,
+            ScoreDefinition<TDocument> score = null)
         {
-            return new NearSearchDefinition<TDocument>(path, new BsonInt32(origin), new BsonInt32(pivot));
+            return new NearSearchDefinition<TDocument>(path, new BsonInt32(origin), new BsonInt32(pivot), score);
         }
 
-        public SearchDefinition<TDocument> Near<TField>(Expression<Func<TDocument, TField>> path, int origin, int pivot)
+        public SearchDefinition<TDocument> Near<TField>(
+            Expression<Func<TDocument, TField>> path,
+            int origin,
+            int pivot,
+            ScoreDefinition<TDocument> score = null)
         {
-            return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot);
+            return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot, score);
         }
 
-        public SearchDefinition<TDocument> Near(PathDefinition<TDocument> path, long origin, long pivot)
+        public SearchDefinition<TDocument> Near(
+            PathDefinition<TDocument> path,
+            long origin,
+            long pivot,
+            ScoreDefinition<TDocument> score = null)
         {
-            return new NearSearchDefinition<TDocument>(path, new BsonInt64(origin), new BsonInt64(pivot));
+            return new NearSearchDefinition<TDocument>(path, new BsonInt64(origin), new BsonInt64(pivot), score);
         }
 
-        public SearchDefinition<TDocument> Near<TField>(Expression<Func<TDocument, TField>> path, long origin, long pivot)
+        public SearchDefinition<TDocument> Near<TField>(
+            Expression<Func<TDocument, TField>> path,
+            long origin,
+            long pivot,
+            ScoreDefinition<TDocument> score = null)
         {
-            return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot);
+            return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot, score);
         }
 
-        public SearchDefinition<TDocument> Near(PathDefinition<TDocument> path, DateTime origin, long pivot)
+        public SearchDefinition<TDocument> Near(
+            PathDefinition<TDocument> path,
+            DateTime origin,
+            long pivot,
+            ScoreDefinition<TDocument> score = null)
         {
-            return new NearSearchDefinition<TDocument>(path, new BsonDateTime(origin), new BsonInt64(pivot));
+            return new NearSearchDefinition<TDocument>(path, new BsonDateTime(origin), new BsonInt64(pivot), score);
         }
 
-        public SearchDefinition<TDocument> Near<TField>(Expression<Func<TDocument, TField>> path, DateTime origin, long pivot)
+        public SearchDefinition<TDocument> Near<TField>(
+            Expression<Func<TDocument, TField>> path,
+            DateTime origin,
+            long pivot,
+            ScoreDefinition<TDocument> score = null)
         {
-            return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot);
+            return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot, score);
         }
 
-        public SearchDefinition<TDocument> Phrase(QueryDefinition query, PathDefinition<TDocument> path)
+        public SearchDefinition<TDocument> Phrase(
+            QueryDefinition query,
+            PathDefinition<TDocument> path,
+            ScoreDefinition<TDocument> score = null)
         {
-            return new PhraseSearchDefinition<TDocument>(query, path);
+            return new PhraseSearchDefinition<TDocument>(query, path, score);
         }
 
-        public SearchDefinition<TDocument> Phrase<TField>(QueryDefinition query, Expression<Func<TDocument, TField>> path)
+        public SearchDefinition<TDocument> Phrase<TField>(
+            QueryDefinition query,
+            Expression<Func<TDocument, TField>> path,
+            ScoreDefinition<TDocument> score = null)
         {
-            return Phrase(query, new ExpressionFieldDefinition<TDocument>(path));
+            return Phrase(query, new ExpressionFieldDefinition<TDocument>(path), score);
         }
 
-        public SearchDefinition<TDocument> QueryString(FieldDefinition<TDocument> defaultPath, string query)
+        public SearchDefinition<TDocument> QueryString(
+            FieldDefinition<TDocument> defaultPath,
+            string query,
+            ScoreDefinition<TDocument> score = null)
         {
-            return new QueryStringSearchDefinition<TDocument>(defaultPath, query);
+            return new QueryStringSearchDefinition<TDocument>(defaultPath, query, score);
         }
 
-        public SearchDefinition<TDocument> QueryString<TField>(Expression<Func<TDocument, TField>> defaultPath, string query)
+        public SearchDefinition<TDocument> QueryString<TField>(
+            Expression<Func<TDocument, TField>> defaultPath,
+            string query,
+            ScoreDefinition<TDocument> score = null)
         {
-            return QueryString(new ExpressionFieldDefinition<TDocument>(defaultPath), query);
+            return QueryString(new ExpressionFieldDefinition<TDocument>(defaultPath), query, score);
         }
 
         public SearchDefinition<TDocument> Regex(
             QueryDefinition query,
             PathDefinition<TDocument> path,
-            bool allowAnalyzedField = false)
+            bool allowAnalyzedField = false,
+            ScoreDefinition<TDocument> score = null)
         {
-            return new RegexSearchDefinition<TDocument>(query, path, allowAnalyzedField);
+            return new RegexSearchDefinition<TDocument>(query, path, allowAnalyzedField, score);
         }
 
         public SearchDefinition<TDocument> Regex<TField>(
             QueryDefinition query,
             Expression<Func<TDocument, TField>> path,
-            bool allowAnalyzedField = false)
+            bool allowAnalyzedField = false,
+            ScoreDefinition<TDocument> score = null)
         {
-            return Regex(query, new ExpressionFieldDefinition<TDocument>(path), allowAnalyzedField);
+            return Regex(query, new ExpressionFieldDefinition<TDocument>(path), allowAnalyzedField, score);
         }
 
         public SearchDefinition<TDocument> Should(IEnumerable<SearchDefinition<TDocument>> clauses)
@@ -177,33 +237,37 @@ namespace MongoDB.Driver.Search
         public SearchDefinition<TDocument> Text(
             QueryDefinition query,
             PathDefinition<TDocument> path,
-            FuzzyOptions fuzzy = null)
+            FuzzyOptions fuzzy = null,
+            ScoreDefinition<TDocument> score = null)
         {
-            return new TextSearchDefinition<TDocument>(query, path, fuzzy);
+            return new TextSearchDefinition<TDocument>(query, path, fuzzy, score);
         }
 
         public SearchDefinition<TDocument> Text<TField>(
             QueryDefinition query,
             Expression<Func<TDocument, TField>> path,
-            FuzzyOptions fuzzy = null)
+            FuzzyOptions fuzzy = null,
+            ScoreDefinition<TDocument> score = null)
         {
-            return Text(query, new ExpressionFieldDefinition<TDocument>(path), fuzzy);
+            return Text(query, new ExpressionFieldDefinition<TDocument>(path), fuzzy, score);
         }
 
         public SearchDefinition<TDocument> Wildcard(
             QueryDefinition query,
             PathDefinition<TDocument> path,
-            bool allowAnalyzedField = false)
+            bool allowAnalyzedField = false,
+            ScoreDefinition<TDocument> score = null)
         {
-            return new WildcardSearchDefinition<TDocument>(query, path, allowAnalyzedField);
+            return new WildcardSearchDefinition<TDocument>(query, path, allowAnalyzedField, score);
         }
 
         public SearchDefinition<TDocument> Wildcard<TField>(
             QueryDefinition query,
             Expression<Func<TDocument, TField>> path,
-            bool allowAnalyzedField = false)
+            bool allowAnalyzedField = false,
+            ScoreDefinition<TDocument> score = null)
         {
-            return Wildcard(query, new ExpressionFieldDefinition<TDocument>(path), allowAnalyzedField);
+            return Wildcard(query, new ExpressionFieldDefinition<TDocument>(path), allowAnalyzedField, score);
         }
     }
 
@@ -213,17 +277,20 @@ namespace MongoDB.Driver.Search
         private readonly PathDefinition<TDocument> _path;
         private readonly AutocompleteTokenOrder _tokenOrder;
         private readonly FuzzyOptions _fuzzy;
+        private readonly ScoreDefinition<TDocument> _score;
 
         public AutocompleteSearchDefinition(
             QueryDefinition query,
             PathDefinition<TDocument> path,
             AutocompleteTokenOrder tokenOrder,
-            FuzzyOptions fuzzy)
+            FuzzyOptions fuzzy,
+            ScoreDefinition<TDocument> score)
         {
             _query = Ensure.IsNotNull(query, nameof(query));
             _path = Ensure.IsNotNull(path, nameof(path));
             _tokenOrder = tokenOrder;
             _fuzzy = fuzzy;
+            _score = score;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
@@ -238,6 +305,10 @@ namespace MongoDB.Driver.Search
             if (_fuzzy != null)
             {
                 document.Add("fuzzy", _fuzzy.Render());
+            }
+            if (_score != null)
+            {
+                document.Add("score", _score.Render(documentSerializer, serializerRegistry));
             }
             return new BsonDocument("autocomplete", document);
         }
@@ -266,11 +337,13 @@ namespace MongoDB.Driver.Search
     {
         private readonly FieldDefinition<TDocument> _path;
         private readonly BsonValue _value;
+        private readonly ScoreDefinition<TDocument> _score;
 
-        public EqSearchDefinition(FieldDefinition<TDocument> path, BsonValue value)
+        public EqSearchDefinition(FieldDefinition<TDocument> path, BsonValue value, ScoreDefinition<TDocument> score)
         {
             _path = Ensure.IsNotNull(path, nameof(path));
             _value = value;
+            _score = score;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
@@ -279,6 +352,10 @@ namespace MongoDB.Driver.Search
             var document = new BsonDocument();
             document.Add("path", renderedField.FieldName);
             document.Add("value", _value);
+            if (_score != null)
+            {
+                document.Add("score", _score.Render(documentSerializer, serializerRegistry));
+            }
             return new BsonDocument("equals", document);
         }
     }
@@ -305,12 +382,18 @@ namespace MongoDB.Driver.Search
         private readonly PathDefinition<TDocument> _path;
         private readonly BsonValue _origin;
         private readonly BsonValue _pivot;
+        private readonly ScoreDefinition<TDocument> _score;
 
-        public NearSearchDefinition(PathDefinition<TDocument> path, BsonValue origin, BsonValue pivot)
+        public NearSearchDefinition(
+            PathDefinition<TDocument> path,
+            BsonValue origin,
+            BsonValue pivot,
+            ScoreDefinition<TDocument> score = null)
         {
             _path = Ensure.IsNotNull(path, nameof(path));
             _origin = origin;
             _pivot = pivot;
+            _score = score;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
@@ -319,6 +402,10 @@ namespace MongoDB.Driver.Search
             document.Add("path", _path.Render(documentSerializer, serializerRegistry));
             document.Add("origin", _origin);
             document.Add("pivot", _pivot);
+            if (_score != null)
+            {
+                document.Add("score", _score.Render(documentSerializer, serializerRegistry));
+            }
             return new BsonDocument("near", document);
         }
     }
@@ -327,11 +414,13 @@ namespace MongoDB.Driver.Search
     {
         private readonly QueryDefinition _query;
         private readonly PathDefinition<TDocument> _path;
+        private readonly ScoreDefinition<TDocument> _score;
 
-        public PhraseSearchDefinition(QueryDefinition query, PathDefinition<TDocument> path)
+        public PhraseSearchDefinition(QueryDefinition query, PathDefinition<TDocument> path, ScoreDefinition<TDocument> score)
         {
             _query = Ensure.IsNotNull(query, nameof(query));
             _path = Ensure.IsNotNull(path, nameof(path));
+            _score = score;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
@@ -339,6 +428,10 @@ namespace MongoDB.Driver.Search
             var document = new BsonDocument();
             document.Add("query", _query.Render());
             document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            if (_score != null)
+            {
+                document.Add("score", _score.Render(documentSerializer, serializerRegistry));
+            }
             return new BsonDocument("phrase", document);
         }
     }
@@ -347,11 +440,13 @@ namespace MongoDB.Driver.Search
     {
         private readonly FieldDefinition<TDocument> _defaultPath;
         private readonly string _query;
+        private readonly ScoreDefinition<TDocument> _score;
 
-        public QueryStringSearchDefinition(FieldDefinition<TDocument> defaultPath, string query)
+        public QueryStringSearchDefinition(FieldDefinition<TDocument> defaultPath, string query, ScoreDefinition<TDocument> score)
         {
             _defaultPath = Ensure.IsNotNull(defaultPath, nameof(defaultPath));
             _query = Ensure.IsNotNull(query, nameof(query));
+            _score = score;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
@@ -360,6 +455,10 @@ namespace MongoDB.Driver.Search
             var document = new BsonDocument();
             document.Add("defaultPath", renderedField.FieldName);
             document.Add("query", _query);
+            if (_score != null)
+            {
+                document.Add("score", _score.Render(documentSerializer, serializerRegistry));
+            }
             return new BsonDocument("queryString", document);
         }
     }
@@ -369,15 +468,18 @@ namespace MongoDB.Driver.Search
         private readonly QueryDefinition _query;
         private readonly PathDefinition<TDocument> _path;
         private bool _allowAnalyzedField;
+        private ScoreDefinition<TDocument> _score;
 
         public RegexSearchDefinition(
             QueryDefinition query,
             PathDefinition<TDocument> path,
-            bool allowAnalyzedField)
+            bool allowAnalyzedField,
+            ScoreDefinition<TDocument> score)
         {
             _query = Ensure.IsNotNull(query, nameof(query));
             _path = Ensure.IsNotNull(path, nameof(path));
             _allowAnalyzedField = allowAnalyzedField;
+            _score = score;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
@@ -389,6 +491,10 @@ namespace MongoDB.Driver.Search
             {
                 document.Add("allowAnalyzedField", true);
             }
+            if (_score != null)
+            {
+                document.Add("score", _score.Render(documentSerializer, serializerRegistry));
+            }
             return new BsonDocument("regex", document);
         }
     }
@@ -398,12 +504,18 @@ namespace MongoDB.Driver.Search
         private readonly QueryDefinition _query;
         private readonly PathDefinition<TDocument> _path;
         private readonly FuzzyOptions _fuzzy;
+        private readonly ScoreDefinition<TDocument> _score;
 
-        public TextSearchDefinition(QueryDefinition query, PathDefinition<TDocument> path, FuzzyOptions fuzzy)
+        public TextSearchDefinition(
+            QueryDefinition query,
+            PathDefinition<TDocument> path,
+            FuzzyOptions fuzzy,
+            ScoreDefinition<TDocument> score)
         {
             _query = Ensure.IsNotNull(query, nameof(query));
             _path = Ensure.IsNotNull(path, nameof(path));
             _fuzzy = fuzzy;
+            _score = score;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
@@ -415,6 +527,10 @@ namespace MongoDB.Driver.Search
             {
                 document.Add("fuzzy", _fuzzy.Render());
             }
+            if (_score != null)
+            {
+                document.Add("score", _score.Render(documentSerializer, serializerRegistry));
+            }
             return new BsonDocument("text", document);
         }
     }
@@ -424,15 +540,18 @@ namespace MongoDB.Driver.Search
         private readonly QueryDefinition _query;
         private readonly PathDefinition<TDocument> _path;
         private bool _allowAnalyzedField;
+        private readonly ScoreDefinition<TDocument> _score;
 
         public WildcardSearchDefinition(
             QueryDefinition query,
             PathDefinition<TDocument> path,
-            bool allowAnalyzedField)
+            bool allowAnalyzedField,
+            ScoreDefinition<TDocument> score)
         {
             _query = Ensure.IsNotNull(query, nameof(query));
             _path = Ensure.IsNotNull(path, nameof(path));
             _allowAnalyzedField = allowAnalyzedField;
+            _score = score;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
@@ -443,6 +562,10 @@ namespace MongoDB.Driver.Search
             if (_allowAnalyzedField)
             {
                 document.Add("allowAnalyzedField", true);
+            }
+            if (_score != null)
+            {
+                document.Add("score", _score.Render(documentSerializer, serializerRegistry));
             }
             return new BsonDocument("wildcard", document);
         }
