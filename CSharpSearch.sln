@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoDB.Labs.Search", "MongoDB.Driver.Search\MongoDB.Labs.Search.csproj", "{55115E23-FF31-4F2D-A35E-D7409AE85846}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoDB.Labs.Search", "MongoDB.Labs.Search\MongoDB.Labs.Search.csproj", "{55115E23-FF31-4F2D-A35E-D7409AE85846}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoDB.Labs.Search.Tests", "MongoDB.Driver.Search.Tests\MongoDB.Labs.Search.Tests.csproj", "{9C739DB5-026F-474A-BB5F-6505170BBEEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoDB.Labs.Search.Tests", "MongoDB.Labs.Search.Tests\MongoDB.Labs.Search.Tests.csproj", "{9C739DB5-026F-474A-BB5F-6505170BBEEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
