@@ -1,8 +1,9 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 using Xunit;
 
-namespace MongoDB.Driver.Search.Tests
+namespace MongoDB.Labs.Search.Tests
 {
     public class ProjectionDefinitionBuilderTests
     {

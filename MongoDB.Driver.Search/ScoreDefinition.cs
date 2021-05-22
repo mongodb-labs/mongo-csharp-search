@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
-namespace MongoDB.Driver.Search
+namespace MongoDB.Labs.Search
 {
     public abstract class ScoreDefinition<TDocument>
     {

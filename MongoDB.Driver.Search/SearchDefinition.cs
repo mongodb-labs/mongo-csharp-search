@@ -2,7 +2,7 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver.Core.Misc;
 
-namespace MongoDB.Driver.Search
+namespace MongoDB.Labs.Search
 {
     public abstract class SearchDefinition<TDocument>
     {

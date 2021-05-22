@@ -1,11 +1,12 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace MongoDB.Driver.Search.Tests
+namespace MongoDB.Labs.Search.Tests
 {
     public class PipelineDefinitionBuilderTests
     {

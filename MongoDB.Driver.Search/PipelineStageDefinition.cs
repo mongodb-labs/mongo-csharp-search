@@ -1,7 +1,8 @@
 ﻿using System;
 using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 
-namespace MongoDB.Driver.Search
+namespace MongoDB.Labs.Search
 {
     // This class is identical to the class with the same name in MongoDB.Driver.
     // It is duplicated here because it is internal and hence inaccessible to this

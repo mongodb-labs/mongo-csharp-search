@@ -1,10 +1,11 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 using MongoDB.Driver.Core.Misc;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MongoDB.Driver.Search
+namespace MongoDB.Labs.Search
 {
     public abstract class PathDefinition<TDocument>
     {

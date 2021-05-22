@@ -1,6 +1,7 @@
-﻿using MongoDB.Driver.Core.Misc;
+﻿using MongoDB.Driver;
+using MongoDB.Driver.Core.Misc;
 
-namespace MongoDB.Driver.Search
+namespace MongoDB.Labs.Search
 {
     public static class AggregateFluentBuilder
     {

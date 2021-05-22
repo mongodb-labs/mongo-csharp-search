@@ -1,7 +1,7 @@
 ﻿using MongoDB.Driver.Core.Misc;
 using System;
 
-namespace MongoDB.Driver.Search
+namespace MongoDB.Labs.Search
 {
     internal static class EnsureExtensions
     {

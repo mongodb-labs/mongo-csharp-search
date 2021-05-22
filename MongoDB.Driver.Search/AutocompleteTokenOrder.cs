@@ -1,4 +1,4 @@
-﻿namespace MongoDB.Driver.Search
+﻿namespace MongoDB.Labs.Search
 {
     public enum AutocompleteTokenOrder
     {

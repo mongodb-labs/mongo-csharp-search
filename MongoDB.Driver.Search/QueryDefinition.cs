@@ -3,7 +3,7 @@ using MongoDB.Driver.Core.Misc;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MongoDB.Driver.Search
+namespace MongoDB.Labs.Search
 {
     public abstract class QueryDefinition
     {

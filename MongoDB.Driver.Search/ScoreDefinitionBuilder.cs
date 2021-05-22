@@ -1,10 +1,11 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 using MongoDB.Driver.Core.Misc;
 using System;
 using System.Linq.Expressions;
 
-namespace MongoDB.Driver.Search
+namespace MongoDB.Labs.Search
 {
     public sealed class ScoreDefinitionBuilder<TDocument>
     {

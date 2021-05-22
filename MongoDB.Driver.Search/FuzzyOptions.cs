@@ -1,7 +1,7 @@
 ﻿using MongoDB.Driver.Core.Misc;
 using MongoDB.Bson;
 
-namespace MongoDB.Driver.Search
+namespace MongoDB.Labs.Search
 {
     public class FuzzyOptions
     {

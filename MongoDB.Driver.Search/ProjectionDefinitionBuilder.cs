@@ -1,4 +1,6 @@
-﻿namespace MongoDB.Driver.Search
+﻿using MongoDB.Driver;
+
+namespace MongoDB.Labs.Search
 {
     public static class ProjectionDefinitionExtensions
     {
