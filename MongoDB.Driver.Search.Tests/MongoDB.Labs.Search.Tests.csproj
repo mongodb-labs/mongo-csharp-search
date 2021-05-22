@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MongoDB.Driver.Search\MongoDB.Driver.Search.csproj" />
+    <ProjectReference Include="..\MongoDB.Driver.Search\MongoDB.Labs.Search.csproj" />
   </ItemGroup>
 
 </Project>
