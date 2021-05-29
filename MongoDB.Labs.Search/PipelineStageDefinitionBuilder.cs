@@ -21,14 +21,23 @@ namespace MongoDB.Labs.Search
     public static class PipelineStageDefinitionBuilder
     {
         public static PipelineStageDefinition<TInput, TInput> Search<TInput>(
-            SearchDefinition<TInput> query)
+            SearchDefinition<TInput> query, HighlightOptions<TInput> highlight = null)
         {
             Ensure.IsNotNull(query, nameof(query));
 
             const string operatorName = "$search";
             var stage = new DelegatedPipelineStageDefinition<TInput, TInput>(
                 operatorName,
-                (s, sr) => new RenderedPipelineStageDefinition<TInput>(operatorName, new BsonDocument(operatorName, query.Render(s, sr)), s));
+                (s, sr) =>
+                {
+                    var renderedQuery = query.Render(s, sr);
+                    if (highlight != null)
+                    {
+                        renderedQuery.Add("highlight", highlight.Render(s, sr));
+                    }
+                    var document = new BsonDocument(operatorName, renderedQuery);
+                    return new RenderedPipelineStageDefinition<TInput>(operatorName, document, s);
+                });
 
             return stage;
         }

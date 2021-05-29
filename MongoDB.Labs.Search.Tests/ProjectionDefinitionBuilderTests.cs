@@ -22,6 +22,14 @@ namespace MongoDB.Labs.Search.Tests
     public class ProjectionDefinitionBuilderTests
     {
         [Fact]
+        public void MetaSearchHighlights()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(subject.MetaSearchHighlights("a"), "{ a: { $meta: 'searchHighlights' } }");
+        }
+
+        [Fact]
         public void MetaSearchScore()
         {
             var subject = CreateSubject<BsonDocument>();

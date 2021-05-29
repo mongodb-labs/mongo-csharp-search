@@ -37,6 +37,19 @@ namespace MongoDB.Labs.Search.Tests
         }
 
         [Fact]
+        public void Search_should_add_expected_stage_with_highlight()
+        {
+            var pipeline = new EmptyPipelineDefinition<BsonDocument>();
+            var builder = new SearchDefinitionBuilder<BsonDocument>();
+            var highlightBuilder = new HighlightOptionsBuilder<BsonDocument>();
+            var result = pipeline.Search(builder.Text("foo", "bar"), highlightBuilder.Options("foo"));
+            var stages = RenderStages(result, BsonDocumentSerializer.Instance);
+            Assert.Equal(
+                BsonDocument.Parse("{ $search: { text: { query: 'foo', path: 'bar' }, highlight: { path: 'foo' } } }"),
+                stages[0]);
+        }
+
+        [Fact]
         public void Search_should_throw_when_pipeline_is_null()
         {
             PipelineDefinition<BsonDocument, BsonDocument> pipeline = null;

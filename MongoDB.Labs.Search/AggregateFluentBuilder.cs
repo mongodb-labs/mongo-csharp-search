@@ -21,10 +21,11 @@ namespace MongoDB.Labs.Search
     {
         public static IAggregateFluent<TResult> Search<TResult>(
             this IAggregateFluent<TResult> fluent,
-            SearchDefinition<TResult> query)
+            SearchDefinition<TResult> query,
+            HighlightOptions<TResult> highlight = null)
         {
             Ensure.IsNotNull(fluent, nameof(fluent));
-            return fluent.AppendStage(PipelineStageDefinitionBuilder.Search(query));
+            return fluent.AppendStage(PipelineStageDefinitionBuilder.Search(query, highlight));
         }
     }
 }
