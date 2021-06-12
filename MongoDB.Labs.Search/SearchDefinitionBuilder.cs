@@ -192,17 +192,19 @@ namespace MongoDB.Labs.Search
         public SearchDefinition<TDocument> Phrase(
             QueryDefinition query,
             PathDefinition<TDocument> path,
+            int slop = 0,
             ScoreDefinition<TDocument> score = null)
         {
-            return new PhraseSearchDefinition<TDocument>(query, path, score);
+            return new PhraseSearchDefinition<TDocument>(query, path, slop, score);
         }
 
         public SearchDefinition<TDocument> Phrase<TField>(
             QueryDefinition query,
             Expression<Func<TDocument, TField>> path,
+            int slop = 0,
             ScoreDefinition<TDocument> score = null)
         {
-            return Phrase(query, new ExpressionFieldDefinition<TDocument>(path), score);
+            return Phrase(query, new ExpressionFieldDefinition<TDocument>(path), slop, score);
         }
 
         public SearchDefinition<TDocument> QueryString(
@@ -429,12 +431,18 @@ namespace MongoDB.Labs.Search
     {
         private readonly QueryDefinition _query;
         private readonly PathDefinition<TDocument> _path;
+        private readonly int _slop;
         private readonly ScoreDefinition<TDocument> _score;
 
-        public PhraseSearchDefinition(QueryDefinition query, PathDefinition<TDocument> path, ScoreDefinition<TDocument> score)
+        public PhraseSearchDefinition(
+            QueryDefinition query,
+            PathDefinition<TDocument> path,
+            int slop,
+            ScoreDefinition<TDocument> score)
         {
             _query = Ensure.IsNotNull(query, nameof(query));
             _path = Ensure.IsNotNull(path, nameof(path));
+            _slop = slop;
             _score = score;
         }
 
@@ -443,6 +451,10 @@ namespace MongoDB.Labs.Search
             var document = new BsonDocument();
             document.Add("query", _query.Render());
             document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            if (_slop != 0)
+            {
+                document.Add("slop", _slop);
+            }
             if (_score != null)
             {
                 document.Add("score", _score.Render(documentSerializer, serializerRegistry));

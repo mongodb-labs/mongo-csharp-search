@@ -284,9 +284,13 @@ namespace MongoDB.Labs.Search.Tests
                 subject.Phrase(new[] { "foo", "bar" }, new[] { "x", "y" }),
                 "{ phrase: { query: ['foo', 'bar'], path: ['x', 'y'] } }");
 
+            AssertRendered(
+                subject.Phrase("foo", "x", 5),
+                "{ phrase: { query: 'foo', path: 'x', slop: 5 } }");
+
             var scoreBuilder = new ScoreDefinitionBuilder<BsonDocument>();
             AssertRendered(
-                subject.Phrase("foo", "x", scoreBuilder.Constant(1)),
+                subject.Phrase("foo", "x", score: scoreBuilder.Constant(1)),
                 "{ phrase: { query: 'foo', path: 'x', score: { constant: { value: 1 } } } }");
         }
 
