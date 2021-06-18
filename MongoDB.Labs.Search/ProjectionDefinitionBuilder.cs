@@ -16,8 +16,20 @@ using MongoDB.Driver;
 
 namespace MongoDB.Labs.Search
 {
+    /// <summary>
+    /// Extension methods for projections pertaining to Atlas Search.
+    /// </summary>
     public static class ProjectionDefinitionExtensions
     {
+        /// <summary>
+        /// Combines an existing projection with a search highlights projection.
+        /// </summary>
+        /// <typeparam name="TDocument">The type of the document.</typeparam>
+        /// <param name="projection">The projection.</param>
+        /// <param name="field">The field.</param>
+        /// <returns>
+        /// A combined projection.
+        /// </returns>
         public static ProjectionDefinition<TDocument> MetaSearchHighlights<TDocument>(
             this ProjectionDefinition<TDocument> projection,
             string field)
@@ -26,6 +38,15 @@ namespace MongoDB.Labs.Search
             return builder.Combine(projection, builder.MetaSearchHighlights(field));
         }
 
+        /// <summary>
+        /// Combines an existing projection with a search score projection.
+        /// </summary>
+        /// <typeparam name="TDocument">The type of the document.</typeparam>
+        /// <param name="projection">The projection.</param>
+        /// <param name="field">The field.</param>
+        /// <returns>
+        /// A combined projection.
+        /// </returns>
         public static ProjectionDefinition<TDocument> MetaSearchScore<TDocument>(
             this ProjectionDefinition<TDocument> projection,
             string field)
@@ -35,8 +56,21 @@ namespace MongoDB.Labs.Search
         }
     }
 
+    /// <summary>
+    /// Extension methods for <see cref="ProjectionDefinitionBuilder{TSource}"/> pertaining to
+    /// Atlas Search.
+    /// </summary>
     public static class ProjectionDefinitionBuilderExtensions
     {
+        /// <summary>
+        /// Creates a search highlights projection.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the source.</typeparam>
+        /// <param name="builder">The projection definition builder.</param>
+        /// <param name="field">The field.</param>
+        /// <returns>
+        /// A search highlights projection.
+        /// </returns>
         public static ProjectionDefinition<TSource> MetaSearchHighlights<TSource>(
             this ProjectionDefinitionBuilder<TSource> builder,
             string field)
@@ -44,6 +78,15 @@ namespace MongoDB.Labs.Search
             return builder.Meta(field, "searchHighlights");
         }
 
+        /// <summary>
+        /// Creates a search score projection.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the source.</typeparam>
+        /// <param name="builder">The projection definition builder.</param>
+        /// <param name="field">The field.</param>
+        /// <returns>
+        /// A search score projection.
+        /// </returns>
         public static ProjectionDefinition<TSource> MetaSearchScore<TSource>(
             this ProjectionDefinitionBuilder<TSource> builder,
             string field)

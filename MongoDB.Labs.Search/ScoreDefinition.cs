@@ -17,8 +17,18 @@ using MongoDB.Bson.Serialization;
 
 namespace MongoDB.Labs.Search
 {
+    /// <summary>
+    /// Base class for search score modifiers.
+    /// </summary>
+    /// <typeparam name="TDocument">The type of the document.</typeparam>
     public abstract class ScoreDefinition<TDocument>
     {
+        /// <summary>
+        /// Renders the score modifier to a <see cref="BsonDocument"/>.
+        /// </summary>
+        /// <param name="documentSerializer">The document serializer.</param>
+        /// <param name="serializerRegistry">The serializer registry.</param>
+        /// <returns>A <see cref="BsonDocument"/>.</returns>
         public abstract BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry);
     }
 }

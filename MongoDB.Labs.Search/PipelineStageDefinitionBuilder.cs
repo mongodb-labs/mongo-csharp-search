@@ -18,8 +18,18 @@ using MongoDB.Driver.Core.Misc;
 
 namespace MongoDB.Labs.Search
 {
+    /// <summary>
+    /// Methods for building pipeline stages pertaining to Atlas Search.
+    /// </summary>
     public static class PipelineStageDefinitionBuilder
     {
+        /// <summary>
+        /// Creates a $search stage.
+        /// </summary>
+        /// <typeparam name="TInput">The type of the input documents.</typeparam>
+        /// <param name="query">The search definition.</param>
+        /// <param name="highlight">The highlight options.</param>
+        /// <returns>The stage.</returns>
         public static PipelineStageDefinition<TInput, TInput> Search<TInput>(
             SearchDefinition<TInput> query, HighlightOptions<TInput> highlight = null)
         {

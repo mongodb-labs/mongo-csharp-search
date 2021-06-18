@@ -17,8 +17,22 @@ using MongoDB.Driver.Core.Misc;
 
 namespace MongoDB.Labs.Search
 {
+    /// <summary>
+    /// Extension methods for adding stages pertaing to Atlas Search to a pipeline.
+    /// </summary>
     public static class PipelineDefinitionBuilder
     {
+        /// <summary>
+        /// Appends a $search stage to the pipeline.
+        /// </summary>
+        /// <typeparam name="TInput">The type of the input documents.</typeparam>
+        /// <typeparam name="TOutput">The type of the output documents.</typeparam>
+        /// <param name="pipeline">The pipeline.</param>
+        /// <param name="query">The search definition.</param>
+        /// <param name="highlight">The highlight options.</param>
+        /// <returns>
+        /// A new pipeline with an additional stage.
+        /// </returns>
         public static PipelineDefinition<TInput, TOutput> Search<TInput, TOutput>(
             this PipelineDefinition<TInput, TOutput> pipeline,
             SearchDefinition<TOutput> query,

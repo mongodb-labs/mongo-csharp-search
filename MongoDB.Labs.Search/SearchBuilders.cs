@@ -14,22 +14,35 @@
 
 namespace MongoDB.Labs.Search
 {
+    /// <summary>
+    /// A static helper class containing various builders pertaining to Atlas Search.
+    /// </summary>
+    /// <typeparam name="TDocument">The type of the document.</typeparam>
     public static class SearchBuilders<TDocument>
     {
         private static HighlightOptionsBuilder<TDocument> __highlight = new HighlightOptionsBuilder<TDocument>();
         private static ScoreDefinitionBuilder<TDocument> __score = new ScoreDefinitionBuilder<TDocument>();
         private static SearchDefinitionBuilder<TDocument> __search = new SearchDefinitionBuilder<TDocument>();
 
+        /// <summary>
+        /// Gets a <see cref="HighlightOptionsBuilder{TDocument}"/>.
+        /// </summary>
         public static HighlightOptionsBuilder<TDocument> Highlight
         {
             get { return __highlight; }
         }
 
+        /// <summary>
+        /// Gets a <see cref="ScoreDefinitionBuilder{TDocument}"/>.
+        /// </summary>
         public static ScoreDefinitionBuilder<TDocument> Score
         {
             get { return __score; }
         }
 
+        /// <summary>
+        /// Gets a <see cref="SearchDefinitionBuilder{TDocument}"/>.
+        /// </summary>
         public static SearchDefinitionBuilder<TDocument> Search
         {
             get { return __search; }

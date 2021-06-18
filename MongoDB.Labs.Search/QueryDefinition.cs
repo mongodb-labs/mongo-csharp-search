@@ -19,50 +19,94 @@ using System.Linq;
 
 namespace MongoDB.Labs.Search
 {
+    /// <summary>
+    /// Base class for search queries.
+    /// </summary>
     public abstract class QueryDefinition
     {
+        /// <summary>
+        /// Renders the query to a <see cref="BsonValue"/>.
+        /// </summary>
+        /// <returns>A <see cref="BsonValue"/>.</returns>
         public abstract BsonValue Render();
 
+        /// <summary>
+        /// Performs an implicit conversion from a string to <see cref="QueryDefinition"/>.
+        /// </summary>
+        /// <param name="query">The string.</param>
+        /// <returns>
+        /// The result of the conversion.
+        /// </returns>
         public static implicit operator QueryDefinition(string query)
         {
             return new SingleQueryDefinition(query);
         }
 
+        /// <summary>
+        /// Performs an implicit conversion from an array of strings to <see cref="QueryDefinition"/>.
+        /// </summary>
+        /// <param name="queries">The array of strings.</param>
+        /// <returns>
+        /// The result of the conversion.
+        /// </returns>
         public static implicit operator QueryDefinition(string[] queries)
         {
             return new MultiQueryDefinition(queries);
         }
 
+        /// <summary>
+        /// Performs an implicit conversion from a list of strings to <see cref="QueryDefinition"/>.
+        /// </summary>
+        /// <param name="queries">The list of strings.</param>
+        /// <returns>
+        /// The result of the conversion.
+        /// </returns>
         public static implicit operator QueryDefinition(List<string> queries)
         {
             return new MultiQueryDefinition(queries);
         }
     }
 
+    /// <summary>
+    /// A query definition for a single string.
+    /// </summary>
     public sealed class SingleQueryDefinition : QueryDefinition
     {
         private readonly string _query;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SinglePathDefinition{TDocument}"/> class.
+        /// </summary>
+        /// <param name="query">The query string.</param>
         public SingleQueryDefinition(string query)
         {
             _query = Ensure.IsNotNull(query, nameof(query));
         }
 
+        /// <inheritdoc />
         public override BsonValue Render()
         {
             return new BsonString(_query);
         }
     }
 
+    /// <summary>
+    /// A query definition for multiple strings.
+    /// </summary>
     public sealed class MultiQueryDefinition : QueryDefinition
     {
         private readonly IEnumerable<string> _queries;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MultiPathDefinition{TDocument}"/> class.
+        /// </summary>
+        /// <param name="queries">The query strings.</param>
         public MultiQueryDefinition(IEnumerable<string> queries)
         {
             _queries = Ensure.IsNotNull(queries, nameof(queries));
         }
 
+        /// <inheritdoc/>
         public override BsonValue Render()
         {
             return new BsonArray(_queries.Select(query => new BsonString(query)));
