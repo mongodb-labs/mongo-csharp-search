@@ -14,9 +14,20 @@
 
 namespace MongoDB.Labs.Search
 {
+    /// <summary>
+    /// The order in which to search for tokens in an autocomplete search definition.
+    /// </summary>
     public enum AutocompleteTokenOrder
     {
+        /// <summary>
+        /// Indicates that tokens in the query can appear in any order in the documents.
+        /// </summary>
         Any,
+        
+        /// <summary>
+        /// Indicates that tokens in the query must appear adjacent to each other or in the order
+        /// specified in the query in the documents.
+        /// </summary>
         Sequential
     }
 }

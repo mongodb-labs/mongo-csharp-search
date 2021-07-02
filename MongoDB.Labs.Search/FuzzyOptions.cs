@@ -17,24 +17,38 @@ using MongoDB.Bson;
 
 namespace MongoDB.Labs.Search
 {
+    /// <summary>
+    /// Options for fuzzy search.
+    /// </summary>
     public class FuzzyOptions
     {
         private int? _maxEdits;
         private int? _prefixLength;
         private int? _maxExpansions;
 
+        /// <summary>
+        /// Gets or sets the maximum number of single-character edits required to match the
+        /// specified search term.
+        /// </summary>
         public int? MaxEdits
         {
             get { return _maxEdits; }
             set { _maxEdits = EnsureExtensions.IsNullOrBetween(value, 1, 2, nameof(value)); }
         }
 
+        /// <summary>
+        /// Gets or sets the number of characters at the beginning of each term in the result that
+        /// must exactly match.
+        /// </summary>
         public int? PrefixLength
         {
             get { return _prefixLength; }
             set { _prefixLength = Ensure.IsNullOrGreaterThanOrEqualToZero(value, nameof(value)); }
         }
 
+        /// <summary>
+        /// Gets or sets the number of variations to generate and search for.
+        /// </summary>
         public int? MaxExpansions
         {
             get { return _maxExpansions; }

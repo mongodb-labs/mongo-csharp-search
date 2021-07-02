@@ -17,15 +17,26 @@ using MongoDB.Driver.Core.Misc;
 
 namespace MongoDB.Labs.Search
 {
+    /// <summary>
+    /// Extension methods for <see cref="IAggregateFluent{TResult}"/>.
+    /// </summary>
     public static class AggregateFluentBuilder
     {
+        /// <summary>
+        /// Appends a $search stage to the pipeline.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="aggregate">The aggregate.</param>
+        /// <param name="query">The search definition.</param>
+        /// <param name="highlight">The highlight options.</param>
+        /// <returns>The fluent aggregate interface.</returns>
         public static IAggregateFluent<TResult> Search<TResult>(
-            this IAggregateFluent<TResult> fluent,
+            this IAggregateFluent<TResult> aggregate,
             SearchDefinition<TResult> query,
             HighlightOptions<TResult> highlight = null)
         {
-            Ensure.IsNotNull(fluent, nameof(fluent));
-            return fluent.AppendStage(PipelineStageDefinitionBuilder.Search(query, highlight));
+            Ensure.IsNotNull(aggregate, nameof(aggregate));
+            return aggregate.AppendStage(PipelineStageDefinitionBuilder.Search(query, highlight));
         }
     }
 }
