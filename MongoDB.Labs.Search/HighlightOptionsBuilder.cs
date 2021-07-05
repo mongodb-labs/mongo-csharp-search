@@ -18,8 +18,25 @@ using MongoDB.Driver;
 
 namespace MongoDB.Labs.Search
 {
+    /// <summary>
+    /// A build for highlighting options.
+    /// </summary>
+    /// <typeparam name="TDocument">The type of the document.</typeparam>
     public sealed class HighlightOptionsBuilder<TDocument>
     {
+        /// <summary>
+        /// Creates highlighting options.
+        /// </summary>
+        /// <param name="path">The document field to search.</param>
+        /// <param name="maxCharsToExamine">
+        /// The maximum number of characters to examine on a document when performing highlighting
+        /// for a field.
+        /// </param>
+        /// <param name="maxNumPassages">
+        /// The number of high-scoring passages to return per document in the highlighting results
+        /// for each field.
+        /// </param>
+        /// <returns>Highlighting options.</returns>
         public HighlightOptions<TDocument> Options(
             PathDefinition<TDocument> path,
             int? maxCharsToExamine = null,
@@ -33,6 +50,20 @@ namespace MongoDB.Labs.Search
             };
         }
 
+        /// <summary>
+        /// Creates highlighting options.
+        /// </summary>
+        /// <typeparam name="TField">The type of the field.</typeparam>
+        /// <param name="path">The document field to search.</param>
+        /// <param name="maxCharsToExamine">
+        /// The maximum number of characters to examine on a document when performing highlighting
+        /// for a field.
+        /// </param>
+        /// <param name="maxNumPassages">
+        /// The number of high-scoring passages to return per document in the highlighting results
+        /// for each field.
+        /// </param>
+        /// <returns>Highlighting options.</returns>
         public HighlightOptions<TDocument> Options<TField>(
             Expression<Func<TDocument, TField>> path,
             int? maxCharsToExamine = null,
