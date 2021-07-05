@@ -19,11 +19,20 @@ using MongoDB.Bson.Serialization.Serializers;
 
 namespace MongoDB.Labs.Search.ObjectModel.Serializers
 {
+    /// <summary>
+    /// Represents a serializer for a <see cref="HighlightTextType"/> value.
+    /// </summary>
     public class HighlightTextTypeSerializer : SerializerBase<HighlightTextType>
     {
         private const string hitName = "hit";
         private const string textName = "text";
 
+        /// <summary>
+        /// Deserializes a value.
+        /// </summary>
+        /// <param name="context">The deserialization context.</param>
+        /// <param name="args">The deserialization arguments.</param>
+        /// <returns>The value.</returns>
         public override HighlightTextType Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             var type = context.Reader.GetCurrentBsonType();
@@ -43,6 +52,12 @@ namespace MongoDB.Labs.Search.ObjectModel.Serializers
             }
         }
 
+        /// <summary>
+        /// Serializes a value.
+        /// </summary>
+        /// <param name="context">The serialization context.</param>
+        /// <param name="args">The serialization arguments.</param>
+        /// <param name="value">The value.</param>
         public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, HighlightTextType value)
         {
             switch (value)
