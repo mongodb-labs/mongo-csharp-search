@@ -2,10 +2,30 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>MongoDB Inc.</Authors>
+    <Description>MongoDB driver extension providing support for Atlas Search.</Description>
+    <Copyright>Copyright © 2021-present MongoDB Inc.</Copyright>
+    <PackageProjectUrl>https://docs.atlas.mongodb.com/atlas-search/</PackageProjectUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageTags>mongodb;mongo;nosql;atlas;search</PackageTags>
+    <Version>1.0.0-beta1</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.12.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
