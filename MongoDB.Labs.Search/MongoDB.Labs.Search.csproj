@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Authors>MongoDB Inc.</Authors>
-    <Description>MongoDB driver extension providing support for Atlas Search.</Description>
+    <Description>MongoDB driver extension providing support for Atlas Search. This package is NOT a supported MongoDB product. See https://github.com/mongodb-labs/mongo-csharp-search for more details.</Description>
     <Copyright>Copyright © 2021-present MongoDB Inc.</Copyright>
     <PackageProjectUrl>https://docs.atlas.mongodb.com/atlas-search/</PackageProjectUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -17,6 +17,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageIcon>PackageIcon.png</PackageIcon>
     <PackageIconUrl />
+    <RepositoryUrl>https://github.com/mongodb-labs/mongo-csharp-search</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
