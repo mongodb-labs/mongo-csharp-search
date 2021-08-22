@@ -15,6 +15,7 @@
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
     <PackageIcon>PackageIcon.png</PackageIcon>
     <PackageIconUrl />
     <RepositoryUrl>https://github.com/mongodb-labs/mongo-csharp-search</RepositoryUrl>
