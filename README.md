@@ -6,7 +6,7 @@ This library is an extension to the MongoDB C# driver providing support for the
 methods for Atlas search by adding a reference to the library in your project
 and using the `MongoDB.Labs.Search` namespace.
 
-*This repository is NOT a supported MongoDB product.*
+**This repository is NOT a supported MongoDB product.**
 
 Examples
 --------
