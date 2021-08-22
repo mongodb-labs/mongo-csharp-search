@@ -8,6 +8,9 @@ and using the `MongoDB.Labs.Search` namespace.
 
 **This repository is NOT a supported MongoDB product.**
 
+You can get the latest release from the [NuGet feed](https://www.nuget.org/packages/MongoDB.Labs.Search)
+or from the [GitHub releases page](https://github.com/mongodb-labs/mongo-csharp-search/releases).
+
 Examples
 --------
 
