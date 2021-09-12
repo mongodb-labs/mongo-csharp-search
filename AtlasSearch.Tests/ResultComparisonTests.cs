@@ -79,6 +79,40 @@ namespace AtlasSearch.Tests
             Assert.Equal("Declaration of Independence", results[0].Title);
         }
 
+        [Fact]
+        public void TestMust()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Must(
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Phrase("life, liberty", x => x.Body),
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Wildcard("happ*", x => x.Body, true)))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("Declaration of Independence", results[0].Title);
+        }
+
+        [Fact]
+        public void TestMustNot()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .MustNot(
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Phrase("life, liberty", x => x.Body)))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.NotEqual("Declaration of Independence", results[0].Title);
+        }
+
         private static IMongoCollection<HistoricalDocument> GetTestCollection()
         {
             var uri = Environment.GetEnvironmentVariable("ATLAS_SEARCH_URI");
