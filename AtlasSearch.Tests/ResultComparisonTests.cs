@@ -65,6 +65,20 @@ namespace AtlasSearch.Tests
             Assert.Equal(".", highlightTexts[14].Value);
         }
 
+        [Fact]
+        public void TestAutocomplete()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Autocomplete("Declaration of Ind", x => x.Title))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("Declaration of Independence", results[0].Title);
+        }
+
         private static IMongoCollection<HistoricalDocument> GetTestCollection()
         {
             var uri = Environment.GetEnvironmentVariable("ATLAS_SEARCH_URI");
