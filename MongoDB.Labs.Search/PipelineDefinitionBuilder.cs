@@ -36,10 +36,11 @@ namespace MongoDB.Labs.Search
         public static PipelineDefinition<TInput, TOutput> Search<TInput, TOutput>(
             this PipelineDefinition<TInput, TOutput> pipeline,
             SearchDefinition<TOutput> query,
-            HighlightOptions<TOutput> highlight = null)
+            HighlightOptions<TOutput> highlight = null,
+            string indexName = null)
         {
             Ensure.IsNotNull(pipeline, nameof(pipeline));
-            return pipeline.AppendStage(PipelineStageDefinitionBuilder.Search(query, highlight));
+            return pipeline.AppendStage(PipelineStageDefinitionBuilder.Search(query, highlight, indexName));
         }
     }
 }

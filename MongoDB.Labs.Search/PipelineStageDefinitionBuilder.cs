@@ -31,7 +31,9 @@ namespace MongoDB.Labs.Search
         /// <param name="highlight">The highlight options.</param>
         /// <returns>The stage.</returns>
         public static PipelineStageDefinition<TInput, TInput> Search<TInput>(
-            SearchDefinition<TInput> query, HighlightOptions<TInput> highlight = null)
+            SearchDefinition<TInput> query,
+            HighlightOptions<TInput> highlight = null,
+            string indexName = null)
         {
             Ensure.IsNotNull(query, nameof(query));
 
@@ -44,6 +46,10 @@ namespace MongoDB.Labs.Search
                     if (highlight != null)
                     {
                         renderedQuery.Add("highlight", highlight.Render(s, sr));
+                    }
+                    if (indexName != null)
+                    {
+                        renderedQuery.Add("index", indexName);
                     }
                     var document = new BsonDocument(operatorName, renderedQuery);
                     return new RenderedPipelineStageDefinition<TInput>(operatorName, document, s);

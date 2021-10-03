@@ -33,10 +33,11 @@ namespace MongoDB.Labs.Search
         public static IAggregateFluent<TResult> Search<TResult>(
             this IAggregateFluent<TResult> aggregate,
             SearchDefinition<TResult> query,
-            HighlightOptions<TResult> highlight = null)
+            HighlightOptions<TResult> highlight = null,
+            string indexName = null)
         {
             Ensure.IsNotNull(aggregate, nameof(aggregate));
-            return aggregate.AppendStage(PipelineStageDefinitionBuilder.Search(query, highlight));
+            return aggregate.AppendStage(PipelineStageDefinitionBuilder.Search(query, highlight, indexName));
         }
     }
 }

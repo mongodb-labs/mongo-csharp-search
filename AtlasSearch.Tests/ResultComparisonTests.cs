@@ -35,7 +35,8 @@ namespace AtlasSearch.Tests
                     SearchBuilders<HistoricalDocument>.Search
                         .Phrase("life, liberty, and the pursuit of happiness", x => x.Body),
                     SearchBuilders<HistoricalDocument>.Highlight
-                        .Options(x => x.Body))
+                        .Options(x => x.Body),
+                    "default")
                 .Limit(1)
                 .Project<HistoricalDocument>(
                     Builders<HistoricalDocument>.Projection
