@@ -30,6 +30,7 @@ namespace MongoDB.Labs.Search
         /// <param name="pipeline">The pipeline.</param>
         /// <param name="query">The search definition.</param>
         /// <param name="highlight">The highlight options.</param>
+        /// <param name="indexName">The index name.</param>
         /// <returns>
         /// A new pipeline with an additional stage.
         /// </returns>

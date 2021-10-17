@@ -29,6 +29,7 @@ namespace MongoDB.Labs.Search
         /// <param name="aggregate">The aggregate.</param>
         /// <param name="query">The search definition.</param>
         /// <param name="highlight">The highlight options.</param>
+        /// <param name="indexName">The index name.</param>
         /// <returns>The fluent aggregate interface.</returns>
         public static IAggregateFluent<TResult> Search<TResult>(
             this IAggregateFluent<TResult> aggregate,

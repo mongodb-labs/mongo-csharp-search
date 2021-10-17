@@ -29,6 +29,7 @@ namespace MongoDB.Labs.Search
         /// <typeparam name="TInput">The type of the input documents.</typeparam>
         /// <param name="query">The search definition.</param>
         /// <param name="highlight">The highlight options.</param>
+        /// <param name="indexName">The index name.</param>
         /// <returns>The stage.</returns>
         public static PipelineStageDefinition<TInput, TInput> Search<TInput>(
             SearchDefinition<TInput> query,
