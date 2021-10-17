@@ -81,6 +81,42 @@ namespace AtlasSearch.Tests
         }
 
         [Fact]
+        public void TestExists()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Must(
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Text("life, liberty, and the pursuit of happiness", x => x.Body),
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Exists(x => x.Title)))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("Declaration of Independence", results[0].Title);
+        }
+
+        [Fact]
+        public void TestFilter()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Filter(
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Phrase("life, liberty", x => x.Body),
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Wildcard("happ*", x => x.Body, true)))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("Declaration of Independence", results[0].Title);
+        }
+
+        [Fact]
         public void TestMust()
         {
             var coll = GetTestCollection();
@@ -112,6 +148,66 @@ namespace AtlasSearch.Tests
                 .ToList();
             Assert.Single(results);
             Assert.NotEqual("Declaration of Independence", results[0].Title);
+        }
+
+        [Fact]
+        public void TestQueryString()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .QueryString(x => x.Body, "life, liberty, and the pursuit of happiness"))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("Declaration of Independence", results[0].Title);
+        }
+
+        [Fact]
+        public void TestShould()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Should(
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Phrase("life, liberty", x => x.Body),
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Wildcard("happ*", x => x.Body, true)))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("Declaration of Independence", results[0].Title);
+        }
+
+        [Fact]
+        public void TestText()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Text("life, liberty, and the pursuit of happiness", x => x.Body))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("Declaration of Independence", results[0].Title);
+        }
+
+        [Fact]
+        public void TestWildcard()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Wildcard("tranquil*", x => x.Body, true))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("US Constitution", results[0].Title);
         }
 
         private static IMongoCollection<HistoricalDocument> GetTestCollection()
