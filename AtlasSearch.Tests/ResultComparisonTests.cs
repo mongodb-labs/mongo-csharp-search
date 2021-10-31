@@ -211,7 +211,7 @@ namespace AtlasSearch.Tests
         }
 
         [Fact]
-        public void TestAnalyzer()
+        public void TestAnalyzerPath()
         {
             var coll = GetTestCollection();
             List<HistoricalDocument> results = coll.Aggregate()
@@ -221,6 +221,23 @@ namespace AtlasSearch.Tests
                             "life, liberty, and the pursuit of happiness",
                             SearchBuilders<HistoricalDocument>.Path
                                 .Analyzer(x => x.Body, "english")))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("Declaration of Independence", results[0].Title);
+        }
+
+        [Fact]
+        public void TestWildcardPath()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Phrase(
+                            "life, liberty, and the pursuit of happiness",
+                            SearchBuilders<HistoricalDocument>.Path
+                                .Wildcard("b*")))
                 .Limit(1)
                 .ToList();
             Assert.Single(results);

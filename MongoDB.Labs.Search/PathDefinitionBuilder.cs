@@ -103,6 +103,19 @@ namespace MongoDB.Labs.Search
         {
             return Analyzer(new ExpressionFieldDefinition<TDocument>(field), analyzerName);
         }
+
+        /// <summary>
+        /// Creates a search path that uses special characters in the field name
+        /// that can match any character.
+        /// </summary>
+        /// <param name="query">
+        /// The wildcard string that the field name must match.
+        /// </param>
+        /// <returns>A wildcard search path.</returns>
+        public PathDefinition<TDocument> Wildcard(string query)
+        {
+            return new WildcardPathDefinition<TDocument>(query);
+        }
     }
 
     internal sealed class SinglePathDefinition<TDocument> : PathDefinition<TDocument>
@@ -161,4 +174,18 @@ namespace MongoDB.Labs.Search
         }
     }
 
+    internal sealed class WildcardPathDefinition<TDocument> : PathDefinition<TDocument>
+    {
+        private readonly string _query;
+
+        public WildcardPathDefinition(string query)
+        {
+            _query = Ensure.IsNotNull(query, nameof(query));
+        }
+
+        public override BsonValue Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            return new BsonDocument("wildcard", _query);
+        }
+    }
 }

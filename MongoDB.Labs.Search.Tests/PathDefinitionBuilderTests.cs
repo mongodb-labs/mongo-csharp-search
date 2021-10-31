@@ -110,6 +110,16 @@ namespace MongoDB.Labs.Search.Tests
                 "{ value: 'fn', multi: 'english' }");
         }
 
+        [Fact]
+        public void Wildcard()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Wildcard("*"),
+                "{ wildcard: '*' }");
+        }
+
         private void AssertRendered<TDocument>(PathDefinition<TDocument> path, string expected)
         {
             AssertRendered(path, BsonDocument.Parse(expected));
