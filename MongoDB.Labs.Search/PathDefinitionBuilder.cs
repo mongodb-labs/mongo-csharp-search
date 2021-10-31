@@ -14,6 +14,8 @@
 
 using MongoDB.Driver;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace MongoDB.Labs.Search
@@ -24,6 +26,58 @@ namespace MongoDB.Labs.Search
     /// <typeparam name="TDocument">The type of the document.</typeparam>
     public sealed class PathDefinitionBuilder<TDocument>
     {
+        /// <summary>
+        /// Creates a search path for a single field.
+        /// </summary>
+        /// <param name="field">The field definition.</param>
+        /// <returns>A single-field search path.</returns>
+        public PathDefinition<TDocument> Single(FieldDefinition<TDocument> field)
+        {
+            return new SinglePathDefinition<TDocument>(field);
+        }
+
+        /// <summary>
+        /// Creates a search path for a single field.
+        /// </summary>
+        /// <typeparam name="TField">The type of the field.</typeparam>
+        /// <param name="field">The field definition.</param>
+        /// <returns>A single-field search path.</returns>
+        public PathDefinition<TDocument> Single<TField>(Expression<Func<TDocument, TField>> field)
+        {
+            return Single(new ExpressionFieldDefinition<TDocument>(field));
+        }
+
+        /// <summary>
+        /// Creates a search path for multiple fields.
+        /// </summary>
+        /// <param name="fields">The collection of field definitions.</param>
+        /// <returns>A multi-field search path.</returns>
+        public PathDefinition<TDocument> Multi(IEnumerable<FieldDefinition<TDocument>> fields)
+        {
+            return new MultiPathDefinition<TDocument>(fields);
+        }
+
+        /// <summary>
+        /// Creates a search path for multiple fields.
+        /// </summary>
+        /// <param name="fields">The array of field definitions.</param>
+        /// <returns>A multi-field search path.</returns>
+        public PathDefinition<TDocument> Multi(params FieldDefinition<TDocument>[] fields)
+        {
+            return Multi((IEnumerable<FieldDefinition<TDocument>>)fields);
+        }
+
+        /// <summary>
+        /// Creates a search path for multiple fields.
+        /// </summary>
+        /// <typeparam name="TField">The type of the fields.</typeparam>
+        /// <param name="fields">The array of field definitions.</param>
+        /// <returns>A multi-field search path.</returns>
+        public PathDefinition<TDocument> Multi<TField>(params Expression<Func<TDocument, TField>>[] fields)
+        {
+            return Multi(fields.Select(x => new ExpressionFieldDefinition<TDocument>(x)));
+        }
+
         /// <summary>
         /// Creates a search path that searches using the specified analyzer.
         /// </summary>

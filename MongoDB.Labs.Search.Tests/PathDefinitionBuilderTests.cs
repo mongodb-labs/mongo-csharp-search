@@ -15,12 +15,78 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
+using System.Collections.Generic;
 using Xunit;
 
 namespace MongoDB.Labs.Search.Tests
 {
     public class PathDefinitionBuilderTests
     {
+        [Fact]
+        public void Single()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(subject.Single("x"), new BsonString("x"));
+        }
+
+        [Fact]
+        public void Single_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(subject.Single(x => x.FirstName), new BsonString("fn"));
+            AssertRendered(subject.Single("FirstName"), new BsonString("fn"));
+        }
+
+        [Fact]
+        public void Multi()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Multi("x", "y"),
+                new BsonArray()
+                {
+                    new BsonString("x"),
+                    new BsonString("y")
+                });
+            AssertRendered(
+                subject.Multi(
+                    new List<FieldDefinition<BsonDocument>>()
+                    {
+                        "x",
+                        "y"
+                    }),
+                new BsonArray()
+                {
+                    new BsonString("x"),
+                    new BsonString("y")
+                });
+        }
+
+        [Fact]
+        public void Multi_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.Multi(x => x.FirstName, x => x.LastName),
+                new BsonArray()
+                {
+                    new BsonString("fn"),
+                    new BsonString("ln")
+                });
+            AssertRendered(
+                subject.Multi("FirstName", "LastName"),
+                new BsonArray()
+                {
+                    new BsonString("fn"),
+                    new BsonString("ln")
+                });
+        }
+
         [Fact]
         public void Analyzer()
         {
@@ -49,7 +115,7 @@ namespace MongoDB.Labs.Search.Tests
             AssertRendered(path, BsonDocument.Parse(expected));
         }
 
-        private void AssertRendered<TDocument>(PathDefinition<TDocument> path, BsonDocument expected)
+        private void AssertRendered<TDocument>(PathDefinition<TDocument> path, BsonValue expected)
         {
             var documentSerializer = BsonSerializer.SerializerRegistry.GetSerializer<TDocument>();
             var renderedPath = path.Render(documentSerializer, BsonSerializer.SerializerRegistry);
@@ -66,6 +132,9 @@ namespace MongoDB.Labs.Search.Tests
         {
             [BsonElement("fn")]
             public string FirstName { get; set; }
+
+            [BsonElement("ln")]
+            public string LastName { get; set; }
         }
     }
 }
