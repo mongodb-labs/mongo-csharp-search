@@ -15,7 +15,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Misc;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -98,90 +97,6 @@ namespace MongoDB.Labs.Search
         {
             return new MultiPathDefinition<TDocument>(
                 fieldNames.Select(fieldName => new StringFieldDefinition<TDocument>(fieldName)));
-        }
-    }
-
-    /// <summary>
-    /// A search path for a single field definition.
-    /// </summary>
-    /// <typeparam name="TDocument">The type of the document.</typeparam>
-    public sealed class SinglePathDefinition<TDocument> : PathDefinition<TDocument>
-    {
-        private readonly FieldDefinition<TDocument> _field;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SinglePathDefinition{TDocument}"/> class.
-        /// </summary>
-        /// <param name="field">The field definition.</param>
-        public SinglePathDefinition(FieldDefinition<TDocument> field)
-        {
-            _field = Ensure.IsNotNull(field, nameof(field));
-        }
-
-        /// <inheritdoc />
-        public override BsonValue Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
-        {
-            var renderedField = _field.Render(documentSerializer, serializerRegistry);
-            return new BsonString(renderedField.FieldName);
-        }
-    }
-
-    /// <summary>
-    /// A search path for multiple field definitions.
-    /// </summary>
-    /// <typeparam name="TDocument">The type of the document.</typeparam>
-    public sealed class MultiPathDefinition<TDocument> : PathDefinition<TDocument>
-    {
-        private readonly IEnumerable<FieldDefinition<TDocument>> _fields;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MultiPathDefinition{TDocument}"/> class.
-        /// </summary>
-        /// <param name="fields">The collection of field definitions.</param>
-        public MultiPathDefinition(IEnumerable<FieldDefinition<TDocument>> fields)
-        {
-            _fields = Ensure.IsNotNull(fields, nameof(fields));
-        }
-
-        /// <inheritdoc />
-        public override BsonValue Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
-        {
-            return new BsonArray(_fields.Select(field =>
-            {
-                var renderedField = field.Render(documentSerializer, serializerRegistry);
-                return new BsonString(renderedField.FieldName);
-            }));
-        }
-    }
-
-    /// <summary>
-    /// A search path specifying an alternate analyzer.
-    /// </summary>
-    /// <typeparam name="TDocument">The type of the document.</typeparam>
-    public sealed class AnalyzerPathDefinition<TDocument> : PathDefinition<TDocument>
-    {
-        private readonly FieldDefinition<TDocument> _field;
-        private readonly string _analyzerName;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AnalyzerPathDefinition{TDocument}"/> class.
-        /// </summary>
-        /// <param name="field">The field definition.</param>
-        /// <param name="analyzerName">The name of the analyzer.</param>
-        public AnalyzerPathDefinition(FieldDefinition<TDocument> field, string analyzerName)
-        {
-            _field = Ensure.IsNotNull(field, nameof(field));
-            _analyzerName = Ensure.IsNotNull(analyzerName, nameof(analyzerName));
-        }
-
-        /// <inheritdoc />
-        public override BsonValue Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
-        {
-            var renderedField = _field.Render(documentSerializer, serializerRegistry);
-            var document = new BsonDocument();
-            document.Add("value", renderedField.FieldName);
-            document.Add("multi", _analyzerName);
-            return document;
         }
     }
 }

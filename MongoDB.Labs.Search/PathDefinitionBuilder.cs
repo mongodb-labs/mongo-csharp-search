@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Misc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -101,4 +104,61 @@ namespace MongoDB.Labs.Search
             return Analyzer(new ExpressionFieldDefinition<TDocument>(field), analyzerName);
         }
     }
+
+    internal sealed class SinglePathDefinition<TDocument> : PathDefinition<TDocument>
+    {
+        private readonly FieldDefinition<TDocument> _field;
+
+        public SinglePathDefinition(FieldDefinition<TDocument> field)
+        {
+            _field = Ensure.IsNotNull(field, nameof(field));
+        }
+
+        public override BsonValue Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var renderedField = _field.Render(documentSerializer, serializerRegistry);
+            return new BsonString(renderedField.FieldName);
+        }
+    }
+
+    internal sealed class MultiPathDefinition<TDocument> : PathDefinition<TDocument>
+    {
+        private readonly IEnumerable<FieldDefinition<TDocument>> _fields;
+
+        public MultiPathDefinition(IEnumerable<FieldDefinition<TDocument>> fields)
+        {
+            _fields = Ensure.IsNotNull(fields, nameof(fields));
+        }
+
+        public override BsonValue Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            return new BsonArray(_fields.Select(field =>
+            {
+                var renderedField = field.Render(documentSerializer, serializerRegistry);
+                return new BsonString(renderedField.FieldName);
+            }));
+        }
+    }
+
+    internal sealed class AnalyzerPathDefinition<TDocument> : PathDefinition<TDocument>
+    {
+        private readonly FieldDefinition<TDocument> _field;
+        private readonly string _analyzerName;
+
+        public AnalyzerPathDefinition(FieldDefinition<TDocument> field, string analyzerName)
+        {
+            _field = Ensure.IsNotNull(field, nameof(field));
+            _analyzerName = Ensure.IsNotNull(analyzerName, nameof(analyzerName));
+        }
+
+        public override BsonValue Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var renderedField = _field.Render(documentSerializer, serializerRegistry);
+            var document = new BsonDocument();
+            document.Add("value", renderedField.FieldName);
+            document.Add("multi", _analyzerName);
+            return document;
+        }
+    }
+
 }
