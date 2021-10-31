@@ -210,6 +210,23 @@ namespace AtlasSearch.Tests
             Assert.Equal("US Constitution", results[0].Title);
         }
 
+        [Fact]
+        public void TestAnalyzer()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Phrase(
+                            "life, liberty, and the pursuit of happiness",
+                            SearchBuilders<HistoricalDocument>.Path
+                                .Analyzer(x => x.Body, "english")))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("Declaration of Independence", results[0].Title);
+        }
+
         private static IMongoCollection<HistoricalDocument> GetTestCollection()
         {
             var uri = Environment.GetEnvironmentVariable("ATLAS_SEARCH_URI");

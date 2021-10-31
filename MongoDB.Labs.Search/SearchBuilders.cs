@@ -20,9 +20,18 @@ namespace MongoDB.Labs.Search
     /// <typeparam name="TDocument">The type of the document.</typeparam>
     public static class SearchBuilders<TDocument>
     {
+        private static PathDefinitionBuilder<TDocument> __path = new PathDefinitionBuilder<TDocument>();
         private static HighlightOptionsBuilder<TDocument> __highlight = new HighlightOptionsBuilder<TDocument>();
         private static ScoreDefinitionBuilder<TDocument> __score = new ScoreDefinitionBuilder<TDocument>();
         private static SearchDefinitionBuilder<TDocument> __search = new SearchDefinitionBuilder<TDocument>();
+
+        /// <summary>
+        /// Gets a <see cref="PathDefinition{TDocument}"/>.
+        /// </summary>
+        public static PathDefinitionBuilder<TDocument> Path
+        {
+            get { return __path; }
+        }
 
         /// <summary>
         /// Gets a <see cref="HighlightOptionsBuilder{TDocument}"/>.

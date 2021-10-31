@@ -153,4 +153,35 @@ namespace MongoDB.Labs.Search
             }));
         }
     }
+
+    /// <summary>
+    /// A search path specifying an alternate analyzer.
+    /// </summary>
+    /// <typeparam name="TDocument">The type of the document.</typeparam>
+    public sealed class AnalyzerPathDefinition<TDocument> : PathDefinition<TDocument>
+    {
+        private readonly FieldDefinition<TDocument> _field;
+        private readonly string _analyzerName;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AnalyzerPathDefinition{TDocument}"/> class.
+        /// </summary>
+        /// <param name="field">The field definition.</param>
+        /// <param name="analyzerName">The name of the analyzer.</param>
+        public AnalyzerPathDefinition(FieldDefinition<TDocument> field, string analyzerName)
+        {
+            _field = Ensure.IsNotNull(field, nameof(field));
+            _analyzerName = Ensure.IsNotNull(analyzerName, nameof(analyzerName));
+        }
+
+        /// <inheritdoc />
+        public override BsonValue Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var renderedField = _field.Render(documentSerializer, serializerRegistry);
+            var document = new BsonDocument();
+            document.Add("value", renderedField.FieldName);
+            document.Add("multi", _analyzerName);
+            return document;
+        }
+    }
 }
