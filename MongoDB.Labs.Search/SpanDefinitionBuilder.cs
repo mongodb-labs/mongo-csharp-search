@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -36,6 +38,21 @@ namespace MongoDB.Labs.Search
         public SpanDefinition<TDocument> First(SpanDefinition<TDocument> @operator, int endPositionLte)
         {
             return new FirstSpanDefinition<TDocument>(@operator, endPositionLte);
+        }
+
+        /// <summary>
+        /// Creates a span clause that matches multiple string found near each other.
+        /// </summary>
+        /// <param name="clauses">The clauses.</param>
+        /// <param name="slop">The allowable distance between words in the query phrase.</param>
+        /// <param name="inOrder">Whether to require that the clauses appear in the specified order.</param>
+        /// <returns>A near span clause.</returns>
+        public SpanDefinition<TDocument> Near(
+            IEnumerable<SpanDefinition<TDocument>> clauses,
+            int slop,
+            bool inOrder = false)
+        {
+            return new NearSpanDefinition<TDocument>(clauses, slop, inOrder);
         }
 
         /// <summary>
@@ -82,6 +99,33 @@ namespace MongoDB.Labs.Search
             document.Add("operator", renderedOperator);
             document.Add("endPositionLte", _endPositionLte);
             return new BsonDocument("first", document);
+        }
+    }
+
+    internal sealed class NearSpanDefinition<TDocument> : SpanDefinition<TDocument>
+    {
+        private readonly List<SpanDefinition<TDocument>> _clauses;
+        private readonly int _slop;
+        private readonly bool _inOrder;
+
+        public NearSpanDefinition(
+            IEnumerable<SpanDefinition<TDocument>> clauses,
+            int slop,
+            bool inOrder)
+        {
+            _clauses = Ensure.IsNotNull(clauses, nameof(clauses)).ToList();
+            _slop = slop;
+            _inOrder = inOrder;
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var clauseDocs = _clauses.Select(clause => clause.Render(documentSerializer, serializerRegistry));
+            var document = new BsonDocument();
+            document.Add("clauses", new BsonArray(clauseDocs));
+            document.Add("slop", _slop);
+            document.Add("inOrder", _inOrder);
+            return new BsonDocument("near", document);
         }
     }
 

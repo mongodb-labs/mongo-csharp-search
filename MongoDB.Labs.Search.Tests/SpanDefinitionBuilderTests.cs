@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
@@ -42,6 +43,50 @@ namespace MongoDB.Labs.Search.Tests
             AssertRendered(
                 subject.First(subject.Term("born", "Biography"), 5),
                 "{ first: { operator: { term: { query: 'born', path: 'bio' } }, endPositionLte: 5 } }");
+        }
+
+        [Fact]
+        public void Near()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Near(
+                    new List<SpanDefinition<BsonDocument>>()
+                    {
+                        subject.Term("foo", "x"),
+                        subject.Term("bar", "x")
+                    },
+                    5,
+                    inOrder: true),
+                "{ near: { clauses: [{ term: { query: 'foo', path: 'x' } }, { term: { query: 'bar', path: 'x' } }], slop: 5, inOrder: true } }");
+        }
+
+        [Fact]
+        public void Near_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.Near(
+                    new List<SpanDefinition<Person>>()
+                    {
+                        subject.Term("born", x => x.Biography),
+                        subject.Term("school", x => x.Biography)
+                    },
+                    5,
+                    inOrder: true),
+                "{ near: { clauses: [{ term: { query: 'born', path: 'bio' } }, { term: { query: 'school', path: 'bio' } }], slop: 5, inOrder: true } }");
+            AssertRendered(
+                subject.Near(
+                    new List<SpanDefinition<Person>>()
+                    {
+                        subject.Term("born", "Biography"),
+                        subject.Term("school", "Biography")
+                    },
+                    5,
+                    inOrder: true),
+                "{ near: { clauses: [{ term: { query: 'born', path: 'bio' } }, { term: { query: 'school', path: 'bio' } }], slop: 5, inOrder: true } }");
         }
 
         private void AssertRendered<TDocument>(SpanDefinition<TDocument> span, string expected)

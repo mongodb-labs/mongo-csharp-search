@@ -183,7 +183,7 @@ namespace AtlasSearch.Tests
         }
 
         [Fact]
-        public void TestSpan()
+        public void TestSpanFirst()
         {
             var coll = GetTestCollection();
             List<HistoricalDocument> results = coll.Aggregate()
@@ -195,6 +195,35 @@ namespace AtlasSearch.Tests
                                     SearchBuilders<HistoricalDocument>.Span
                                         .Term("happiness", x => x.Body),
                                     250)))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("Declaration of Independence", results[0].Title);
+        }
+
+        [Fact]
+        public void TestSpanNear()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Span(
+                            SearchBuilders<HistoricalDocument>.Span
+                                .Near(
+                                    new List<SpanDefinition<HistoricalDocument>>()
+                                    {
+                                        SearchBuilders<HistoricalDocument>.Span
+                                            .Term("life", x => x.Body),
+                                        SearchBuilders<HistoricalDocument>.Span
+                                            .Term("liberty", x => x.Body),
+                                        SearchBuilders<HistoricalDocument>.Span
+                                            .Term("pursuit", x => x.Body),
+                                        SearchBuilders<HistoricalDocument>.Span
+                                            .Term("happiness", x => x.Body),
+                                    },
+                                    3,
+                                    inOrder: true)))
                 .Limit(1)
                 .ToList();
             Assert.Single(results);
