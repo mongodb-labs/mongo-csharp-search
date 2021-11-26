@@ -458,6 +458,21 @@ namespace MongoDB.Labs.Search.Tests
         }
 
         [Fact]
+        public void Span()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Span(
+                    SearchBuilders<BsonDocument>.Span
+                        .First(
+                            SearchBuilders<BsonDocument>.Span
+                                .Term("foo", "x"),
+                            5)),
+                "{ span: { first: { operator: { term: { query: 'foo', path: 'x' } }, endPositionLte: 5 } } }");
+        }
+
+        [Fact]
         public void Text()
         {
             var subject = CreateSubject<BsonDocument>();

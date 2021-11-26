@@ -183,6 +183,25 @@ namespace AtlasSearch.Tests
         }
 
         [Fact]
+        public void TestSpan()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Span(
+                            SearchBuilders<HistoricalDocument>.Span
+                                .First(
+                                    SearchBuilders<HistoricalDocument>.Span
+                                        .Term("happiness", x => x.Body),
+                                    250)))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("Declaration of Independence", results[0].Title);
+        }
+
+        [Fact]
         public void TestText()
         {
             var coll = GetTestCollection();

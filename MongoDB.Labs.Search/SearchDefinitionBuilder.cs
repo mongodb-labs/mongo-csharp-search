@@ -491,6 +491,17 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
+        /// Creates a search definition that finds text search matches within regions of a text
+        /// field.
+        /// </summary>
+        /// <param name="clause">The span clause.</param>
+        /// <returns>A span search definition.</returns>
+        public SearchDefinition<TDocument> Span(SpanDefinition<TDocument> clause)
+        {
+            return new SpanSearchDefinition<TDocument>(clause);
+        }
+
+        /// <summary>
         /// Creates a search definition that performs full-text search using the analyzer specified
         /// in the index configuration.
         /// </summary>
@@ -775,8 +786,8 @@ namespace MongoDB.Labs.Search
     {
         private readonly QueryDefinition _query;
         private readonly PathDefinition<TDocument> _path;
-        private bool _allowAnalyzedField;
-        private ScoreDefinition<TDocument> _score;
+        private readonly bool _allowAnalyzedField;
+        private readonly ScoreDefinition<TDocument> _score;
 
         public RegexSearchDefinition(
             QueryDefinition query,
@@ -804,6 +815,22 @@ namespace MongoDB.Labs.Search
                 document.Add("score", _score.Render(documentSerializer, serializerRegistry));
             }
             return new BsonDocument("regex", document);
+        }
+    }
+
+    internal sealed class SpanSearchDefinition<TDocument> : SearchDefinition<TDocument>
+    {
+        private readonly SpanDefinition<TDocument> _clause;
+
+        public SpanSearchDefinition(SpanDefinition<TDocument> clause)
+        {
+            _clause = Ensure.IsNotNull(clause, nameof(clause));
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var renderedClause = _clause.Render(documentSerializer, serializerRegistry);
+            return new BsonDocument("span", renderedClause);
         }
     }
 

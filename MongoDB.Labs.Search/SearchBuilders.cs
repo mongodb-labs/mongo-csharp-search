@@ -24,6 +24,7 @@ namespace MongoDB.Labs.Search
         private static HighlightOptionsBuilder<TDocument> __highlight = new HighlightOptionsBuilder<TDocument>();
         private static ScoreDefinitionBuilder<TDocument> __score = new ScoreDefinitionBuilder<TDocument>();
         private static SearchDefinitionBuilder<TDocument> __search = new SearchDefinitionBuilder<TDocument>();
+        private static SpanDefinitionBuilder<TDocument> __span = new SpanDefinitionBuilder<TDocument>();
 
         /// <summary>
         /// Gets a <see cref="PathDefinition{TDocument}"/>.
@@ -55,6 +56,14 @@ namespace MongoDB.Labs.Search
         public static SearchDefinitionBuilder<TDocument> Search
         {
             get { return __search; }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="SpanDefinitionBuilder{TDocument}"/>.
+        /// </summary>
+        public static SpanDefinitionBuilder<TDocument> Span
+        {
+            get { return __span; }
         }
     }
 }
