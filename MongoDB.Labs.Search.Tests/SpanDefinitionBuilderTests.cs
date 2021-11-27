@@ -89,6 +89,35 @@ namespace MongoDB.Labs.Search.Tests
                 "{ near: { clauses: [{ term: { query: 'born', path: 'bio' } }, { term: { query: 'school', path: 'bio' } }], slop: 5, inOrder: true } }");
         }
 
+        [Fact]
+        public void Or()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Or(
+                    subject.Term("foo", "x"),
+                    subject.Term("bar", "x")),
+                "{ or: { clauses: [{ term: { query: 'foo', path: 'x' } }, { term: { query: 'bar', path: 'x' } }] } }");
+        }
+
+        [Fact]
+        public void Or_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.Or(
+                    subject.Term("engineer", x => x.Biography),
+                    subject.Term("developer", x => x.Biography)),
+                "{ or: { clauses: [{ term: { query: 'engineer', path: 'bio' } }, { term: { query: 'developer', path: 'bio' } }] } }");
+            AssertRendered(
+                subject.Or(
+                    subject.Term("engineer", "Biography"),
+                    subject.Term("developer", "Biography")),
+                "{ or: { clauses: [{ term: { query: 'engineer', path: 'bio' } }, { term: { query: 'developer', path: 'bio' } }] } }");
+        }
+
         private void AssertRendered<TDocument>(SpanDefinition<TDocument> span, string expected)
         {
             AssertRendered(span, BsonDocument.Parse(expected));

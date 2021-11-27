@@ -56,6 +56,26 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
+        /// Creates a span clause that matches any of its subclauses.
+        /// </summary>
+        /// <param name="clauses">The clauses.</param>
+        /// <returns>An or span clause.</returns>
+        public SpanDefinition<TDocument> Or(IEnumerable<SpanDefinition<TDocument>> clauses)
+        {
+            return new OrSpanDefinition<TDocument>(clauses);
+        }
+
+        /// <summary>
+        /// Creates a span clause that matches any of its subclauses.
+        /// </summary>
+        /// <param name="clauses">The clauses.</param>
+        /// <returns>An or span clause.</returns>
+        public SpanDefinition<TDocument> Or(params SpanDefinition<TDocument>[] clauses)
+        {
+            return Or((IEnumerable<SpanDefinition<TDocument>>)clauses);
+        }
+
+        /// <summary>
         /// Creates a span clause that matches a single term.
         /// </summary>
         /// <param name="query">The string or strings to search for.</param>
@@ -126,6 +146,24 @@ namespace MongoDB.Labs.Search
             document.Add("slop", _slop);
             document.Add("inOrder", _inOrder);
             return new BsonDocument("near", document);
+        }
+    }
+
+    internal sealed class OrSpanDefinition<TDocument> : SpanDefinition<TDocument>
+    {
+        private readonly List<SpanDefinition<TDocument>> _clauses;
+
+        public OrSpanDefinition(IEnumerable<SpanDefinition<TDocument>> clauses)
+        {
+            _clauses = Ensure.IsNotNull(clauses, nameof(clauses)).ToList();
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var clauseDocs = _clauses.Select(clause => clause.Render(documentSerializer, serializerRegistry));
+            var document = new BsonDocument();
+            document.Add("clauses", new BsonArray(clauseDocs));
+            return new BsonDocument("or", document);
         }
     }
 
