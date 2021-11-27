@@ -76,6 +76,19 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
+        /// Creates a span clause that excludes certain strings from the search results.
+        /// </summary>
+        /// <param name="include">Clause to be included.</param>
+        /// <param name="exclude">Clause to be excluded.</param>
+        /// <returns>A subtract span clause.</returns>
+        public SpanDefinition<TDocument> Subtract(
+            SpanDefinition<TDocument> include,
+            SpanDefinition<TDocument> exclude)
+        {
+            return new SubtractSpanDefinition<TDocument>(include, exclude);
+        }
+
+        /// <summary>
         /// Creates a span clause that matches a single term.
         /// </summary>
         /// <param name="query">The string or strings to search for.</param>
@@ -164,6 +177,28 @@ namespace MongoDB.Labs.Search
             var document = new BsonDocument();
             document.Add("clauses", new BsonArray(clauseDocs));
             return new BsonDocument("or", document);
+        }
+    }
+
+    internal sealed class SubtractSpanDefinition<TDocument> : SpanDefinition<TDocument>
+    {
+        private readonly SpanDefinition<TDocument> _include;
+        private readonly SpanDefinition<TDocument> _exclude;
+
+        public SubtractSpanDefinition(SpanDefinition<TDocument> include, SpanDefinition<TDocument> exclude)
+        {
+            _include = Ensure.IsNotNull(include, nameof(include));
+            _exclude = Ensure.IsNotNull(exclude, nameof(exclude));
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var renderedInclude = _include.Render(documentSerializer, serializerRegistry);
+            var renderedExclude = _exclude.Render(documentSerializer, serializerRegistry);
+            var document = new BsonDocument();
+            document.Add("include", renderedInclude);
+            document.Add("exclude", renderedExclude);
+            return new BsonDocument("subtract", document);
         }
     }
 

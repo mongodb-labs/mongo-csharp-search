@@ -118,6 +118,35 @@ namespace MongoDB.Labs.Search.Tests
                 "{ or: { clauses: [{ term: { query: 'engineer', path: 'bio' } }, { term: { query: 'developer', path: 'bio' } }] } }");
         }
 
+        [Fact]
+        public void Subtract()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Subtract(
+                    subject.Term("foo", "x"),
+                    subject.Term("bar", "x")),
+                "{ subtract: { include: { term: { query: 'foo', path: 'x' } }, exclude: { term: { query: 'bar', path: 'x' } } } }");
+        }
+
+        [Fact]
+        public void Subtract_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.Subtract(
+                    subject.Term("engineer", x => x.Biography),
+                    subject.Term("train", x => x.Biography)),
+                "{ subtract: { include: { term: { query: 'engineer', path: 'bio' } }, exclude: { term: { query: 'train', path: 'bio' } } } }");
+            AssertRendered(
+                subject.Subtract(
+                    subject.Term("engineer", "Biography"),
+                    subject.Term("train", "Biography")),
+                "{ subtract: { include: { term: { query: 'engineer', path: 'bio' } }, exclude: { term: { query: 'train', path: 'bio' } } } }");
+        }
+
         private void AssertRendered<TDocument>(SpanDefinition<TDocument> span, string expected)
         {
             AssertRendered(span, BsonDocument.Parse(expected));

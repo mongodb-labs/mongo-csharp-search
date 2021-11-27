@@ -251,6 +251,26 @@ namespace AtlasSearch.Tests
         }
 
         [Fact]
+        public void TestSpanSubtract()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Span(
+                            SearchBuilders<HistoricalDocument>.Span
+                                .Subtract(
+                                    SearchBuilders<HistoricalDocument>.Span
+                                        .Term("unalienable", x => x.Body),
+                                    SearchBuilders<HistoricalDocument>.Span
+                                        .Term("inalienable", x => x.Body))))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("Declaration of Independence", results[0].Title);
+        }
+
+        [Fact]
         public void TestText()
         {
             var coll = GetTestCollection();
