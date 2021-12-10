@@ -429,6 +429,13 @@ namespace MongoDB.Labs.Search
             return QueryString(new ExpressionFieldDefinition<TDocument>(defaultPath), query, score);
         }
 
+        /// <summary>
+        /// Creates a search definition that queries for documents where a date/time field is in
+        /// the specified range.
+        /// </summary>
+        /// <param name="path">The indexed field or fields to search.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A fluent range interface.</returns>
         public IRangeFluent<TDocument, DateTime> RangeDateTime(
             PathDefinition<TDocument> path,
             ScoreDefinition<TDocument> score = null)
@@ -436,6 +443,13 @@ namespace MongoDB.Labs.Search
             return new RangeFluentImpl<TDocument, DateTime, DateTimeBsonValueFactory>(path, score);
         }
 
+        /// <summary>
+        /// Creates a search definition that queries for documents where a date/time field is in
+        /// the specified range.
+        /// </summary>
+        /// <param name="path">The indexed field or fields to search.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A fluent range interface.</returns>
         public IRangeFluent<TDocument, DateTime> RangeDateTime(
             Expression<Func<TDocument, DateTime>> path,
             ScoreDefinition<TDocument> score = null)
@@ -443,6 +457,13 @@ namespace MongoDB.Labs.Search
             return RangeDateTime(new ExpressionFieldDefinition<TDocument>(path), score);
         }
 
+        /// <summary>
+        /// Creates a search definition that queries for documents where a floating-point
+        /// field is in the specified range.
+        /// </summary>
+        /// <param name="path">The indexed field or fields to search.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A fluent range interface.</returns>
         public IRangeFluent<TDocument, double> RangeDouble(
             PathDefinition<TDocument> path,
             ScoreDefinition<TDocument> score = null)
@@ -451,6 +472,13 @@ namespace MongoDB.Labs.Search
         }
 
 
+        /// <summary>
+        /// Creates a search definition that queries for documents where a floating-point
+        /// field is in the specified range.
+        /// </summary>
+        /// <param name="path">The indexed field or fields to search.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A fluent range interface.</returns>
         public IRangeFluent<TDocument, double> RangeDouble(
             Expression<Func<TDocument, double>> path,
             ScoreDefinition<TDocument> score = null)
@@ -458,6 +486,13 @@ namespace MongoDB.Labs.Search
             return RangeDouble(new ExpressionFieldDefinition<TDocument>(path), score);
         }
 
+        /// <summary>
+        /// Creates a search definition that queries for documents where a 32-bit integer
+        /// field is in the specified range.
+        /// </summary>
+        /// <param name="path">The indexed field or fields to search.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A fluent range interface.</returns>
         public IRangeFluent<TDocument, int> RangeInt32(
             PathDefinition<TDocument> path,
             ScoreDefinition<TDocument> score = null)
@@ -465,6 +500,13 @@ namespace MongoDB.Labs.Search
             return new RangeFluentImpl<TDocument, int, Int32BsonValueFactory>(path, score);
         }
 
+        /// <summary>
+        /// Creates a search definition that queries for documents where a 32-bit integer
+        /// field is in the specified range.
+        /// </summary>
+        /// <param name="path">The indexed field or fields to search.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A fluent range interface.</returns>
         public IRangeFluent<TDocument, int> RangeInt32(
             Expression<Func<TDocument, int>> path,
             ScoreDefinition<TDocument> score = null)
@@ -472,6 +514,13 @@ namespace MongoDB.Labs.Search
             return RangeInt32(new ExpressionFieldDefinition<TDocument>(path), score);
         }
 
+        /// <summary>
+        /// Creates a search definition that queries for documents where a 64-bit integer
+        /// field is in the specified range.
+        /// </summary>
+        /// <param name="path">The indexed field or fields to search.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A fluent range interface.</returns>
         public IRangeFluent<TDocument, long> RangeInt64(
             PathDefinition<TDocument> path,
             ScoreDefinition<TDocument> score = null)
@@ -479,6 +528,13 @@ namespace MongoDB.Labs.Search
             return new RangeFluentImpl<TDocument, long, Int64BsonValueFactory>(path, score);
         }
 
+        /// <summary>
+        /// Creates a search definition that queries for documents where a 64-bit integer
+        /// field is in the specified range.
+        /// </summary>
+        /// <param name="path">The indexed field or fields to search.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A fluent range interface.</returns>
         public IRangeFluent<TDocument, long> RangeInt64(
             Expression<Func<TDocument, long>> path,
             ScoreDefinition<TDocument> score = null)

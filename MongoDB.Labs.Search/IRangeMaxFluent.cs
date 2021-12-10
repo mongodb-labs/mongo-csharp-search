@@ -14,11 +14,26 @@
 
 namespace MongoDB.Labs.Search
 {
+    /// <summary>
+    /// Fluent interface for range searches where only the maximum value can be set.
+    /// </summary>
+    /// <typeparam name="TDocument">The type of the document.</typeparam>
+    /// <typeparam name="TValue">The type of the field value.</typeparam>
     public interface IRangeMaxFluent<TDocument, TValue>
         where TValue : struct
     {
+        /// <summary>
+        /// Creates a less than range.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The search definition.</returns>
         SearchDefinition<TDocument> Lt(TValue value);
 
+        /// <summary>
+        /// Creates a less than or equal range.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The search definition.</returns>
         SearchDefinition<TDocument> Lte(TValue value);
     }
 
