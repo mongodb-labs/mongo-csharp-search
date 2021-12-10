@@ -429,6 +429,63 @@ namespace MongoDB.Labs.Search
             return QueryString(new ExpressionFieldDefinition<TDocument>(defaultPath), query, score);
         }
 
+        public IRangeFluent<TDocument, DateTime> RangeDateTime(
+            PathDefinition<TDocument> path,
+            ScoreDefinition<TDocument> score = null)
+        {
+            return new RangeFluentImpl<TDocument, DateTime, DateTimeBsonValueFactory>(path, score);
+        }
+
+        public IRangeFluent<TDocument, DateTime> RangeDateTime(
+            Expression<Func<TDocument, DateTime>> path,
+            ScoreDefinition<TDocument> score = null)
+        {
+            return RangeDateTime(new ExpressionFieldDefinition<TDocument>(path), score);
+        }
+
+        public IRangeFluent<TDocument, double> RangeDouble(
+            PathDefinition<TDocument> path,
+            ScoreDefinition<TDocument> score = null)
+        {
+            return new RangeFluentImpl<TDocument, double, DoubleBsonValueFactory>(path, score);
+        }
+
+
+        public IRangeFluent<TDocument, double> RangeDouble(
+            Expression<Func<TDocument, double>> path,
+            ScoreDefinition<TDocument> score = null)
+        {
+            return RangeDouble(new ExpressionFieldDefinition<TDocument>(path), score);
+        }
+
+        public IRangeFluent<TDocument, int> RangeInt32(
+            PathDefinition<TDocument> path,
+            ScoreDefinition<TDocument> score = null)
+        {
+            return new RangeFluentImpl<TDocument, int, Int32BsonValueFactory>(path, score);
+        }
+
+        public IRangeFluent<TDocument, int> RangeInt32(
+            Expression<Func<TDocument, int>> path,
+            ScoreDefinition<TDocument> score = null)
+        {
+            return RangeInt32(new ExpressionFieldDefinition<TDocument>(path), score);
+        }
+
+        public IRangeFluent<TDocument, long> RangeInt64(
+            PathDefinition<TDocument> path,
+            ScoreDefinition<TDocument> score = null)
+        {
+            return new RangeFluentImpl<TDocument, long, Int64BsonValueFactory>(path, score);
+        }
+
+        public IRangeFluent<TDocument, long> RangeInt64(
+            Expression<Func<TDocument, long>> path,
+            ScoreDefinition<TDocument> score = null)
+        {
+            return RangeInt64(new ExpressionFieldDefinition<TDocument>(path), score);
+        }
+
         /// <summary>
         /// Creates a search definition that interprets the query as a regular expression.
         /// </summary>
@@ -779,6 +836,55 @@ namespace MongoDB.Labs.Search
                 document.Add("score", _score.Render(documentSerializer, serializerRegistry));
             }
             return new BsonDocument("queryString", document);
+        }
+    }
+
+    internal sealed class RangeSearchDefinition<TDocument, TValue, TFactory> : SearchDefinition<TDocument>
+        where TValue : struct
+        where TFactory : IBsonValueFactory<TValue>, new()
+    {
+        private readonly PathDefinition<TDocument> _path;
+        private readonly ScoreDefinition<TDocument> _score;
+        private readonly TValue? _min;
+        private readonly bool _minInclusive;
+        private readonly TValue? _max;
+        private readonly bool _maxInclusive;
+
+        public RangeSearchDefinition(
+            PathDefinition<TDocument> path,
+            ScoreDefinition<TDocument> score,
+            TValue? min,
+            bool minInclusive,
+            TValue? max,
+            bool maxInclusive)
+        {
+            _path = Ensure.IsNotNull(path, nameof(path));
+            _score = score;
+            _min = min;
+            _minInclusive = minInclusive;
+            _max = max;
+            _maxInclusive = maxInclusive;
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var document = new BsonDocument();
+            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            if (_score != null)
+            {
+                document.Add("score", _score.Render(documentSerializer, serializerRegistry));
+            }
+            if (_min.HasValue)
+            {
+                var factory = new TFactory();
+                document.Add(_minInclusive ? "gte" : "gt", factory.Create(_min.Value));
+            }
+            if (_max.HasValue)
+            {
+                var factory = new TFactory();
+                document.Add(_maxInclusive ? "lte" : "lt", factory.Create(_max.Value));
+            }
+            return new BsonDocument("range", document);
         }
     }
 

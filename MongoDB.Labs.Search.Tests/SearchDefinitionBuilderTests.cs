@@ -369,6 +369,60 @@ namespace MongoDB.Labs.Search.Tests
         }
 
         [Fact]
+        public void RangeDateTime()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.RangeDateTime("x")
+                    .Gte(new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc))
+                    .Lte(new DateTime(2009, 12, 31, 0, 0, 0, DateTimeKind.Utc)),
+                "{ range: { path: 'x', gte: { $date: '2000-01-01T00:00:00Z' }, lte: { $date: '2009-12-31T00:00:00Z' } } }");
+        }
+
+        [Fact]
+        public void RangeDouble()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.RangeDouble("x").Gt(1.5).Lt(2.5),
+                "{ range: { path: 'x', gt: 1.5, lt: 2.5 } }");
+        }
+
+        [Fact]
+        public void RangeInt32()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.RangeInt32("x").Gt(1).Lt(10),
+                "{ range: { path: 'x', gt: 1, lt: 10 } }");
+            AssertRendered(
+                subject.RangeInt32("x").Lt(10).Gt(1),
+                "{ range: { path: 'x', gt: 1, lt: 10 } }");
+            AssertRendered(
+                subject.RangeInt32("x").Gte(1).Lte(10),
+                "{ range: { path: 'x', gte: 1, lte: 10 } }");
+            AssertRendered(
+                subject.RangeInt32("x").Lte(10).Gte(1),
+                "{ range: { path: 'x', gte: 1, lte: 10 } }");
+        }
+
+        [Fact]
+        public void RangeInt32_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.RangeInt32(x => x.Age).Gte(18).Lt(65),
+                "{ range: { path: 'age', gte: 18, lt: 65 } }");
+            AssertRendered(
+                subject.RangeInt32("Age").Gte(18).Lt(65),
+                "{ range: { path: 'age', gte: 18, lt: 65 } }");
+        }
+
+        [Fact]
         public void Regex()
         {
             var subject = CreateSubject<BsonDocument>();
