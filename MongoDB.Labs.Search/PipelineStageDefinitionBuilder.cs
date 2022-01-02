@@ -41,7 +41,7 @@ namespace MongoDB.Labs.Search
             const string operatorName = "$search";
             var stage = new DelegatedPipelineStageDefinition<TInput, TInput>(
                 operatorName,
-                (s, sr) =>
+                (s, sr, linqProvider) =>
                 {
                     var renderedQuery = query.Render(s, sr);
                     if (highlight != null)

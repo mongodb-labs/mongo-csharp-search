@@ -15,6 +15,7 @@
 using System;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace MongoDB.Labs.Search
 {
@@ -24,9 +25,9 @@ namespace MongoDB.Labs.Search
     internal sealed class DelegatedPipelineStageDefinition<TInput, TOutput> : PipelineStageDefinition<TInput, TOutput>
     {
         private readonly string _operatorName;
-        private readonly Func<IBsonSerializer<TInput>, IBsonSerializerRegistry, RenderedPipelineStageDefinition<TOutput>> _renderer;
+        private readonly Func<IBsonSerializer<TInput>, IBsonSerializerRegistry, LinqProvider, RenderedPipelineStageDefinition<TOutput>> _renderer;
 
-        public DelegatedPipelineStageDefinition(string operatorName, Func<IBsonSerializer<TInput>, IBsonSerializerRegistry, RenderedPipelineStageDefinition<TOutput>> renderer)
+        public DelegatedPipelineStageDefinition(string operatorName, Func<IBsonSerializer<TInput>, IBsonSerializerRegistry, LinqProvider, RenderedPipelineStageDefinition<TOutput>> renderer)
         {
             _operatorName = operatorName;
             _renderer = renderer;
@@ -37,9 +38,9 @@ namespace MongoDB.Labs.Search
             get { return _operatorName; }
         }
 
-        public override RenderedPipelineStageDefinition<TOutput> Render(IBsonSerializer<TInput> inputSerializer, IBsonSerializerRegistry serializerRegistry)
+        public override RenderedPipelineStageDefinition<TOutput> Render(IBsonSerializer<TInput> inputSerializer, IBsonSerializerRegistry serializerRegistry, LinqProvider linqProvider)
         {
-            return _renderer(inputSerializer, serializerRegistry);
+            return _renderer(inputSerializer, serializerRegistry, linqProvider);
         }
     }
 }
