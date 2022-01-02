@@ -81,12 +81,38 @@ namespace AtlasSearch.Tests
         }
 
         [Fact]
+        public void TestCompound()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Compound()
+                        .Must(
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Text("life", x => x.Body),
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Text("liberty", x => x.Body))
+                        .MustNot(
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Text("property", x => x.Body))
+                        .Must(
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Text("pursuit of happiness", x => x.Body)))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("Declaration of Independence", results[0].Title);
+        }
+
+        [Fact]
         public void TestExists()
         {
             var coll = GetTestCollection();
             List<HistoricalDocument> results = coll.Aggregate()
                 .Search(
                     SearchBuilders<HistoricalDocument>.Search
+                        .Compound()
                         .Must(
                             SearchBuilders<HistoricalDocument>.Search
                                 .Text("life, liberty, and the pursuit of happiness", x => x.Body),
@@ -105,6 +131,7 @@ namespace AtlasSearch.Tests
             List<HistoricalDocument> results = coll.Aggregate()
                 .Search(
                     SearchBuilders<HistoricalDocument>.Search
+                        .Compound()
                         .Filter(
                             SearchBuilders<HistoricalDocument>.Search
                                 .Phrase("life, liberty", x => x.Body),
@@ -123,6 +150,7 @@ namespace AtlasSearch.Tests
             List<HistoricalDocument> results = coll.Aggregate()
                 .Search(
                     SearchBuilders<HistoricalDocument>.Search
+                        .Compound()
                         .Must(
                             SearchBuilders<HistoricalDocument>.Search
                                 .Phrase("life, liberty", x => x.Body),
@@ -141,6 +169,7 @@ namespace AtlasSearch.Tests
             List<HistoricalDocument> results = coll.Aggregate()
                 .Search(
                     SearchBuilders<HistoricalDocument>.Search
+                        .Compound()
                         .MustNot(
                             SearchBuilders<HistoricalDocument>.Search
                                 .Phrase("life, liberty", x => x.Body)))
@@ -171,6 +200,7 @@ namespace AtlasSearch.Tests
             List<HistoricalDocument> results = coll.Aggregate()
                 .Search(
                     SearchBuilders<HistoricalDocument>.Search
+                        .Compound()
                         .Should(
                             SearchBuilders<HistoricalDocument>.Search
                                 .Phrase("life, liberty", x => x.Body),

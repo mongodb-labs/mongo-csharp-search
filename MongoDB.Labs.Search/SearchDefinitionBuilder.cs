@@ -71,6 +71,15 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
+        /// Creates a search definition that combines two or more operators into a single query.
+        /// </summary>
+        /// <returns></returns>
+        public CompoundFluent<TDocument> Compound()
+        {
+            return new CompoundFluentImpl<TDocument>();
+        }
+
+        /// <summary>
         /// Creates a search definition that queries for documents where an indexed field is equal
         /// to the specified value.
         /// </summary>
@@ -155,70 +164,6 @@ namespace MongoDB.Labs.Search
         public SearchDefinition<TDocument> Exists<TField>(Expression<Func<TDocument, TField>> path)
         {
             return Exists(new ExpressionFieldDefinition<TDocument>(path));
-        }
-
-        /// <summary>
-        /// Creates a search definition with clauses which must all match for a document to be
-        /// included in the results.
-        /// </summary>
-        /// <param name="clauses">The clauses.</param>
-        /// <returns>A filter search definition.</returns>
-        public SearchDefinition<TDocument> Filter(IEnumerable<SearchDefinition<TDocument>> clauses)
-        {
-            return new CompoundSearchDefinition<TDocument>("filter", clauses);
-        }
-
-        /// <summary>
-        /// Creates a search definition with clauses which must all match for a document to be
-        /// included in the results.
-        /// </summary>
-        /// <param name="clauses">The clauses.</param>
-        /// <returns>A filter search definition.</returns>
-        public SearchDefinition<TDocument> Filter(params SearchDefinition<TDocument>[] clauses)
-        {
-            return Filter((IEnumerable<SearchDefinition<TDocument>>)clauses);
-        }
-
-        /// <summary>
-        /// Creates a search definition with clauses which must match to produce results.
-        /// </summary>
-        /// <param name="clauses">The clauses.</param>
-        /// <returns>A must search definition.</returns>
-        public SearchDefinition<TDocument> Must(IEnumerable<SearchDefinition<TDocument>> clauses)
-        {
-            return new CompoundSearchDefinition<TDocument>("must", clauses);
-        }
-
-        /// <summary>
-        /// Creates a search definition with caluses which must match to produce results.
-        /// </summary>
-        /// <param name="clauses">The clauses.</param>
-        /// <returns>A must search definition.</returns>
-        public SearchDefinition<TDocument> Must(params SearchDefinition<TDocument>[] clauses)
-        {
-            return Must((IEnumerable<SearchDefinition<TDocument>>)clauses);
-        }
-
-        /// <summary>
-        /// Creates a search definition with clauses which must not match for a document to be
-        /// included in the results.
-        /// </summary>
-        /// <param name="clauses">The clauses.</param>
-        /// <returns>A must not search definition.</returns>
-        public SearchDefinition<TDocument> MustNot(IEnumerable<SearchDefinition<TDocument>> clauses)
-        {
-            return new CompoundSearchDefinition<TDocument>("mustNot", clauses);
-        }
-
-        /// <summary>
-        /// Creates a search definition with clauses which must not match for a document to be
-        /// included in the results.
-        /// </summary>
-        /// <param name="clauses">The clauses.</param>
-        /// <returns>A must not search definition.</returns>
-        public SearchDefinition<TDocument> MustNot(params SearchDefinition<TDocument>[] clauses)
-        {
-            return MustNot((IEnumerable<SearchDefinition<TDocument>>)clauses);
         }
 
         /// <summary>
@@ -469,28 +414,6 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
-        /// Creates a search definition with clauses which cause documents in the result set to be
-        /// scored higher if they match.
-        /// </summary>
-        /// <param name="clauses">The clauses.</param>
-        /// <returns>A should search definition.</returns>
-        public SearchDefinition<TDocument> Should(IEnumerable<SearchDefinition<TDocument>> clauses)
-        {
-            return new CompoundSearchDefinition<TDocument>("should", clauses);
-        }
-
-        /// <summary>
-        /// Creates a search definition with clauses which cause documents in the result set to be
-        /// scored higher if they match.
-        /// </summary>
-        /// <param name="clauses">The clauses.</param>
-        /// <returns>A should search definition.</returns>
-        public SearchDefinition<TDocument> Should(params SearchDefinition<TDocument>[] clauses)
-        {
-            return Should((IEnumerable<SearchDefinition<TDocument>>)clauses);
-        }
-
-        /// <summary>
         /// Creates a search definition that finds text search matches within regions of a text
         /// field.
         /// </summary>
@@ -625,19 +548,49 @@ namespace MongoDB.Labs.Search
 
     internal sealed class CompoundSearchDefinition<TDocument> : SearchDefinition<TDocument>
     {
-        private readonly string _term;
-        private readonly List<SearchDefinition<TDocument>> _clauses;
+        private readonly List<SearchDefinition<TDocument>> _must;
+        private readonly List<SearchDefinition<TDocument>> _mustNot;
+        private readonly List<SearchDefinition<TDocument>> _should;
+        private readonly List<SearchDefinition<TDocument>> _filter;
 
-        public CompoundSearchDefinition(string term, IEnumerable<SearchDefinition<TDocument>> clauses)
+        public CompoundSearchDefinition(
+            List<SearchDefinition<TDocument>> must,
+            List<SearchDefinition<TDocument>> mustNot,
+            List<SearchDefinition<TDocument>> should,
+            List<SearchDefinition<TDocument>> filter)
         {
-            _term = Ensure.IsNotNullOrEmpty(term, nameof(term));
-            _clauses = Ensure.IsNotNull(clauses, nameof(clauses)).ToList();
+            // This constructor should always be called from a fluent interface that
+            // ensures that the parameters are not null and copies the lists, so there is
+            // no need to do any of that here.
+            _must = must;
+            _mustNot = mustNot;
+            _should = should;
+            _filter = filter;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            var clauseDocs = _clauses.Select(clause => clause.Render(documentSerializer, serializerRegistry));
-            var document = new BsonDocument(_term, new BsonArray(clauseDocs));
+            var document = new BsonDocument();
+            if (_must != null)
+            {
+                var mustDocs = _must.Select(clause => clause.Render(documentSerializer, serializerRegistry));
+                document.Add("must", new BsonArray(mustDocs));
+            }
+            if (_mustNot != null)
+            {
+                var mustNotDocs = _mustNot.Select(clause => clause.Render(documentSerializer, serializerRegistry));
+                document.Add("mustNot", new BsonArray(mustNotDocs));
+            }
+            if (_should != null)
+            {
+                var shouldDocs = _should.Select(clause => clause.Render(documentSerializer, serializerRegistry));
+                document.Add("should", new BsonArray(shouldDocs));
+            }
+            if (_filter != null)
+            {
+                var filterDocs = _filter.Select(clause => clause.Render(documentSerializer, serializerRegistry));
+                document.Add("filter", new BsonArray(filterDocs));
+            }
             return new BsonDocument("compound", document);
         }
     }

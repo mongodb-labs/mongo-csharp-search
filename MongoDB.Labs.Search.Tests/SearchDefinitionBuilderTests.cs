@@ -112,6 +112,24 @@ namespace MongoDB.Labs.Search.Tests
         }
 
         [Fact]
+        public void Compound()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered<BsonDocument>(
+                subject.Compound()
+                    .Must(
+                        subject.Exists("x"),
+                        subject.Exists("y"))
+                    .MustNot(
+                        subject.Exists("foo"),
+                        subject.Exists("bar"))
+                    .Must(
+                        subject.Exists("z")),
+                "{ compound: { must: [{ exists: { path: 'x' } }, { exists: { path: 'y' } }, { exists: { path: 'z' } }], mustNot: [{ exists: { path: 'foo' } }, { exists: { path: 'bar' } }] } }");
+        }
+
+        [Fact]
         public void Eq()
         {
             var subject = CreateSubject<BsonDocument>();
@@ -177,8 +195,8 @@ namespace MongoDB.Labs.Search.Tests
         {
             var subject = CreateSubject<BsonDocument>();
 
-            AssertRendered(
-                subject.Filter(
+            AssertRendered<BsonDocument>(
+                subject.Compound().Filter(
                     subject.Exists("x"),
                     subject.Exists("y")),
                 "{ compound: { filter: [{ exists: { path: 'x' } }, { exists: { path: 'y' } }] } }");
@@ -189,8 +207,8 @@ namespace MongoDB.Labs.Search.Tests
         {
             var subject = CreateSubject<BsonDocument>();
 
-            AssertRendered(
-                subject.Must(
+            AssertRendered<BsonDocument>(
+                subject.Compound().Must(
                     subject.Exists("x"),
                     subject.Exists("y")),
                 "{ compound: { must: [{ exists: { path: 'x' } }, { exists: { path: 'y' } }] } }");
@@ -201,8 +219,8 @@ namespace MongoDB.Labs.Search.Tests
         {
             var subject = CreateSubject<BsonDocument>();
 
-            AssertRendered(
-                subject.MustNot(
+            AssertRendered<BsonDocument>(
+                subject.Compound().MustNot(
                     subject.Exists("x"),
                     subject.Exists("y")),
                 "{ compound: { mustNot: [{ exists: { path: 'x' } }, { exists: { path: 'y' } }] } }");
@@ -450,8 +468,8 @@ namespace MongoDB.Labs.Search.Tests
         {
             var subject = CreateSubject<BsonDocument>();
 
-            AssertRendered(
-                subject.Should(
+            AssertRendered<BsonDocument>(
+                subject.Compound().Should(
                     subject.Exists("x"),
                     subject.Exists("y")),
                 "{ compound: { should: [{ exists: { path: 'x' } }, { exists: { path: 'y' } }] } }");
