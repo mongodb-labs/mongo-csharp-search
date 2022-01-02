@@ -194,6 +194,24 @@ namespace AtlasSearch.Tests
         }
 
         [Fact]
+        public void TestRange()
+        {
+            var coll = GetGeoTestCollection();
+            List<Shipwreck> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<Shipwreck>.Search
+                        .Must(
+                            SearchBuilders<Shipwreck>.Search
+                                .RangeDouble(x => x.Latitude).Gt(60.1).Lt(60.2),
+                            SearchBuilders<Shipwreck>.Search
+                                .RangeDouble(x => x.Longitude).Gt(-149.5).Lt(-149.4)))
+                .Limit(1)
+                .ToList();
+            Assert.Single(results);
+            Assert.Equal("US,US,graph,Chart 16682", results[0].Chart);
+        }
+
+        [Fact]
         public void TestShould()
         {
             var coll = GetTestCollection();
@@ -362,12 +380,24 @@ namespace AtlasSearch.Tests
             Assert.Equal("Declaration of Independence", results[0].Title);
         }
 
-        private static IMongoCollection<HistoricalDocument> GetTestCollection()
+        private static MongoClient GetTestClient()
         {
             var uri = Environment.GetEnvironmentVariable("ATLAS_SEARCH_URI");
-            var client = new MongoClient(uri);
+            return new MongoClient(uri);
+        }
+
+        private static IMongoCollection<HistoricalDocument> GetTestCollection()
+        {
+            var client = GetTestClient();
             var db = client.GetDatabase("sample_training");
             return db.GetCollection<HistoricalDocument>("posts");
+        }
+
+        private static IMongoCollection<Shipwreck> GetGeoTestCollection()
+        {
+            var client = GetTestClient();
+            var db = client.GetDatabase("sample_geospatial");
+            return db.GetCollection<Shipwreck>("shipwrecks");
         }
 
         [BsonIgnoreExtraElements]
@@ -387,6 +417,19 @@ namespace AtlasSearch.Tests
 
             [BsonElement("score")]
             public double Score { get; set; }
+        }
+
+        [BsonIgnoreExtraElements]
+        private class Shipwreck
+        {
+            [BsonElement("latdec")]
+            public double Latitude { get; set; }
+
+            [BsonElement("londec")]
+            public double Longitude { get; set; }
+
+            [BsonElement("chart")]
+            public string Chart { get; set; }
         }
     }
 }
