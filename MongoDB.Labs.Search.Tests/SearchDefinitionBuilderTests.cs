@@ -16,13 +16,27 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+using MongoDB.Driver.GeoJsonObjectModel;
 using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace MongoDB.Labs.Search.Tests
 {
     public class SearchDefinitionBuildTests
     {
+        private readonly GeoJsonPolygon<GeoJson2DGeographicCoordinates> __testPolygon =
+            new GeoJsonPolygon<GeoJson2DGeographicCoordinates>(
+                new GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates>(
+                    new GeoJsonLinearRingCoordinates<GeoJson2DGeographicCoordinates>(
+                        new List<GeoJson2DGeographicCoordinates>()
+                        {
+                            new GeoJson2DGeographicCoordinates(-161.323242, 22.512557),
+                            new GeoJson2DGeographicCoordinates(-152.446289, 22.065278),
+                            new GeoJson2DGeographicCoordinates(-156.09375, 17.811456),
+                            new GeoJson2DGeographicCoordinates(-161.323242, 22.512557)
+                        })));
+
         [Fact]
         public void Autocomplete()
         {
@@ -200,6 +214,38 @@ namespace MongoDB.Labs.Search.Tests
                     subject.Exists("x"),
                     subject.Exists("y")),
                 "{ compound: { filter: [{ exists: { path: 'x' } }, { exists: { path: 'y' } }] } }");
+        }
+
+        [Fact]
+        public void GeoShape()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.GeoShape(
+                    __testPolygon,
+                    "location",
+                    GeoShapeRelation.Disjoint),
+                "{ geoShape: { geometry: { type: 'Polygon', coordinates: [[[-161.323242, 22.512557], [-152.446289, 22.065278], [-156.09375, 17.811456], [-161.323242, 22.512557]]] }, path: 'location', relation: 'disjoint' } }");
+        }
+
+        [Fact]
+        public void GeoShape_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.GeoShape(
+                    __testPolygon,
+                    x => x.Location,
+                    GeoShapeRelation.Disjoint),
+                "{ geoShape: { geometry: { type: 'Polygon', coordinates: [[[-161.323242, 22.512557], [-152.446289, 22.065278], [-156.09375, 17.811456], [-161.323242, 22.512557]]] }, path: 'location', relation: 'disjoint' } }");
+            AssertRendered(
+                subject.GeoShape(
+                    __testPolygon,
+                    "Location",
+                    GeoShapeRelation.Disjoint),
+                "{ geoShape: { geometry: { type: 'Polygon', coordinates: [[[-161.323242, 22.512557], [-152.446289, 22.065278], [-156.09375, 17.811456], [-161.323242, 22.512557]]] }, path: 'location', relation: 'disjoint' } }");
         }
 
         [Fact]
@@ -742,6 +788,9 @@ namespace MongoDB.Labs.Search.Tests
 
             [BsonElement("dob")]
             public DateTime Birthday { get; set; }
+
+            [BsonElement("location")]
+            public GeoJsonPoint<GeoJson2DGeographicCoordinates> Location { get; set; }
         }
     }
 }

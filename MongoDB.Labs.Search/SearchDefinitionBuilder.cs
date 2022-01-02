@@ -20,6 +20,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Misc;
+using MongoDB.Driver.GeoJsonObjectModel;
 
 namespace MongoDB.Labs.Search
 {
@@ -164,6 +165,59 @@ namespace MongoDB.Labs.Search
         public SearchDefinition<TDocument> Exists<TField>(Expression<Func<TDocument, TField>> path)
         {
             return Exists(new ExpressionFieldDefinition<TDocument>(path));
+        }
+
+        /// <summary>
+        /// Creates a search definition that queries for shapes with a given geometry.
+        /// </summary>
+        /// <typeparam name="TCoordinates">The type of the coordinates.</typeparam>
+        /// <param name="geometry">
+        /// GeoJSON object specifying the Polygon, MultiPolygon, or LineString shape or point
+        /// to search.
+        /// </param>
+        /// <param name="path">Indexed geo type field or fields to search.</param>
+        /// <param name="relation">
+        /// Relation of the query shape geometry to the indexed field geometry.
+        /// </param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A geo shape search definition.</returns>
+        public SearchDefinition<TDocument> GeoShape<TCoordinates>(
+            GeoJsonGeometry<TCoordinates> geometry,
+            PathDefinition<TDocument> path,
+            GeoShapeRelation relation,
+            ScoreDefinition<TDocument> score = null)
+            where TCoordinates : GeoJsonCoordinates
+        {
+            return new GeoShapeSearchDefinition<TDocument, TCoordinates>(geometry, path, relation, score);
+        }
+
+        /// <summary>
+        /// Creates a search definition that queries for shapes with a given geometry.
+        /// </summary>
+        /// <typeparam name="TCoordinates">The type of the coordinates.</typeparam>
+        /// <typeparam name="TField">The type of the field.</typeparam>
+        /// <param name="geometry">
+        /// GeoJSON object specifying the Polygon, MultiPolygon, or LineString shape or point
+        /// to search.
+        /// </param>
+        /// <param name="path">Indexed geo type field or fields to search.</param>
+        /// <param name="relation">
+        /// Relation of the query shape geometry to the indexed field geometry.
+        /// </param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A geo shape search definition.</returns>
+        public SearchDefinition<TDocument> GeoShape<TCoordinates, TField>(
+            GeoJsonGeometry<TCoordinates> geometry,
+            Expression<Func<TDocument, TField>> path,
+            GeoShapeRelation relation,
+            ScoreDefinition<TDocument> score = null)
+            where TCoordinates : GeoJsonCoordinates
+        {
+            return GeoShape(
+                geometry,
+                new ExpressionFieldDefinition<TDocument>(path),
+                relation,
+                score);
         }
 
         /// <summary>
@@ -756,6 +810,57 @@ namespace MongoDB.Labs.Search
             var renderedField = _path.Render(documentSerializer, serializerRegistry);
             var document = new BsonDocument("path", renderedField.FieldName);
             return new BsonDocument("exists", document);
+        }
+    }
+
+    internal sealed class GeoShapeSearchDefinition<TDocument, TCoordinates> : SearchDefinition<TDocument>
+        where TCoordinates : GeoJsonCoordinates
+    {
+        private readonly GeoJsonGeometry<TCoordinates> _geometry;
+        private readonly PathDefinition<TDocument> _path;
+        private readonly GeoShapeRelation _relation;
+        private readonly ScoreDefinition<TDocument> _score;
+
+        public GeoShapeSearchDefinition(
+            GeoJsonGeometry<TCoordinates> geometry,
+            PathDefinition<TDocument> path,
+            GeoShapeRelation relation,
+            ScoreDefinition<TDocument> score)
+        {
+            _geometry = Ensure.IsNotNull(geometry, nameof(geometry));
+            _path = Ensure.IsNotNull(path, nameof(path));
+            _relation = relation;
+            _score = score;
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var document = new BsonDocument();
+            document.Add("geometry", _geometry.ToBsonDocument());
+            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            document.Add("relation", RelationToString(_relation));
+            if (_score != null)
+            {
+                document.Add("score", _score.Render(documentSerializer, serializerRegistry));
+            }
+            return new BsonDocument("geoShape", document);
+        }
+
+        private static string RelationToString(GeoShapeRelation relation)
+        {
+            switch (relation)
+            {
+                case GeoShapeRelation.Contains:
+                    return "contains";
+                case GeoShapeRelation.Disjoint:
+                    return "disjoint";
+                case GeoShapeRelation.Intersects:
+                    return "intersects";
+                case GeoShapeRelation.Within:
+                    return "within";
+                default:
+                    throw new ArgumentException($"Invalid relation: {relation}", nameof(relation));
+            }
         }
     }
 
