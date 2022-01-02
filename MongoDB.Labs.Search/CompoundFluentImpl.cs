@@ -23,6 +23,7 @@ namespace MongoDB.Labs.Search
         private List<SearchDefinition<TDocument>> _mustNot;
         private List<SearchDefinition<TDocument>> _should;
         private List<SearchDefinition<TDocument>> _filter;
+        private int _minimumShouldMatch = 0;
 
         public override CompoundFluent<TDocument> Must(IEnumerable<SearchDefinition<TDocument>> clauses)
         {
@@ -64,9 +65,15 @@ namespace MongoDB.Labs.Search
             return this;
         }
 
+        public override CompoundFluent<TDocument> MinimumShouldMatch(int minimumShouldMatch)
+        {
+            _minimumShouldMatch = minimumShouldMatch;
+            return this;
+        }
+
         public override SearchDefinition<TDocument> ToSearchDefinition()
         {
-            return new CompoundSearchDefinition<TDocument>(_must, _mustNot, _should, _filter);
+            return new CompoundSearchDefinition<TDocument>(_must, _mustNot, _should, _filter, _minimumShouldMatch);
         }
     }
 }

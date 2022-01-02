@@ -665,12 +665,14 @@ namespace MongoDB.Labs.Search
         private readonly List<SearchDefinition<TDocument>> _mustNot;
         private readonly List<SearchDefinition<TDocument>> _should;
         private readonly List<SearchDefinition<TDocument>> _filter;
+        private readonly int _minimumShouldMatch;
 
         public CompoundSearchDefinition(
             List<SearchDefinition<TDocument>> must,
             List<SearchDefinition<TDocument>> mustNot,
             List<SearchDefinition<TDocument>> should,
-            List<SearchDefinition<TDocument>> filter)
+            List<SearchDefinition<TDocument>> filter,
+            int minimumShouldMatch)
         {
             // This constructor should always be called from a fluent interface that
             // ensures that the parameters are not null and copies the lists, so there is
@@ -679,6 +681,7 @@ namespace MongoDB.Labs.Search
             _mustNot = mustNot;
             _should = should;
             _filter = filter;
+            _minimumShouldMatch = minimumShouldMatch;
         }
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
@@ -703,6 +706,10 @@ namespace MongoDB.Labs.Search
             {
                 var filterDocs = _filter.Select(clause => clause.Render(documentSerializer, serializerRegistry));
                 document.Add("filter", new BsonArray(filterDocs));
+            }
+            if (_minimumShouldMatch > 0)
+            {
+                document.Add("minimumShouldMatch", _minimumShouldMatch);
             }
             return new BsonDocument("compound", document);
         }

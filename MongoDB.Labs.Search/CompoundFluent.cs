@@ -97,6 +97,14 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
+        /// Sets a value specifying the minimum number of should clauses the must match
+        /// to include a document in the results.
+        /// </summary>
+        /// <param name="minimumShouldMatch">The value to set.</param>
+        /// <returns>The compound fluent interface.</returns>
+        public abstract CompoundFluent<TDocument> MinimumShouldMatch(int minimumShouldMatch);
+
+        /// <summary>
         /// Constructs a search definition from the fluent interface.
         /// </summary>
         /// <returns>A compound search definition.</returns>

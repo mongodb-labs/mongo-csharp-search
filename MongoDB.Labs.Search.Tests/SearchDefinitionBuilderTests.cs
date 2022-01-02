@@ -523,10 +523,12 @@ namespace MongoDB.Labs.Search.Tests
             var subject = CreateSubject<BsonDocument>();
 
             AssertRendered<BsonDocument>(
-                subject.Compound().Should(
-                    subject.Exists("x"),
-                    subject.Exists("y")),
-                "{ compound: { should: [{ exists: { path: 'x' } }, { exists: { path: 'y' } }] } }");
+                subject.Compound()
+                    .Should(
+                        subject.Exists("x"),
+                        subject.Exists("y"))
+                    .MinimumShouldMatch(2),
+                "{ compound: { should: [{ exists: { path: 'x' } }, { exists: { path: 'y' } }], minimumShouldMatch: 2 } }");
         }
 
         [Fact]

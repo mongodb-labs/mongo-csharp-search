@@ -200,6 +200,7 @@ namespace AtlasSearch.Tests
             List<Shipwreck> results = coll.Aggregate()
                 .Search(
                     SearchBuilders<Shipwreck>.Search
+                        .Compound()
                         .Must(
                             SearchBuilders<Shipwreck>.Search
                                 .RangeDouble(x => x.Latitude).Gt(60.1).Lt(60.2),
@@ -223,7 +224,8 @@ namespace AtlasSearch.Tests
                             SearchBuilders<HistoricalDocument>.Search
                                 .Phrase("life, liberty", x => x.Body),
                             SearchBuilders<HistoricalDocument>.Search
-                                .Wildcard("happ*", x => x.Body, true)))
+                                .Wildcard("happ*", x => x.Body, true))
+                        .MinimumShouldMatch(2))
                 .Limit(1)
                 .ToList();
             Assert.Single(results);
