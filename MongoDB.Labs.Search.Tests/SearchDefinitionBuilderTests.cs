@@ -249,6 +249,29 @@ namespace MongoDB.Labs.Search.Tests
         }
 
         [Fact]
+        public void GeoWithin()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.GeoWithin(__testPolygon, "location"),
+                "{ geoWithin: { geometry: { type: 'Polygon', coordinates: [[[-161.323242, 22.512557], [-152.446289, 22.065278], [-156.09375, 17.811456], [-161.323242, 22.512557]]] }, path: 'location' } }");
+        }
+
+        [Fact]
+        public void GeoWithin_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.GeoWithin(__testPolygon, x => x.Location),
+                "{ geoWithin: { geometry: { type: 'Polygon', coordinates: [[[-161.323242, 22.512557], [-152.446289, 22.065278], [-156.09375, 17.811456], [-161.323242, 22.512557]]] }, path: 'location' } }");
+            AssertRendered(
+                subject.GeoWithin(__testPolygon, "Location"),
+                "{ geoWithin: { geometry: { type: 'Polygon', coordinates: [[[-161.323242, 22.512557], [-152.446289, 22.065278], [-156.09375, 17.811456], [-161.323242, 22.512557]]] }, path: 'location' } }");
+        }
+
+        [Fact]
         public void Must()
         {
             var subject = CreateSubject<BsonDocument>();

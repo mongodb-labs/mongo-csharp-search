@@ -221,6 +221,47 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
+        /// Creates a search definition that queries for geographic points within a given
+        /// geometry.
+        /// </summary>
+        /// <typeparam name="TCoordinates">The type of the coordinates.</typeparam>
+        /// <param name="geometry">
+        /// GeoJSON object specifying the MultiPolygon or Polygon to search within.
+        /// </param>
+        /// <param name="path">Indexed geo type field or fields to search.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A geo within search definition.</returns>
+        public SearchDefinition<TDocument> GeoWithin<TCoordinates>(
+            GeoJsonGeometry<TCoordinates> geometry,
+            PathDefinition<TDocument> path,
+            ScoreDefinition<TDocument> score = null)
+            where TCoordinates : GeoJsonCoordinates
+        {
+            return new GeoWithinSearchDefinition<TDocument, TCoordinates>(geometry, path, score);
+        }
+
+        /// <summary>
+        /// Creates a search definition that queries for geographic points within a given
+        /// geometry.
+        /// </summary>
+        /// <typeparam name="TCoordinates">The type of the coordinates.</typeparam>
+        /// <typeparam name="TField">The type of the field.</typeparam>
+        /// <param name="geometry">
+        /// GeoJSON object specifying the MultiPolygon or Polygon to search within.
+        /// </param>
+        /// <param name="path">Indexed geo type field or fields to search.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A geo within search definition.</returns>
+        public SearchDefinition<TDocument> GeoWithin<TCoordinates, TField>(
+            GeoJsonGeometry<TCoordinates> geometry,
+            Expression<Func<TDocument, TField>> path,
+            ScoreDefinition<TDocument> score = null)
+            where TCoordinates : GeoJsonCoordinates
+        {
+            return GeoWithin(geometry, new ExpressionFieldDefinition<TDocument>(path), score);
+        }
+
+        /// <summary>
         /// Creates a search definition that supports querying and scoring numeric and date values.
         /// </summary>
         /// <param name="path">The indexed field or fields to search.</param>
@@ -861,6 +902,39 @@ namespace MongoDB.Labs.Search
                 default:
                     throw new ArgumentException($"Invalid relation: {relation}", nameof(relation));
             }
+        }
+    }
+
+    internal sealed class GeoWithinSearchDefinition<TDocument, TCoordinates> : SearchDefinition<TDocument>
+        where TCoordinates : GeoJsonCoordinates
+    {
+        private readonly GeoJsonGeometry<TCoordinates> _geometry;
+        private readonly PathDefinition<TDocument> _path;
+        private readonly ScoreDefinition<TDocument> _score;
+
+        public GeoWithinSearchDefinition(
+            GeoJsonGeometry<TCoordinates> geometry,
+            PathDefinition<TDocument> path,
+            ScoreDefinition<TDocument> score)
+        {
+            _geometry = Ensure.IsNotNull(geometry, nameof(geometry));
+            _path = Ensure.IsNotNull(path, nameof(path));
+            _score = score;
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var document = new BsonDocument();
+            if (_geometry != null)
+            {
+                document.Add("geometry", _geometry.ToBsonDocument());
+            }
+            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            if (_score != null)
+            {
+                document.Add("score", _score.Render(documentSerializer, serializerRegistry));
+            }
+            return new BsonDocument("geoWithin", document);
         }
     }
 

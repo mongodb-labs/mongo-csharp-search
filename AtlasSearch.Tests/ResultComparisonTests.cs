@@ -170,6 +170,19 @@ namespace AtlasSearch.Tests
         }
 
         [Fact]
+        public void TestGeoWithin()
+        {
+            var coll = GetGeoTestCollection();
+            List<Shipwreck> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<Shipwreck>.Search
+                        .GeoWithin(__testPolygon, x => x.Coordinates))
+                .Limit(1)
+                .ToList();
+            Assert.Empty(results);
+        }
+
+        [Fact]
         public void TestMust()
         {
             var coll = GetTestCollection();
