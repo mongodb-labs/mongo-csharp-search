@@ -25,7 +25,7 @@ namespace MongoDB.Labs.Search.Tests
 {
     public class SearchDefinitionBuildTests
     {
-        private readonly GeoJsonPolygon<GeoJson2DGeographicCoordinates> __testPolygon =
+        private static readonly GeoJsonPolygon<GeoJson2DGeographicCoordinates> __testPolygon =
             new GeoJsonPolygon<GeoJson2DGeographicCoordinates>(
                 new GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates>(
                     new GeoJsonLinearRingCoordinates<GeoJson2DGeographicCoordinates>(
@@ -36,12 +36,17 @@ namespace MongoDB.Labs.Search.Tests
                             new GeoJson2DGeographicCoordinates(-156.09375, 17.811456),
                             new GeoJson2DGeographicCoordinates(-161.323242, 22.512557)
                         })));
-        private readonly GeoWithinBox<GeoJson2DGeographicCoordinates> __testBox =
+        private static readonly GeoWithinBox<GeoJson2DGeographicCoordinates> __testBox =
             new GeoWithinBox<GeoJson2DGeographicCoordinates>(
                 new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
                     new GeoJson2DGeographicCoordinates(-161.323242, 22.065278)),
                 new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
                     new GeoJson2DGeographicCoordinates(-152.446289, 22.512557)));
+        private static readonly GeoWithinCircle<GeoJson2DGeographicCoordinates> __testCircle =
+            new GeoWithinCircle<GeoJson2DGeographicCoordinates>(
+                new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+                    new GeoJson2DGeographicCoordinates(-161.323242, 22.512557)),
+                7.5);
 
         [Fact]
         public void Autocomplete()
@@ -265,6 +270,9 @@ namespace MongoDB.Labs.Search.Tests
             AssertRendered(
                 subject.GeoWithin(__testBox, "location"),
                 "{ geoWithin: { box: { bottomLeft: { type: 'Point', coordinates: [-161.323242, 22.065278] }, topRight: { type: 'Point', coordinates: [-152.446289, 22.512557] } }, path: 'location' } }");
+            AssertRendered(
+                subject.GeoWithin(__testCircle, "location"),
+                "{ geoWithin: { circle: { center: { type: 'Point', coordinates: [-161.323242, 22.512557] }, radius: 7.5 }, path: 'location' } }");
         }
 
         [Fact]
@@ -285,6 +293,13 @@ namespace MongoDB.Labs.Search.Tests
             AssertRendered(
                 subject.GeoWithin(__testBox, "Location"),
                 "{ geoWithin: { box: { bottomLeft: { type: 'Point', coordinates: [-161.323242, 22.065278] }, topRight: { type: 'Point', coordinates: [-152.446289, 22.512557] } }, path: 'location' } }");
+
+            AssertRendered(
+                subject.GeoWithin(__testCircle, x => x.Location),
+                "{ geoWithin: { circle: { center: { type: 'Point', coordinates: [-161.323242, 22.512557] }, radius: 7.5 }, path: 'location' } }");
+            AssertRendered(
+                subject.GeoWithin(__testCircle, "Location"),
+                "{ geoWithin: { circle: { center: { type: 'Point', coordinates: [-161.323242, 22.512557] }, radius: 7.5 }, path: 'location' } }");
         }
 
         [Fact]

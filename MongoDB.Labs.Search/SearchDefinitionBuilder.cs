@@ -305,6 +305,49 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
+        /// Creates a search definition that queries for geographic points within a given
+        /// circle.
+        /// </summary>
+        /// <typeparam name="TCoordinates">The type of the coordinates.</typeparam>
+        /// <param name="circle">
+        /// Object that specifies the center point and the radius in meters to search
+        /// within.
+        /// </param>
+        /// <param name="path">Indexed geo type field or fields to search.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A geo within search definition.</returns>
+        public SearchDefinition<TDocument> GeoWithin<TCoordinates>(
+            GeoWithinCircle<TCoordinates> circle,
+            PathDefinition<TDocument> path,
+            ScoreDefinition<TDocument> score = null)
+            where TCoordinates : GeoJsonCoordinates
+        {
+            return new GeoWithinSearchDefinition<TDocument, TCoordinates>(circle, path, score);
+        }
+
+        /// <summary>
+        /// Creates a search definition that queries for geographic points within a given
+        /// circle.
+        /// </summary>
+        /// <typeparam name="TCoordinates">The type of the coordinates.</typeparam>
+        /// <typeparam name="TField">The type of the field.</typeparam>
+        /// <param name="circle">
+        /// Object that specifies the center point and the radius in meters to search
+        /// within.
+        /// </param>
+        /// <param name="path">Indexed geo type field or field to search.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A geo within search definition.</returns>
+        public SearchDefinition<TDocument> GeoWithin<TCoordinates, TField>(
+            GeoWithinCircle<TCoordinates> circle,
+            Expression<Func<TDocument, TField>> path,
+            ScoreDefinition<TDocument> score = null)
+            where TCoordinates : GeoJsonCoordinates
+        {
+            return GeoWithin(circle, new ExpressionFieldDefinition<TDocument>(path), score);
+        }
+
+        /// <summary>
         /// Creates a search definition that supports querying and scoring numeric and date values.
         /// </summary>
         /// <param name="path">The indexed field or fields to search.</param>
@@ -953,6 +996,7 @@ namespace MongoDB.Labs.Search
     {
         private readonly GeoJsonGeometry<TCoordinates> _geometry;
         private readonly GeoWithinBox<TCoordinates> _box;
+        private readonly GeoWithinCircle<TCoordinates> _circle;
         private readonly PathDefinition<TDocument> _path;
         private readonly ScoreDefinition<TDocument> _score;
 
@@ -976,6 +1020,16 @@ namespace MongoDB.Labs.Search
             _score = score;
         }
 
+        public GeoWithinSearchDefinition(
+            GeoWithinCircle<TCoordinates> circle,
+            PathDefinition<TDocument> path,
+            ScoreDefinition<TDocument> score)
+        {
+            _circle = Ensure.IsNotNull(circle, nameof(circle));
+            _path = Ensure.IsNotNull(path, nameof(path));
+            _score = score;
+        }
+
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
             var document = new BsonDocument();
@@ -986,6 +1040,10 @@ namespace MongoDB.Labs.Search
             if (_box != null)
             {
                 document.Add("box", _box.Render());
+            }
+            if (_circle != null)
+            {
+                document.Add("circle", _circle.Render());
             }
             document.Add("path", _path.Render(documentSerializer, serializerRegistry));
             if (_score != null)

@@ -27,7 +27,7 @@ namespace AtlasSearch.Tests
 {
     public class ResultComparisonTests
     {
-        private readonly GeoJsonPolygon<GeoJson2DGeographicCoordinates> __testPolygon =
+        private static readonly GeoJsonPolygon<GeoJson2DGeographicCoordinates> __testPolygon =
             new GeoJsonPolygon<GeoJson2DGeographicCoordinates>(
                 new GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates>(
                     new GeoJsonLinearRingCoordinates<GeoJson2DGeographicCoordinates>(
@@ -38,12 +38,17 @@ namespace AtlasSearch.Tests
                             new GeoJson2DGeographicCoordinates(-156.09375, 17.811456),
                             new GeoJson2DGeographicCoordinates(-161.323242, 22.512557)
                         })));
-        private readonly GeoWithinBox<GeoJson2DGeographicCoordinates> __testBox =
+        private static readonly GeoWithinBox<GeoJson2DGeographicCoordinates> __testBox =
             new GeoWithinBox<GeoJson2DGeographicCoordinates>(
                 new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
                     new GeoJson2DGeographicCoordinates(-161.323242, 22.065278)),
                 new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
                     new GeoJson2DGeographicCoordinates(-152.446289, 22.512557)));
+        private static readonly GeoWithinCircle<GeoJson2DGeographicCoordinates> __testCircle =
+            new GeoWithinCircle<GeoJson2DGeographicCoordinates>(
+                new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+                    new GeoJson2DGeographicCoordinates(-161.323242, 22.512557)),
+                7.5);
 
         [Fact]
         public void TestPhrase()
@@ -196,6 +201,19 @@ namespace AtlasSearch.Tests
                 .Search(
                     SearchBuilders<Shipwreck>.Search
                         .GeoWithin(__testBox, x => x.Coordinates))
+                .Limit(1)
+                .ToList();
+            Assert.Empty(results);
+        }
+
+        [Fact]
+        public void TestGeoWithinCircle()
+        {
+            var coll = GetGeoTestCollection();
+            List<Shipwreck> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<Shipwreck>.Search
+                        .GeoWithin(__testCircle, x => x.Coordinates))
                 .Limit(1)
                 .ToList();
             Assert.Empty(results);
