@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using FluentAssertions;
 using MongoDB.Bson.Serialization;
 using MongoDB.Labs.Search.ObjectModel;
 using Xunit;
@@ -25,13 +26,13 @@ namespace MongoDB.Labs.Search.Tests.ObjectModel
         {
             var json = "{ path: 'abc', texts: [{ value: 'foo', type: 'hit' }, { value: 'bar', type: 'text' }], score: 1.23 }";
             var highlight = BsonSerializer.Deserialize<Highlight>(json);
-            Assert.Equal("abc", highlight.Path);
-            Assert.Equal(2, highlight.Texts.Count);
-            Assert.Equal("foo", highlight.Texts[0].Value);
-            Assert.Equal(HighlightTextType.Hit, highlight.Texts[0].Type);
-            Assert.Equal("bar", highlight.Texts[1].Value);
-            Assert.Equal(HighlightTextType.Text, highlight.Texts[1].Type);
-            Assert.Equal(1.23, highlight.Score);
+            highlight.Path.Should().Be("abc");
+            highlight.Texts.Should().HaveCount(2);
+            highlight.Texts[0].Value.Should().Be("foo");
+            highlight.Texts[0].Type.Should().Be(HighlightTextType.Hit);
+            highlight.Texts[1].Value.Should().Be("bar");
+            highlight.Texts[1].Type.Should().Be(HighlightTextType.Text);
+            highlight.Score.Should().Be(1.23);
         }
     }
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using FluentAssertions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
@@ -815,7 +816,7 @@ namespace MongoDB.Labs.Search.Tests
             var documentSerializer = BsonSerializer.SerializerRegistry.GetSerializer<TDocument>();
             var renderedQuery = query.Render(documentSerializer, BsonSerializer.SerializerRegistry);
 
-            Assert.Equal(expected, renderedQuery);
+            renderedQuery.Should().Equal(expected);
         }
 
         private SearchDefinitionBuilder<TDocument> CreateSubject<TDocument>()

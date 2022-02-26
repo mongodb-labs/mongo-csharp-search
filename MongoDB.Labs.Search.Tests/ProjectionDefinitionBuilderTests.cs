@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using FluentAssertions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
@@ -47,7 +48,7 @@ namespace MongoDB.Labs.Search.Tests
             var documentSerializer = BsonSerializer.SerializerRegistry.GetSerializer<TDocument>();
             var renderedProjection = projection.Render(documentSerializer, BsonSerializer.SerializerRegistry);
 
-            Assert.Equal(expected, renderedProjection);
+            renderedProjection.Should().Equal(expected);
         }
 
         private ProjectionDefinitionBuilder<TDocument> CreateSubject<TDocument>()

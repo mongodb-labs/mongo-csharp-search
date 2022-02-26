@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using FluentAssertions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
@@ -130,7 +131,7 @@ namespace MongoDB.Labs.Search.Tests
             var documentSerializer = BsonSerializer.SerializerRegistry.GetSerializer<TDocument>();
             var renderedPath = path.Render(documentSerializer, BsonSerializer.SerializerRegistry);
 
-            Assert.Equal(expected, renderedPath);
+            renderedPath.Should().Be(expected);
         }
 
         private PathDefinitionBuilder<TDocument> CreateSubject<TDocument>()

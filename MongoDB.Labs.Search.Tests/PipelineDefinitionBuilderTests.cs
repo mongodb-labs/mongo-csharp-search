@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using FluentAssertions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
@@ -31,9 +32,8 @@ namespace MongoDB.Labs.Search.Tests
             var builder = new SearchDefinitionBuilder<BsonDocument>();
             var result = pipeline.Search(builder.Text("foo", "bar"));
             var stages = RenderStages(result, BsonDocumentSerializer.Instance);
-            Assert.Equal(
-                BsonDocument.Parse("{ $search: { text: { query: 'foo', path: 'bar' } } }"),
-                stages[0]);
+            stages[0].Should().Equal(
+                BsonDocument.Parse("{ $search: { text: { query: 'foo', path: 'bar' } } }"));
         }
 
         [Fact]
@@ -44,9 +44,8 @@ namespace MongoDB.Labs.Search.Tests
             var highlightBuilder = new HighlightOptionsBuilder<BsonDocument>();
             var result = pipeline.Search(builder.Text("foo", "bar"), highlightBuilder.Options("foo"));
             var stages = RenderStages(result, BsonDocumentSerializer.Instance);
-            Assert.Equal(
-                BsonDocument.Parse("{ $search: { text: { query: 'foo', path: 'bar' }, highlight: { path: 'foo' } } }"),
-                stages[0]);
+            stages[0].Should().Equal(
+                BsonDocument.Parse("{ $search: { text: { query: 'foo', path: 'bar' }, highlight: { path: 'foo' } } }"));
         }
 
         [Fact]
@@ -54,12 +53,10 @@ namespace MongoDB.Labs.Search.Tests
         {
             var pipeline = new EmptyPipelineDefinition<BsonDocument>();
             var builder = new SearchDefinitionBuilder<BsonDocument>();
-            var highlightBuilder = new HighlightOptionsBuilder<BsonDocument>();
             var result = pipeline.Search(builder.Text("foo", "bar"), indexName: "foo");
             var stages = RenderStages(result, BsonDocumentSerializer.Instance);
-            Assert.Equal(
-                BsonDocument.Parse("{ $search: { text: { query: 'foo', path: 'bar' }, index: 'foo' } }"),
-                stages[0]);
+            stages[0].Should().Equal(
+                BsonDocument.Parse("{ $search: { text: { query: 'foo', path: 'bar' }, index: 'foo' } }"));
         }
 
         [Fact]
@@ -68,8 +65,8 @@ namespace MongoDB.Labs.Search.Tests
             PipelineDefinition<BsonDocument, BsonDocument> pipeline = null;
             var builder = new SearchDefinitionBuilder<BsonDocument>();
             var exception = Record.Exception(() => pipeline.Search(builder.Text("foo", "bar")));
-            var argumentNullException = Assert.IsType<ArgumentNullException>(exception);
-            Assert.Equal("pipeline", argumentNullException.ParamName);
+            exception.Should().BeOfType<ArgumentNullException>()
+                .Which.ParamName.Should().Be("pipeline");
         }
 
         [Fact]
@@ -77,8 +74,8 @@ namespace MongoDB.Labs.Search.Tests
         {
             var pipeline = new EmptyPipelineDefinition<BsonDocument>();
             var exception = Record.Exception(() => pipeline.Search(null));
-            var argumentNullException = Assert.IsType<ArgumentNullException>(exception);
-            Assert.Equal("query", argumentNullException.ParamName);
+            exception.Should().BeOfType<ArgumentNullException>()
+                .Which.ParamName.Should().Be("query");
         }
 
         private IList<BsonDocument> RenderStages<TInput, TOutput>(PipelineDefinition<TInput, TOutput> pipeline, IBsonSerializer<TInput> inputSerializer)

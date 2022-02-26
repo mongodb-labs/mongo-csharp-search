@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using FluentAssertions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
@@ -157,7 +158,7 @@ namespace MongoDB.Labs.Search.Tests
             var documentSerializer = BsonSerializer.SerializerRegistry.GetSerializer<TDocument>();
             var renderedSpan = span.Render(documentSerializer, BsonSerializer.SerializerRegistry);
 
-            Assert.Equal(expected, renderedSpan);
+            renderedSpan.Should().Equal(expected);
         }
 
         private SpanDefinitionBuilder<TDocument> CreateSubject<TDocument>()
