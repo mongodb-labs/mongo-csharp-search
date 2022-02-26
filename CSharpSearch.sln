@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoDB.Labs.Search", "Mong
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoDB.Labs.Search.Tests", "MongoDB.Labs.Search.Tests\MongoDB.Labs.Search.Tests.csproj", "{9C739DB5-026F-474A-BB5F-6505170BBEEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtlasSearch.Tests", "AtlasSearch.Tests\AtlasSearch.Tests.csproj", "{D26D18BA-57A6-424D-93DC-B67AE0403D7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AtlasSearch.Tests", "AtlasSearch.Tests\AtlasSearch.Tests.csproj", "{D26D18BA-57A6-424D-93DC-B67AE0403D7D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9BDA50CD-2EB2-4257-9F79-DC7BEA2FE101}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
