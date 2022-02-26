@@ -41,10 +41,10 @@ namespace MongoDB.Labs.Search
         where TValue : struct
         where TFactory : IBsonValueFactory<TValue>, new()
     {
-        private PathDefinition<TDocument> _path;
-        private ScoreDefinition<TDocument> _score;
-        private TValue _max;
-        private bool _maxInclusive;
+        private readonly PathDefinition<TDocument> _path;
+        private readonly ScoreDefinition<TDocument> _score;
+        private readonly TValue _max;
+        private readonly bool _maxInclusive;
 
         public RangeMinFluentImpl(
             PathDefinition<TDocument> path,

@@ -1291,7 +1291,7 @@ namespace MongoDB.Labs.Search
     {
         private readonly QueryDefinition _query;
         private readonly PathDefinition<TDocument> _path;
-        private bool _allowAnalyzedField;
+        private readonly bool _allowAnalyzedField;
         private readonly ScoreDefinition<TDocument> _score;
 
         public WildcardSearchDefinition(

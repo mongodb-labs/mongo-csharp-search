@@ -55,8 +55,8 @@ namespace MongoDB.Labs.Search
         where TValue : struct
         where TFactory : IBsonValueFactory<TValue>, new()
     {
-        private PathDefinition<TDocument> _path;
-        private ScoreDefinition<TDocument> _score;
+        private readonly PathDefinition<TDocument> _path;
+        private readonly ScoreDefinition<TDocument> _score;
 
         public RangeFluentImpl(PathDefinition<TDocument> path, ScoreDefinition<TDocument> score)
         {
