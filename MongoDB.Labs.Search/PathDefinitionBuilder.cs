@@ -167,10 +167,11 @@ namespace MongoDB.Labs.Search
         public override BsonValue Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
             var renderedField = _field.Render(documentSerializer, serializerRegistry);
-            var document = new BsonDocument();
-            document.Add("value", renderedField.FieldName);
-            document.Add("multi", _analyzerName);
-            return document;
+            return new BsonDocument
+            {
+                ["value"] = renderedField.FieldName,
+                ["multi"] = _analyzerName
+            };
         }
     }
 

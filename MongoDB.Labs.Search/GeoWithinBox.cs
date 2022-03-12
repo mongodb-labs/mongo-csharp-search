@@ -51,10 +51,11 @@ namespace MongoDB.Labs.Search
 
         internal BsonDocument Render()
         {
-            BsonDocument document = new BsonDocument();
-            document.Add("bottomLeft", _bottomLeft.ToBsonDocument());
-            document.Add("topRight", _topRight.ToBsonDocument());
-            return document;
+            return new BsonDocument
+            {
+                ["bottomLeft"] = _bottomLeft.ToBsonDocument(),
+                ["topRight"] = _topRight.ToBsonDocument()
+            };
         }
     }
 }

@@ -67,8 +67,10 @@ namespace MongoDB.Labs.Search
         /// <returns>A <see cref="BsonDocument"/>.</returns>
         public BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            BsonDocument document = new BsonDocument();
-            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            BsonDocument document = new BsonDocument
+            {
+                ["path"] = _path.Render(documentSerializer, serializerRegistry)
+            };
             if (_maxCharsToExamine != null)
             {
                 document.Add("maxCharsToExamine", _maxCharsToExamine);

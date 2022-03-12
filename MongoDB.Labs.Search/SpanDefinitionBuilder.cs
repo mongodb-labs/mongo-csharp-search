@@ -128,9 +128,11 @@ namespace MongoDB.Labs.Search
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
             var renderedOperator = _operator.Render(documentSerializer, serializerRegistry);
-            var document = new BsonDocument();
-            document.Add("operator", renderedOperator);
-            document.Add("endPositionLte", _endPositionLte);
+            var document = new BsonDocument
+            {
+                ["operator"] = renderedOperator,
+                ["endPositionLte"] = _endPositionLte
+            };
             return new BsonDocument("first", document);
         }
     }
@@ -154,10 +156,12 @@ namespace MongoDB.Labs.Search
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
             var clauseDocs = _clauses.Select(clause => clause.Render(documentSerializer, serializerRegistry));
-            var document = new BsonDocument();
-            document.Add("clauses", new BsonArray(clauseDocs));
-            document.Add("slop", _slop);
-            document.Add("inOrder", _inOrder);
+            var document = new BsonDocument
+            {
+                ["clauses"] = new BsonArray(clauseDocs),
+                ["slop"] = _slop,
+                ["inOrder"] = _inOrder
+            };
             return new BsonDocument("near", document);
         }
     }
@@ -174,8 +178,10 @@ namespace MongoDB.Labs.Search
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
             var clauseDocs = _clauses.Select(clause => clause.Render(documentSerializer, serializerRegistry));
-            var document = new BsonDocument();
-            document.Add("clauses", new BsonArray(clauseDocs));
+            var document = new BsonDocument
+            {
+                ["clauses"] = new BsonArray(clauseDocs)
+            };
             return new BsonDocument("or", document);
         }
     }
@@ -195,9 +201,11 @@ namespace MongoDB.Labs.Search
         {
             var renderedInclude = _include.Render(documentSerializer, serializerRegistry);
             var renderedExclude = _exclude.Render(documentSerializer, serializerRegistry);
-            var document = new BsonDocument();
-            document.Add("include", renderedInclude);
-            document.Add("exclude", renderedExclude);
+            var document = new BsonDocument
+            {
+                ["include"] = renderedInclude,
+                ["exclude"] = renderedExclude
+            };
             return new BsonDocument("subtract", document);
         }
     }
@@ -217,9 +225,11 @@ namespace MongoDB.Labs.Search
         {
             var renderedQuery = _query.Render();
             var renderedPath = _path.Render(documentSerializer, serializerRegistry);
-            var document = new BsonDocument();
-            document.Add("query", renderedQuery);
-            document.Add("path", renderedPath);
+            var document = new BsonDocument
+            {
+                ["query"] = renderedQuery,
+                ["path"] = renderedPath
+            };
             return new BsonDocument("term", document);
         }
     }

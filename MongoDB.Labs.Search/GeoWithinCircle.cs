@@ -50,10 +50,11 @@ namespace MongoDB.Labs.Search
 
         internal BsonDocument Render()
         {
-            BsonDocument document = new BsonDocument();
-            document.Add("center", _center.ToBsonDocument());
-            document.Add("radius", _radius);
-            return document;
+            return new BsonDocument
+            {
+                ["center"] = _center.ToBsonDocument(),
+                ["radius"] = _radius
+            };
         }
     }
 }

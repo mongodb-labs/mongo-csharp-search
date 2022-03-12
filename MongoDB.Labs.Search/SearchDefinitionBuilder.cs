@@ -821,9 +821,11 @@ namespace MongoDB.Labs.Search
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            var document = new BsonDocument();
-            document.Add("query", _query.Render());
-            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            var document = new BsonDocument
+            {
+                ["query"] = _query.Render(),
+                ["path"] = _path.Render(documentSerializer, serializerRegistry)
+            };
             if (_tokenOrder == AutocompleteTokenOrder.Sequential)
             {
                 document.Add("tokenOrder", "sequential");
@@ -912,9 +914,11 @@ namespace MongoDB.Labs.Search
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
             var renderedField = _path.Render(documentSerializer, serializerRegistry);
-            var document = new BsonDocument();
-            document.Add("path", renderedField.FieldName);
-            document.Add("value", _value);
+            var document = new BsonDocument
+            {
+                ["path"] = renderedField.FieldName,
+                ["value"] = _value
+            };
             if (_score != null)
             {
                 document.Add("score", _score.Render(documentSerializer, serializerRegistry));
@@ -962,10 +966,12 @@ namespace MongoDB.Labs.Search
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            var document = new BsonDocument();
-            document.Add("geometry", _geometry.ToBsonDocument());
-            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
-            document.Add("relation", RelationToString(_relation));
+            var document = new BsonDocument
+            {
+                ["geometry"] = _geometry.ToBsonDocument(),
+                ["path"] = _path.Render(documentSerializer, serializerRegistry),
+                ["relation"] = RelationToString(_relation)
+            };
             if (_score != null)
             {
                 document.Add("score", _score.Render(documentSerializer, serializerRegistry));
@@ -1075,10 +1081,12 @@ namespace MongoDB.Labs.Search
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            var document = new BsonDocument();
-            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
-            document.Add("origin", _origin);
-            document.Add("pivot", _pivot);
+            var document = new BsonDocument
+            {
+                ["path"] = _path.Render(documentSerializer, serializerRegistry),
+                ["origin"] = _origin,
+                ["pivot"] = _pivot
+            };
             if (_score != null)
             {
                 document.Add("score", _score.Render(documentSerializer, serializerRegistry));
@@ -1108,9 +1116,11 @@ namespace MongoDB.Labs.Search
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            var document = new BsonDocument();
-            document.Add("query", _query.Render());
-            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            var document = new BsonDocument
+            {
+                ["query"] = _query.Render(),
+                ["path"] = _path.Render(documentSerializer, serializerRegistry)
+            };
             if (_slop != 0)
             {
                 document.Add("slop", _slop);
@@ -1139,9 +1149,11 @@ namespace MongoDB.Labs.Search
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
             var renderedField = _defaultPath.Render(documentSerializer, serializerRegistry);
-            var document = new BsonDocument();
-            document.Add("defaultPath", renderedField.FieldName);
-            document.Add("query", _query);
+            var document = new BsonDocument
+            {
+                ["defaultPath"] = renderedField.FieldName,
+                ["query"] = _query
+            };
             if (_score != null)
             {
                 document.Add("score", _score.Render(documentSerializer, serializerRegistry));
@@ -1179,8 +1191,10 @@ namespace MongoDB.Labs.Search
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            var document = new BsonDocument();
-            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            var document = new BsonDocument
+            {
+                ["path"] = _path.Render(documentSerializer, serializerRegistry)
+            };
             if (_score != null)
             {
                 document.Add("score", _score.Render(documentSerializer, serializerRegistry));
@@ -1220,9 +1234,11 @@ namespace MongoDB.Labs.Search
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            var document = new BsonDocument();
-            document.Add("query", _query.Render());
-            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            var document = new BsonDocument
+            {
+                ["query"] = _query.Render(),
+                ["path"] = _path.Render(documentSerializer, serializerRegistry)
+            };
             if (_allowAnalyzedField)
             {
                 document.Add("allowAnalyzedField", true);
@@ -1272,9 +1288,11 @@ namespace MongoDB.Labs.Search
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            var document = new BsonDocument();
-            document.Add("query", _query.Render());
-            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            var document = new BsonDocument
+            {
+                ["query"] = _query.Render(),
+                ["path"] = _path.Render(documentSerializer, serializerRegistry)
+            };
             if (_fuzzy != null)
             {
                 document.Add("fuzzy", _fuzzy.Render());
@@ -1308,9 +1326,11 @@ namespace MongoDB.Labs.Search
 
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
-            var document = new BsonDocument();
-            document.Add("query", _query.Render());
-            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            var document = new BsonDocument
+            {
+                ["query"] = _query.Render(),
+                ["path"] = _path.Render(documentSerializer, serializerRegistry)
+            };
             if (_allowAnalyzedField)
             {
                 document.Add("allowAnalyzedField", true);
