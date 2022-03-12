@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
@@ -69,25 +70,25 @@ namespace AtlasSearch.Tests
                         .MetaSearchScore("score")
                         .MetaSearchHighlights("highlights"))
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
-            Assert.NotEqual(0, results[0].Score);
-            Assert.Single(results[0].Highlights);
+            results.Should().ContainSingle();
+            results[0].Title.Should().Be("Declaration of Independence");
+            results[0].Score.Should().NotBe(0);
+            results[0].Highlights.Should().ContainSingle();
             var highlightTexts = results[0].Highlights[0].Texts;
-            Assert.Equal(15, highlightTexts.Count);
-            Assert.Equal(HighlightTextType.Text, highlightTexts[0].Type);
+            highlightTexts.Should().HaveCount(15);
+            highlightTexts[0].Type.Should().Be(HighlightTextType.Text);
             var highlightRange = highlightTexts.GetRange(1, 13);
             foreach (var highlight in highlightRange)
             {
                 var expected = char.IsLetter(highlight.Value[0]) ?
                     HighlightTextType.Hit : HighlightTextType.Text;
-                Assert.Equal(expected, highlight.Type);
+                highlight.Type.Should().Be(expected);
             }
             var highlightRangeStr = string.Join(
                 string.Empty, highlightRange.Select(x => x.Value));
-            Assert.Equal("Life, Liberty and the pursuit of Happiness", highlightRangeStr);
-            Assert.Equal(HighlightTextType.Text, highlightTexts[14].Type);
-            Assert.Equal(".", highlightTexts[14].Value);
+            highlightRangeStr.Should().Be("Life, Liberty and the pursuit of Happiness");
+            highlightTexts[14].Type.Should().Be(HighlightTextType.Text);
+            highlightTexts[14].Value.Should().Be(".");
         }
 
         [Fact]
@@ -100,8 +101,7 @@ namespace AtlasSearch.Tests
                         .Autocomplete("Declaration of Ind", x => x.Title))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         [Fact]
@@ -125,8 +125,7 @@ namespace AtlasSearch.Tests
                                 .Text("pursuit of happiness", x => x.Body)))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         [Fact]
@@ -144,8 +143,7 @@ namespace AtlasSearch.Tests
                                 .Exists(x => x.Title)))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         [Fact]
@@ -163,8 +161,7 @@ namespace AtlasSearch.Tests
                                 .Wildcard("happ*", x => x.Body, true)))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         [Fact]
@@ -177,7 +174,7 @@ namespace AtlasSearch.Tests
                         .GeoShape(__testPolygon, x => x.Coordinates, GeoShapeRelation.Contains))
                 .Limit(1)
                 .ToList();
-            Assert.Empty(results);
+            results.Should().BeEmpty();
         }
 
         [Fact]
@@ -190,7 +187,7 @@ namespace AtlasSearch.Tests
                         .GeoWithin(__testPolygon, x => x.Coordinates))
                 .Limit(1)
                 .ToList();
-            Assert.Empty(results);
+            results.Should().BeEmpty();
         }
 
         [Fact]
@@ -203,7 +200,7 @@ namespace AtlasSearch.Tests
                         .GeoWithin(__testBox, x => x.Coordinates))
                 .Limit(1)
                 .ToList();
-            Assert.Empty(results);
+            results.Should().BeEmpty();
         }
 
         [Fact]
@@ -216,7 +213,7 @@ namespace AtlasSearch.Tests
                         .GeoWithin(__testCircle, x => x.Coordinates))
                 .Limit(1)
                 .ToList();
-            Assert.Empty(results);
+            results.Should().BeEmpty();
         }
 
         [Fact]
@@ -234,8 +231,7 @@ namespace AtlasSearch.Tests
                                 .Wildcard("happ*", x => x.Body, true)))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         [Fact]
@@ -251,8 +247,7 @@ namespace AtlasSearch.Tests
                                 .Phrase("life, liberty", x => x.Body)))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.NotEqual("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().NotBe("Declaration of Independence");
         }
 
         [Fact]
@@ -265,8 +260,7 @@ namespace AtlasSearch.Tests
                         .QueryString(x => x.Body, "life, liberty, and the pursuit of happiness"))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         [Fact]
@@ -284,8 +278,7 @@ namespace AtlasSearch.Tests
                                 .RangeDouble(x => x.Longitude).Gt(-149.5).Lt(-149.4)))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("US,US,graph,Chart 16682", results[0].Chart);
+            results.Should().ContainSingle().Which.Chart.Should().Be("US,US,graph,Chart 16682");
         }
 
         [Fact]
@@ -304,8 +297,7 @@ namespace AtlasSearch.Tests
                         .MinimumShouldMatch(2))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         [Fact]
@@ -323,8 +315,7 @@ namespace AtlasSearch.Tests
                                     250)))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         [Fact]
@@ -352,8 +343,7 @@ namespace AtlasSearch.Tests
                                     inOrder: true)))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         [Fact]
@@ -372,8 +362,7 @@ namespace AtlasSearch.Tests
                                         .Term("inalienable", x => x.Body))))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         [Fact]
@@ -392,8 +381,7 @@ namespace AtlasSearch.Tests
                                         .Term("inalienable", x => x.Body))))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         [Fact]
@@ -406,8 +394,7 @@ namespace AtlasSearch.Tests
                         .Text("life, liberty, and the pursuit of happiness", x => x.Body))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         [Fact]
@@ -420,8 +407,7 @@ namespace AtlasSearch.Tests
                         .Wildcard("tranquil*", x => x.Body, true))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("US Constitution", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("US Constitution");
         }
 
         [Fact]
@@ -437,8 +423,7 @@ namespace AtlasSearch.Tests
                                 .Analyzer(x => x.Body, "english")))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         [Fact]
@@ -454,8 +439,7 @@ namespace AtlasSearch.Tests
                                 .Wildcard("b*")))
                 .Limit(1)
                 .ToList();
-            Assert.Single(results);
-            Assert.Equal("Declaration of Independence", results[0].Title);
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
         private static MongoClient GetTestClient()
