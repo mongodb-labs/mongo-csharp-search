@@ -10,16 +10,13 @@ jobs:
   build:
 
     runs-on: windows-latest
-    strategy:
-      matrix:
-        dotnet-version: ['2.1.x', '3.1.x']
 
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{ matrix.dotnet-version }}
+        dotnet-version: 3.1.x
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
