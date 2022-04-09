@@ -14,6 +14,10 @@ or from the [GitHub releases page](https://github.com/mongodb-labs/mongo-csharp-
 Examples
 --------
 
+### C# Objects
+
+Perform a search for C# objects, specifying field names as expression trees.
+
 ```C#
 public class HistoricalDocument
 {
@@ -44,6 +48,27 @@ List<HistoricalDocument> results = coll.Aggregate()
         Builders<HistoricalDocument>.Projection
             .Include(x => x.Title)
             .Include(x => x.Body)
+            .MetaSearchHighlights("highlights")
+            .MetaSearchScore("score"))
+    .ToList();
+```
+
+### BSON Documents
+
+Perform a search for raw BSON documents, specifying field names as strings.
+
+```C#
+List<BsonDocument> results = coll.Aggregate()
+    .Search(
+        SearchBuilders<BsonDocument>.Search
+            .Phrase("life, liberty, and the pursuit of happiness", "body", 5),
+        SearchBuilders<BsonDocument>.Highlight
+            .Options("body"))
+    .Limit(10)
+    .Project<BsonDocument>(
+        Builders<BsonDocument>.Projection
+            .Include("title")
+            .Include("body")
             .MetaSearchHighlights("highlights")
             .MetaSearchScore("score"))
     .ToList();
