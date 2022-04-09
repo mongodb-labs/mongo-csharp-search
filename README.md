@@ -148,7 +148,7 @@ bound using `Gt` (greater than) or `Gte` (greater than or equal to) and an upper
 List<Person> results = coll.Aggregate()
     .Search(
         SearchBuilders<Person>.Search
-            .Regex(x => x.FirstName, "joh?n"))
+            .Regex("joh?n", x => x.FirstName))
     .ToList();
 ```
 
@@ -171,6 +171,6 @@ List<HistoricalDocument> results = coll.Aggregate()
 List<HistoricalDocument> results = coll.Aggregate()
     .Search(
         SearchBuilders<HistoricalDocument>.Search
-            .Wildcard(x => x.Body, "happ*"))
+            .Wildcard("happ*", x => x.Body))
     .ToList();
 ```
