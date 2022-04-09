@@ -51,6 +51,9 @@ List<HistoricalDocument> results = coll.Aggregate()
 
 ### Autocomplete Operator
 
+Search for instances of `HistoricalDocument` in which the `Body` field matches the autocomplete
+query `life, liber`.
+
 ```C#
 List<HistoricalDocument> results = coll.Aggregate()
     .Search(
@@ -60,6 +63,9 @@ List<HistoricalDocument> results = coll.Aggregate()
 ```
 
 ### Compound Operator
+
+Search for instances of `HistoricalDocument` in which the `Body` field contains the text `life`
+and `liberty` but not `property`.
 
 ```C#
 List<HistoricalDocument> results = coll.Aggregate()
@@ -79,6 +85,8 @@ List<HistoricalDocument> results = coll.Aggregate()
 
 ### Equals Operator
 
+Search for instances of `Person` in which the `Retired` field is set to true.
+
 ```C#
 List<Person> results = coll.Aggregate()
     .Search(
@@ -88,6 +96,8 @@ List<Person> results = coll.Aggregate()
 ```
 
 ### Exists Operator
+
+Search for instances of `Person` in which the `MiddleName` field exists.
 
 ```C#
 List<Person> results = coll.Aggregate()
@@ -99,6 +109,8 @@ List<Person> results = coll.Aggregate()
 
 ### Near Operator
 
+Search for instances of `Person` in which the `Age` field is near 18 with a pivot of 1.
+
 ```C#
 List<Person> results = coll.Aggregate()
     .Search(
@@ -108,6 +120,9 @@ List<Person> results = coll.Aggregate()
 ```
 
 ### Phrase Operator
+
+Search for instances of `HistoricalDocument` in which the `Body` field contains the phrase
+`life, liberty, and the pursuit of happiness`.
 
 ```C#
 List<HistoricalDocument> results = coll.Aggregate()
@@ -119,6 +134,9 @@ List<HistoricalDocument> results = coll.Aggregate()
 
 ### Query String Operator
 
+Search for instances of `Person` matching the query string `firstName:john lastName:doe` using
+the `FirstName` field as the default when no field is specified in the query string.
+
 ```C#
 List<Person> results = coll.Aggregate()
     .Search(
@@ -128,6 +146,9 @@ List<Person> results = coll.Aggregate()
 ```
 
 ### Range Operator
+
+Search for instances of `Person` in which the `Age` field is greater than or equal to 18 and less
+than 21.
 
 ```C#
 List<Person> results = coll.Aggregate()
@@ -144,6 +165,9 @@ bound using `Gt` (greater than) or `Gte` (greater than or equal to) and an upper
 
 ### Regular Expression Operator
 
+Search for instances of `Person` in which the `FirstName` field matches the regular expression
+`joh?n`.
+
 ```C#
 List<Person> results = coll.Aggregate()
     .Search(
@@ -157,6 +181,9 @@ Regular expressions must be specified using the
 
 ### Text Operator
 
+Search for instances of `HistoricalDocument` in which the `Body` field contains the text
+`life, liberty, and the pursuit of happiness`.
+
 ```C#
 List<HistoricalDocument> results = coll.Aggregate()
     .Search(
@@ -166,6 +193,9 @@ List<HistoricalDocument> results = coll.Aggregate()
 ```
 
 ### Wildcard Operator
+
+Search for instances of `HistoricalDocument` in which the `Body` field matches the wildcard string
+`happ*`.
 
 ```C#
 List<HistoricalDocument> results = coll.Aggregate()
