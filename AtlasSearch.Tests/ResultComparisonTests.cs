@@ -411,6 +411,22 @@ namespace AtlasSearch.Tests
         }
 
         [Fact]
+        public void TestMultiPath()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Phrase(
+                            "life, liberty, and the pursuit of happiness",
+                            SearchBuilders<HistoricalDocument>.Path
+                                .Multi(x => x.Title, x => x.Body)))
+                .Limit(1)
+                .ToList();
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
+        }
+
+        [Fact]
         public void TestAnalyzerPath()
         {
             var coll = GetTestCollection();
