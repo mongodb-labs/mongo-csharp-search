@@ -251,6 +251,19 @@ namespace AtlasSearch.Tests
         }
 
         [Fact]
+        public void TestNear()
+        {
+            var coll = GetGeoTestCollection();
+            List<Shipwreck> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<Shipwreck>.Search
+                        .Near(x => x.Coordinates, __testCircle.Center, 1.0))
+                .Limit(1)
+                .ToList();
+            results.Should().BeEmpty();
+        }
+
+        [Fact]
         public void TestQueryString()
         {
             var coll = GetTestCollection();

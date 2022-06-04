@@ -488,6 +488,45 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
+        /// Creates a search definition that supports querying and scoring numeric and date values.
+        /// </summary>
+        /// <typeparam name="TCoordinates">The type of the coordinates.</typeparam>
+        /// <param name="path">The indexed field or fields to search.</param>
+        /// <param name="origin">The number, date, or geographic point to search near.</param>
+        /// <param name="pivot">The value to use to calculate scores of result documents.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A near search definition.</returns>
+        public SearchDefinition<TDocument> Near<TCoordinates>(
+            PathDefinition<TDocument> path,
+            GeoJsonPoint<TCoordinates> origin,
+            double pivot,
+            ScoreDefinition<TDocument> score = null)
+            where TCoordinates : GeoJsonCoordinates
+        {
+            return new NearSearchDefinition<TDocument>(path, origin.ToBsonDocument(), pivot, score);
+        }
+
+        /// <summary>
+        /// Creates a search definition that supports querying and scoring numeric and date values.
+        /// </summary>
+        /// <typeparam name="TCoordinates">The type of the coordinates</typeparam>
+        /// <typeparam name="TField">The type of the fields.</typeparam>
+        /// <param name="path">The indexed field or fields to search.</param>
+        /// <param name="origin">The number, date, or geographic point to search near.</param>
+        /// <param name="pivot">The value to user to calculate scores of result documents.</param>
+        /// <param name="score">The score modifier.</param>
+        /// <returns>A near search definition.</returns>
+        public SearchDefinition<TDocument> Near<TCoordinates, TField>(
+            Expression<Func<TDocument, TField>> path,
+            GeoJsonPoint<TCoordinates> origin,
+            double pivot,
+            ScoreDefinition<TDocument> score = null)
+            where TCoordinates : GeoJsonCoordinates
+        {
+            return Near(new ExpressionFieldDefinition<TDocument>(path), origin, pivot, score);
+        }
+
+        /// <summary>
         /// Creates a search definition that performs search for documents containing an ordered
         /// sequence of terms.
         /// </summary>
