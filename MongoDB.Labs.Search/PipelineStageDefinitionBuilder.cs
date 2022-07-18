@@ -30,11 +30,16 @@ namespace MongoDB.Labs.Search
         /// <param name="query">The search definition.</param>
         /// <param name="highlight">The highlight options.</param>
         /// <param name="indexName">The index name.</param>
+        /// <param name="returnStoredSource">
+        /// Flag that specifies whether to perform a full document lookup on the backend database
+        /// or return only stored source fields directly from Atlas Search.
+        /// </param>
         /// <returns>The stage.</returns>
         public static PipelineStageDefinition<TInput, TInput> Search<TInput>(
             SearchDefinition<TInput> query,
             HighlightOptions<TInput> highlight = null,
-            string indexName = null)
+            string indexName = null,
+            bool returnStoredSource = false)
         {
             Ensure.IsNotNull(query, nameof(query));
 
@@ -51,6 +56,10 @@ namespace MongoDB.Labs.Search
                     if (indexName != null)
                     {
                         renderedQuery.Add("index", indexName);
+                    }
+                    if (returnStoredSource)
+                    {
+                        renderedQuery.Add("returnStoredSource", returnStoredSource);
                     }
                     var document = new BsonDocument(operatorName, renderedQuery);
                     return new RenderedPipelineStageDefinition<TInput>(operatorName, document, s);

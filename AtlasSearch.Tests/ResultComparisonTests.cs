@@ -54,6 +54,8 @@ namespace AtlasSearch.Tests
         [Fact]
         public void TestPhrase()
         {
+            // This test case exercises the indexName and returnStoredSource arguments. The
+            // remaining test cases omit them.
             var coll = GetTestCollection();
             List<HistoricalDocument> results = coll.Aggregate()
                 .Search(
@@ -61,7 +63,8 @@ namespace AtlasSearch.Tests
                         .Phrase("life, liberty, and the pursuit of happiness", x => x.Body),
                     SearchBuilders<HistoricalDocument>.Highlight
                         .Options(x => x.Body),
-                    "default")
+                    "default",
+                    true)
                 .Limit(1)
                 .Project<HistoricalDocument>(
                     Builders<HistoricalDocument>.Projection
