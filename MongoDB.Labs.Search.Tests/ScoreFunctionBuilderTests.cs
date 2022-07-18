@@ -48,6 +48,16 @@ namespace MongoDB.Labs.Search.Tests
                 "{ path: 'age' }");
         }
 
+        [Fact]
+        public void Relevance()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Relevance(),
+                "{ score: 'relevance' }");
+        }
+
         private void AssertRendered<TDocument>(ScoreFunction<TDocument> function, string expected)
         {
             AssertRendered(function, BsonDocument.Parse(expected));

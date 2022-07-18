@@ -28,7 +28,7 @@ namespace MongoDB.Labs.Search
     public sealed class ScoreFunctionBuilder<TDocument>
     {
         /// <summary>
-        /// Incorporates an indexed numeric field value into a function score.
+        /// Creates a function that incorporates an indexed numeric field value into the score.
         /// </summary>
         /// <param name="path">The path to the numeric field.</param>
         /// <param name="undefined">
@@ -42,7 +42,7 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
-        /// Incorporates an indexed numeric field value into a function score.
+        /// Creates a function that incorporates an indexed numeric field value into the score.
         /// </summary>
         /// <param name="path">The path to the numeric field.</param>
         /// <param name="undefined">
@@ -53,6 +53,16 @@ namespace MongoDB.Labs.Search
         public ScoreFunction<TDocument> Path(Expression<Func<TDocument, double>> path, double undefined = 0)
         {
             return Path(new ExpressionFieldDefinition<TDocument>(path), undefined);
+        }
+
+        /// <summary>
+        /// Creates a function that represents the relvance score, which is the score Atlas Search
+        /// assigns documents based on relevance.
+        /// </summary>
+        /// <returns></returns>
+        public ScoreFunction<TDocument> Relevance()
+        {
+            return new RelevanceScoreFunctionDefinition<TDocument>();
         }
     }
 
@@ -79,6 +89,14 @@ namespace MongoDB.Labs.Search
             document.Add("value", renderedPath);
             document.Add("undefined", _undefined);
             return new BsonDocument("path", document);
+        }
+    }
+
+    internal class RelevanceScoreFunctionDefinition<TDocument> : ScoreFunction<TDocument>
+    {
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegister)
+        {
+            return new BsonDocument("score", "relevance");
         }
     }
 }
