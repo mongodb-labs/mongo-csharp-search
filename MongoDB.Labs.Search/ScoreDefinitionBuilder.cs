@@ -86,6 +86,18 @@ namespace MongoDB.Labs.Search
         {
             return new ConstantScoreDefinition<TDocument>(value);
         }
+
+        /// <summary>
+        /// Creates a score modifier that computes the final score through an expression.
+        /// </summary>
+        /// <param name="function">The expression used to compute the score.</param>
+        /// <returns>
+        /// A function score modifier.
+        /// </returns>
+        public ScoreDefinition<TDocument> Function(ScoreFunction<TDocument> function)
+        {
+            return new FunctionScoreDefinition<TDocument>(function);
+        }
     }
 
     internal class BoostValueScoreDefinition<TDocument> : ScoreDefinition<TDocument>
@@ -138,6 +150,21 @@ namespace MongoDB.Labs.Search
         {
             var document = new BsonDocument("value", _value);
             return new BsonDocument("constant", document);
+        }
+    }
+
+    internal sealed class FunctionScoreDefinition<TDocument> : ScoreDefinition<TDocument>
+    {
+        private readonly ScoreFunction<TDocument> _function;
+
+        public FunctionScoreDefinition(ScoreFunction<TDocument> function)
+        {
+            _function = Ensure.IsNotNull(function, nameof(function));
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            return new BsonDocument("function", _function.Render(documentSerializer, serializerRegistry));
         }
     }
 }

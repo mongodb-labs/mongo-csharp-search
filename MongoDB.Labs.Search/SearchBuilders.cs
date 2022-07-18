@@ -23,6 +23,7 @@ namespace MongoDB.Labs.Search
         private static readonly PathDefinitionBuilder<TDocument> __path = new PathDefinitionBuilder<TDocument>();
         private static readonly HighlightOptionsBuilder<TDocument> __highlight = new HighlightOptionsBuilder<TDocument>();
         private static readonly ScoreDefinitionBuilder<TDocument> __score = new ScoreDefinitionBuilder<TDocument>();
+        private static readonly ScoreFunctionBuilder<TDocument> __scoreFunction = new ScoreFunctionBuilder<TDocument>();
         private static readonly SearchDefinitionBuilder<TDocument> __search = new SearchDefinitionBuilder<TDocument>();
         private static readonly SpanDefinitionBuilder<TDocument> __span = new SpanDefinitionBuilder<TDocument>();
 
@@ -48,6 +49,14 @@ namespace MongoDB.Labs.Search
         public static ScoreDefinitionBuilder<TDocument> Score
         {
             get { return __score; }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="ScoreFunctionBuilder{TDocument}"/>.
+        /// </summary>
+        public static ScoreFunctionBuilder<TDocument> ScoreFunction
+        {
+            get { return __scoreFunction; }
         }
 
         /// <summary>

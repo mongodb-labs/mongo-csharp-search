@@ -61,6 +61,17 @@ namespace MongoDB.Labs.Search.Tests
                 "{ constant: { value: 1 } }");
         }
 
+        [Fact]
+        public void Function()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            var functionBuilder = new ScoreFunctionBuilder<BsonDocument>();
+            AssertRendered(
+                subject.Function(functionBuilder.Path("x")),
+                "{ function: { path: 'x' } }");
+        }
+
         private void AssertRendered<TDocument>(ScoreDefinition<TDocument> score, string expected)
         {
             AssertRendered(score, BsonDocument.Parse(expected));

@@ -474,6 +474,33 @@ namespace AtlasSearch.Tests
             results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
+        [Fact]
+        public void TestFunctionScore_Path()
+        {
+            TestFunctionScore(
+                SearchBuilders<HistoricalDocument>.ScoreFunction
+                    .Path(x => x.Score));
+            TestFunctionScore(
+                SearchBuilders<HistoricalDocument>.ScoreFunction
+                    .Path(x => x.Score, 1));
+        }
+
+        private void TestFunctionScore(ScoreFunction<HistoricalDocument> function)
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Phrase(
+                            "life, liberty, and the pursuit of happiness",
+                            x => x.Body,
+                            score: SearchBuilders<HistoricalDocument>.Score
+                                .Function(function)))
+                .Limit(1)
+                .ToList();
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
+        }
+
         private static MongoClient GetTestClient()
         {
             var uri = Environment.GetEnvironmentVariable("ATLAS_SEARCH_URI");
