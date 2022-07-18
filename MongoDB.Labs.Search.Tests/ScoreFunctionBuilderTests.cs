@@ -58,6 +58,16 @@ namespace MongoDB.Labs.Search.Tests
                 "{ score: 'relevance' }");
         }
 
+        [Fact]
+        public void Constant()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Constant(1),
+                "{ constant: 1 }");
+        }
+
         private void AssertRendered<TDocument>(ScoreFunction<TDocument> function, string expected)
         {
             AssertRendered(function, BsonDocument.Parse(expected));

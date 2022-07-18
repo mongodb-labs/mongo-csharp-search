@@ -38,7 +38,7 @@ namespace MongoDB.Labs.Search
         /// <returns>A path score function.</returns>
         public ScoreFunction<TDocument> Path(PathDefinition<TDocument> path, double undefined = 0)
         {
-            return new PathScoreFunctionDefinition<TDocument>(path, undefined);
+            return new PathScoreFunction<TDocument>(path, undefined);
         }
 
         /// <summary>
@@ -56,22 +56,32 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
-        /// Creates a function that represents the relvance score, which is the score Atlas Search
+        /// Creates a function that represents the relevance score, which is the score Atlas Search
         /// assigns documents based on relevance.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A relevance score function.</returns>
         public ScoreFunction<TDocument> Relevance()
         {
-            return new RelevanceScoreFunctionDefinition<TDocument>();
+            return new RelevanceScoreFunction<TDocument>();
+        }
+
+        /// <summary>
+        /// Creates a function that represents a constant number.
+        /// </summary>
+        /// <param name="value">Number that indicates a fixed value.</param>
+        /// <returns>A constant score function.</returns>
+        public ScoreFunction<TDocument> Constant(double value)
+        {
+            return new ConstantScoreFunction<TDocument>(value);
         }
     }
 
-    internal class PathScoreFunctionDefinition<TDocument> : ScoreFunction<TDocument>
+    internal class PathScoreFunction<TDocument> : ScoreFunction<TDocument>
     {
         private readonly PathDefinition<TDocument> _path;
         private readonly double _undefined;
 
-        public PathScoreFunctionDefinition(PathDefinition<TDocument> path, double undefined)
+        public PathScoreFunction(PathDefinition<TDocument> path, double undefined)
         {
             _path = Ensure.IsNotNull(path, nameof(path));
             _undefined = undefined;
@@ -92,11 +102,26 @@ namespace MongoDB.Labs.Search
         }
     }
 
-    internal class RelevanceScoreFunctionDefinition<TDocument> : ScoreFunction<TDocument>
+    internal class RelevanceScoreFunction<TDocument> : ScoreFunction<TDocument>
     {
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegister)
         {
             return new BsonDocument("score", "relevance");
+        }
+    }
+
+    internal class ConstantScoreFunction<TDocument> : ScoreFunction<TDocument>
+    {
+        private readonly double _value;
+
+        public ConstantScoreFunction(double value)
+        {
+            _value = value;
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegister)
+        {
+            return new BsonDocument("constant", _value);
         }
     }
 }

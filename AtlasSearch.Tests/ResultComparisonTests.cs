@@ -493,6 +493,14 @@ namespace AtlasSearch.Tests
                     .Relevance());
         }
 
+        [Fact]
+        public void TestFunctionScore_Constant()
+        {
+            TestFunctionScore(
+                SearchBuilders<HistoricalDocument>.ScoreFunction
+                    .Constant(1));
+        }
+
         private void TestFunctionScore(ScoreFunction<HistoricalDocument> function)
         {
             var coll = GetTestCollection();
