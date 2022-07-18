@@ -116,6 +116,62 @@ namespace MongoDB.Labs.Search
         {
             return Multiply((IEnumerable<ScoreFunction<TDocument>>)operands);
         }
+
+        /// <summary>
+        /// Creates a function that decays, or reduces by multiplying, the final scores of the
+        /// documents based on the distance of a numeric field from a specified origin point.
+        /// </summary>
+        /// <param name="path">The path to the numeric field.</param>
+        /// <param name="origin">The point of origin from which to calculate the distance.</param>
+        /// <param name="scale">
+        /// The distance from <paramref name="origin"/> plus or minus <paramref name="offset"/> at
+        /// which scores must be multiplied.
+        /// </param>
+        /// <param name="decay">
+        /// The rate at which to multiply score values, which must be a positive number between
+        /// 0 and 1 exclusive.
+        /// </param>
+        /// <param name="offset">
+        /// The number of use to determine the distance from <paramref name="origin"/>.
+        /// </param>
+        /// <returns>A Guassian score function.</returns>
+        public ScoreFunction<TDocument> Gauss(
+            PathDefinition<TDocument> path,
+            double origin,
+            double scale,
+            double decay = 0.5,
+            double offset = 0)
+        {
+            return new GaussScoreFunction<TDocument>(path, origin, scale, decay, offset);
+        }
+
+        /// <summary>
+        /// Creates a function that decays, or reduces by multiplying, the final scores of the
+        /// documents based on the distance of a numeric field from a specified origin point.
+        /// </summary>
+        /// <param name="path">The path to the numeric field.</param>
+        /// <param name="origin">The point of origin from which to calculate the distance.</param>
+        /// <param name="scale">
+        /// The distance from <paramref name="origin"/> plus or minus <paramref name="offset"/> at
+        /// which scores must be multiplied.
+        /// </param>
+        /// <param name="decay">
+        /// The rate at which to multiply score values, which must be a positive number between
+        /// 0 and 1 exclusive.
+        /// </param>
+        /// <param name="offset">
+        /// The number of use to determine the distance from <paramref name="origin"/>.
+        /// </param>
+        /// <returns>A Guassian score function.</returns>
+        public ScoreFunction<TDocument> Gauss(
+            Expression<Func<TDocument, double>> path,
+            double origin,
+            double scale,
+            double decay = 0.5,
+            double offset = 0)
+        {
+            return Gauss(new ExpressionFieldDefinition<TDocument>(path), origin, scale, decay, offset);
+        }
     }
 
     internal sealed class PathScoreFunction<TDocument> : ScoreFunction<TDocument>
@@ -185,6 +241,46 @@ namespace MongoDB.Labs.Search
                 var renderedOperand = operand.Render(documentSerializer, serializerRegister);
                 return renderedOperand;
             })));
+        }
+    }
+
+    internal sealed class GaussScoreFunction<TDocument> : ScoreFunction<TDocument>
+    {
+        private readonly PathDefinition<TDocument> _path;
+        private readonly double _origin;
+        private readonly double _scale;
+        private readonly double _decay;
+        private readonly double _offset;
+
+        public GaussScoreFunction(
+            PathDefinition<TDocument> path,
+            double origin,
+            double scale,
+            double decay,
+            double offset)
+        {
+            _path = Ensure.IsNotNull(path, nameof(path));
+            _origin = origin;
+            _scale = scale;
+            _decay = Ensure.IsBetween(decay, 0, 1, nameof(decay));
+            _offset = offset;
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegister)
+        {
+            var document = new BsonDocument();
+            document.Add("path", _path.Render(documentSerializer, serializerRegister));
+            document.Add("origin", _origin);
+            document.Add("scale", _scale);
+            if (_decay != 0.5)
+            {
+                document.Add("decay", _decay);
+            }
+            if (_offset != 0)
+            {
+                document.Add("offset", _offset);
+            }
+            return new BsonDocument("gauss", document);
         }
     }
 }

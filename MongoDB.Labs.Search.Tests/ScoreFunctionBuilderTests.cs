@@ -92,6 +92,32 @@ namespace MongoDB.Labs.Search.Tests
                 "{ multiply: [{ constant: 1 }, { constant: 2 }] }");
         }
 
+        [Fact]
+        public void Gauss()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Gauss("x", 100, 1),
+                "{ gauss: { path: 'x', origin: 100, scale: 1 } }");
+            AssertRendered(
+                subject.Gauss("x", 100, 1, 0.1, 1),
+                "{ gauss: { path: 'x', origin: 100, scale: 1, decay: 0.1, offset: 1 } }");
+        }
+
+        [Fact]
+        public void Gauss_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.Gauss(x => x.Age, 100, 1),
+                "{ gauss: { path: 'age', origin: 100, scale: 1 } }");
+            AssertRendered(
+                subject.Gauss("Age", 100, 1),
+                "{ gauss: { path: 'age', origin: 100, scale: 1 } }");
+        }
+
         private void AssertRendered<TDocument>(ScoreFunction<TDocument> function, string expected)
         {
             AssertRendered(function, BsonDocument.Parse(expected));

@@ -525,6 +525,17 @@ namespace AtlasSearch.Tests
                             .Constant(2)));
         }
 
+        [Fact]
+        public void TestFunctionScore_Gauss()
+        {
+            TestFunctionScore(
+                SearchBuilders<HistoricalDocument>.ScoreFunction
+                    .Gauss(x => x.Score, 100, 1));
+            TestFunctionScore(
+                SearchBuilders<HistoricalDocument>.ScoreFunction
+                    .Gauss(x => x.Score, 100, 1, 0.1, 1));
+        }
+
         private void TestFunctionScore(ScoreFunction<HistoricalDocument> function)
         {
             var coll = GetTestCollection();
