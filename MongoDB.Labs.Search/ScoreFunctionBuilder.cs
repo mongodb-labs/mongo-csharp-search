@@ -172,6 +172,26 @@ namespace MongoDB.Labs.Search
         {
             return Gauss(new ExpressionFieldDefinition<TDocument>(path), origin, scale, decay, offset);
         }
+
+        /// <summary>
+        /// Creates a function that calculates the base-10 logarithm of a number.
+        /// </summary>
+        /// <param name="operand">The number.</param>
+        /// <returns>A logarithmic score function.</returns>
+        public ScoreFunction<TDocument> Log(ScoreFunction<TDocument> operand)
+        {
+            return new UnaryScoreFunction<TDocument>("log", operand);
+        }
+
+        /// <summary>
+        /// Creates a function that adds 1 to a number and then calculates its base-10 logarithm.
+        /// </summary>
+        /// <param name="operand">The number.</param>
+        /// <returns>A logarithmic score function.</returns>
+        public ScoreFunction<TDocument> Log1p(ScoreFunction<TDocument> operand)
+        {
+            return new UnaryScoreFunction<TDocument>("log1p", operand);
+        }
     }
 
     internal sealed class PathScoreFunction<TDocument> : ScoreFunction<TDocument>
@@ -281,6 +301,23 @@ namespace MongoDB.Labs.Search
                 document.Add("offset", _offset);
             }
             return new BsonDocument("gauss", document);
+        }
+    }
+
+    internal sealed class UnaryScoreFunction<TDocument> : ScoreFunction<TDocument>
+    {
+        private readonly string _operatorName;
+        private readonly ScoreFunction<TDocument> _operand;
+
+        public UnaryScoreFunction(string operatorName, ScoreFunction<TDocument> operand)
+        {
+            _operatorName = operatorName;
+            _operand = Ensure.IsNotNull(operand, nameof(operand));
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegister)
+        {
+            return new BsonDocument(_operatorName, _operand.Render(documentSerializer, serializerRegister));
         }
     }
 }
