@@ -68,6 +68,30 @@ namespace MongoDB.Labs.Search.Tests
                 "{ constant: 1 }");
         }
 
+        [Fact]
+        public void Add()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Add(
+                    subject.Constant(1),
+                    subject.Constant(2)),
+                "{ add: [{ constant: 1 }, { constant: 2 }] }");
+        }
+
+        [Fact]
+        public void Multiply()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.Multiply(
+                    subject.Constant(1),
+                    subject.Constant(2)),
+                "{ multiply: [{ constant: 1 }, { constant: 2 }] }");
+        }
+
         private void AssertRendered<TDocument>(ScoreFunction<TDocument> function, string expected)
         {
             AssertRendered(function, BsonDocument.Parse(expected));

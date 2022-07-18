@@ -501,6 +501,30 @@ namespace AtlasSearch.Tests
                     .Constant(1));
         }
 
+        [Fact]
+        public void TestFunctionScore_Add()
+        {
+            TestFunctionScore(
+                SearchBuilders<HistoricalDocument>.ScoreFunction
+                    .Add(
+                        SearchBuilders<HistoricalDocument>.ScoreFunction
+                            .Constant(1),
+                        SearchBuilders<HistoricalDocument>.ScoreFunction
+                            .Constant(2)));
+        }
+
+        [Fact]
+        public void TestFunctionScore_Multiply()
+        {
+            TestFunctionScore(
+                SearchBuilders<HistoricalDocument>.ScoreFunction
+                    .Multiply(
+                        SearchBuilders<HistoricalDocument>.ScoreFunction
+                            .Constant(1),
+                        SearchBuilders<HistoricalDocument>.ScoreFunction
+                            .Constant(2)));
+        }
+
         private void TestFunctionScore(ScoreFunction<HistoricalDocument> function)
         {
             var coll = GetTestCollection();

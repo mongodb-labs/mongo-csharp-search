@@ -17,6 +17,8 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Misc;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace MongoDB.Labs.Search
@@ -74,9 +76,49 @@ namespace MongoDB.Labs.Search
         {
             return new ConstantScoreFunction<TDocument>(value);
         }
+
+        /// <summary>
+        /// Creates a function that adds a series of numbers.
+        /// </summary>
+        /// <param name="operands">An array of expressions, which can have negative values.</param>
+        /// <returns>An addition score function.</returns>
+        public ScoreFunction<TDocument> Add(IEnumerable<ScoreFunction<TDocument>> operands)
+        {
+            return new ArithmeticScoreFunction<TDocument>("add", operands);
+        }
+
+        /// <summary>
+        /// Creates a function that adds a series of numbers.
+        /// </summary>
+        /// <param name="operands">An array of expressions, which can have negative values.</param>
+        /// <returns>An addition score function.</returns>
+        public ScoreFunction<TDocument> Add(params ScoreFunction<TDocument>[] operands)
+        {
+            return Add((IEnumerable<ScoreFunction<TDocument>>)operands);
+        }
+
+        /// <summary>
+        /// Creates a function that multiplies a series of numbers.
+        /// </summary>
+        /// <param name="operands">An array of expressions, which can have negative values.</param>
+        /// <returns>A multiplication score function.</returns>
+        public ScoreFunction<TDocument> Multiply(IEnumerable<ScoreFunction<TDocument>> operands)
+        {
+            return new ArithmeticScoreFunction<TDocument>("multiply", operands);
+        }
+
+        /// <summary>
+        /// Creates a function that multiplies a series of numbers.
+        /// </summary>
+        /// <param name="operands">An array of expressions, which can have negative values.</param>
+        /// <returns>A mulitplication score function.</returns>
+        public ScoreFunction<TDocument> Multiply(params ScoreFunction<TDocument>[] operands)
+        {
+            return Multiply((IEnumerable<ScoreFunction<TDocument>>)operands);
+        }
     }
 
-    internal class PathScoreFunction<TDocument> : ScoreFunction<TDocument>
+    internal sealed class PathScoreFunction<TDocument> : ScoreFunction<TDocument>
     {
         private readonly PathDefinition<TDocument> _path;
         private readonly double _undefined;
@@ -102,7 +144,7 @@ namespace MongoDB.Labs.Search
         }
     }
 
-    internal class RelevanceScoreFunction<TDocument> : ScoreFunction<TDocument>
+    internal sealed class RelevanceScoreFunction<TDocument> : ScoreFunction<TDocument>
     {
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegister)
         {
@@ -110,7 +152,7 @@ namespace MongoDB.Labs.Search
         }
     }
 
-    internal class ConstantScoreFunction<TDocument> : ScoreFunction<TDocument>
+    internal sealed class ConstantScoreFunction<TDocument> : ScoreFunction<TDocument>
     {
         private readonly double _value;
 
@@ -122,6 +164,27 @@ namespace MongoDB.Labs.Search
         public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegister)
         {
             return new BsonDocument("constant", _value);
+        }
+    }
+
+    internal sealed class ArithmeticScoreFunction<TDocument> : ScoreFunction<TDocument>
+    {
+        private readonly string _operatorName;
+        private readonly IEnumerable<ScoreFunction<TDocument>> _operands;
+
+        public ArithmeticScoreFunction(string operatorName, IEnumerable<ScoreFunction<TDocument>> operands)
+        {
+            _operatorName = operatorName;
+            _operands = Ensure.IsNotNull(operands, nameof(operands));
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegister)
+        {
+            return new BsonDocument(_operatorName, new BsonArray(_operands.Select(operand =>
+            {
+                var renderedOperand = operand.Render(documentSerializer, serializerRegister);
+                return renderedOperand;
+            })));
         }
     }
 }
