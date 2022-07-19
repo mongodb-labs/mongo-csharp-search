@@ -38,6 +38,14 @@ namespace MongoDB.Labs.Search.Tests
             AssertRendered(subject.MetaSearchScore("a"), "{ a : { $meta: 'searchScore' } }");
         }
 
+        [Fact]
+        public void SearchMeta()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(subject.SearchMeta("a"), "{ a: '$$SEARCH_META' }");
+        }
+
         private void AssertRendered<TDocument>(ProjectionDefinition<TDocument> projection, string expected)
         {
             AssertRendered(projection, BsonDocument.Parse(expected));

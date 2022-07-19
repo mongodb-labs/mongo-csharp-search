@@ -30,6 +30,7 @@ namespace MongoDB.Labs.Search
         /// <param name="query">The search definition.</param>
         /// <param name="highlight">The highlight options.</param>
         /// <param name="indexName">The index name.</param>
+        /// <param name="count">The count options.</param>
         /// <param name="returnStoredSource">
         /// Flag that specifies whether to perform a full document lookup on the backend database
         /// or return only stored source fields directly from Atlas Search.
@@ -40,10 +41,11 @@ namespace MongoDB.Labs.Search
             SearchDefinition<TResult> query,
             HighlightOptions<TResult> highlight = null,
             string indexName = null,
+            SearchCountOptions count = null,
             bool returnStoredSource = false)
         {
             Ensure.IsNotNull(aggregate, nameof(aggregate));
-            return aggregate.AppendStage(PipelineStageDefinitionBuilder.Search(query, highlight, indexName, returnStoredSource));
+            return aggregate.AppendStage(PipelineStageDefinitionBuilder.Search(query, highlight, indexName, count, returnStoredSource));
         }
     }
 }

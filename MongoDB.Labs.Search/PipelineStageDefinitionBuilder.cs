@@ -30,6 +30,7 @@ namespace MongoDB.Labs.Search
         /// <param name="query">The search definition.</param>
         /// <param name="highlight">The highlight options.</param>
         /// <param name="indexName">The index name.</param>
+        /// <param name="count">The count options.</param>
         /// <param name="returnStoredSource">
         /// Flag that specifies whether to perform a full document lookup on the backend database
         /// or return only stored source fields directly from Atlas Search.
@@ -39,6 +40,7 @@ namespace MongoDB.Labs.Search
             SearchDefinition<TInput> query,
             HighlightOptions<TInput> highlight = null,
             string indexName = null,
+            SearchCountOptions count = null,
             bool returnStoredSource = false)
         {
             Ensure.IsNotNull(query, nameof(query));
@@ -52,6 +54,10 @@ namespace MongoDB.Labs.Search
                     if (highlight != null)
                     {
                         renderedQuery.Add("highlight", highlight.Render(s, sr));
+                    }
+                    if (count != null)
+                    {
+                        renderedQuery.Add("count", count.Render());
                     }
                     if (indexName != null)
                     {

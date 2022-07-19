@@ -63,8 +63,8 @@ namespace AtlasSearch.Tests
                         .Phrase("life, liberty, and the pursuit of happiness", x => x.Body),
                     SearchBuilders<HistoricalDocument>.Highlight
                         .Options(x => x.Body),
-                    "default",
-                    true)
+                    indexName: "default",
+                    returnStoredSource: true)
                 .Limit(1)
                 .Project<HistoricalDocument>(
                     Builders<HistoricalDocument>.Projection
@@ -475,6 +475,47 @@ namespace AtlasSearch.Tests
         }
 
         [Fact]
+        public void TestCount_LowerBound()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Phrase("life, liberty, and the pursuit of happiness", x => x.Body),
+                    count: new SearchCountOptions()
+                    {
+                        Type = SearchCountType.LowerBound,
+                        Threshold = 128
+                    })
+                .Project<HistoricalDocument>(
+                    Builders<HistoricalDocument>.Projection
+                        .SearchMeta(x => x.MetaResult))
+                .Limit(1)
+                .ToList();
+            results.Should().ContainSingle().Which.MetaResult.Count.LowerBound.Should().Be(108);
+        }
+
+        [Fact]
+        public void TestCount_Total()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Phrase("life, liberty, and the pursuit of happiness", x => x.Body),
+                    count: new SearchCountOptions()
+                    {
+                        Type = SearchCountType.Total
+                    })
+                .Project<HistoricalDocument>(
+                    Builders<HistoricalDocument>.Projection
+                        .SearchMeta(x => x.MetaResult))
+                .Limit(1)
+                .ToList();
+            results.Should().ContainSingle().Which.MetaResult.Count.Total.Should().Be(108);
+        }
+
+        [Fact]
         public void TestFunctionScore_Path()
         {
             TestFunctionScore(
@@ -609,6 +650,9 @@ namespace AtlasSearch.Tests
 
             [BsonElement("score")]
             public double Score { get; set; }
+
+            [BsonElement("metaResult")]
+            public SearchMetaResult MetaResult { get; set; }
         }
 
         [BsonIgnoreExtraElements]
