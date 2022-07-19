@@ -60,6 +60,40 @@ namespace MongoDB.Labs.Search
             var builder = Builders<TDocument>.Projection;
             return builder.Combine(projection, builder.MetaSearchScore(field));
         }
+
+        /// <summary>
+        /// Combines an existing projection with a search metadata projection.
+        /// </summary>
+        /// <typeparam name="TDocument">The type of the document.</typeparam>
+        /// <param name="projection">The projection.</param>
+        /// <param name="field">The field.</param>
+        /// <returns>
+        /// A combined projection.
+        /// </returns>
+        public static ProjectionDefinition<TDocument> SearchMeta<TDocument>(
+            this ProjectionDefinition<TDocument> projection,
+            FieldDefinition<TDocument> field)
+        {
+            var builder = Builders<TDocument>.Projection;
+            return builder.Combine(projection, builder.SearchMeta(field));
+        }
+
+        /// <summary>
+        /// Combines an existing projection with a search metadata projection.
+        /// </summary>
+        /// <typeparam name="TDocument">The type of the document.</typeparam>
+        /// <param name="projection">The projection.</param>
+        /// <param name="field">The field.</param>
+        /// <returns>
+        /// A combined projection.
+        /// </returns>
+        public static ProjectionDefinition<TDocument> SearchMeta<TDocument>(
+            this ProjectionDefinition<TDocument> projection,
+            Expression<Func<TDocument, object>> field)
+        {
+            var builder = Builders<TDocument>.Projection;
+            return builder.Combine(projection, builder.SearchMeta(field));
+        }
     }
 
     /// <summary>
