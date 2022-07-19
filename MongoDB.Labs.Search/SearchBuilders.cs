@@ -25,6 +25,7 @@ namespace MongoDB.Labs.Search
         private static readonly ScoreDefinitionBuilder<TDocument> __score = new ScoreDefinitionBuilder<TDocument>();
         private static readonly ScoreFunctionBuilder<TDocument> __scoreFunction = new ScoreFunctionBuilder<TDocument>();
         private static readonly SearchDefinitionBuilder<TDocument> __search = new SearchDefinitionBuilder<TDocument>();
+        private static readonly SearchFacetBuilder<TDocument> __facet = new SearchFacetBuilder<TDocument>();
         private static readonly SpanDefinitionBuilder<TDocument> __span = new SpanDefinitionBuilder<TDocument>();
 
         /// <summary>
@@ -65,6 +66,14 @@ namespace MongoDB.Labs.Search
         public static SearchDefinitionBuilder<TDocument> Search
         {
             get { return __search; }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="SearchFacetBuilder{TDocument}"/>.
+        /// </summary>
+        public static SearchFacetBuilder<TDocument> Facet
+        {
+            get { return __facet; }
         }
 
         /// <summary>

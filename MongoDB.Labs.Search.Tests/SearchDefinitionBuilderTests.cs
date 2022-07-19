@@ -24,7 +24,7 @@ using Xunit;
 
 namespace MongoDB.Labs.Search.Tests
 {
-    public class SearchDefinitionBuildTests
+    public class SearchDefinitionBuilderTests
     {
         private static readonly GeoJsonPolygon<GeoJson2DGeographicCoordinates> __testPolygon =
             new GeoJsonPolygon<GeoJson2DGeographicCoordinates>(
@@ -214,6 +214,37 @@ namespace MongoDB.Labs.Search.Tests
             AssertRendered(
                 subject.Exists("FirstName"),
                 "{ exists: { path: 'fn' } }");
+        }
+
+        [Fact]
+        public void Facet()
+        {
+            var subject = CreateSubject<BsonDocument>();
+            var facetBuilder = new SearchFacetBuilder<BsonDocument>();
+
+            AssertRendered(
+                subject.Facet(
+                    subject.Phrase("foo", "x"),
+                    facetBuilder.String("string", "y", 100)),
+                "{ facet: { operator: { phrase: { query: 'foo', path: 'x' } }, facets: { string: { type: 'string', path: 'y', numBuckets: 100 } } } }");
+        }
+
+        [Fact]
+        public void Facet_Typed()
+        {
+            var subject = CreateSubject<Person>();
+            var facetBuilder = new SearchFacetBuilder<Person>();
+
+            AssertRendered(
+                subject.Facet(
+                    subject.Phrase("foo", x => x.LastName),
+                    facetBuilder.String("string", x => x.FirstName, 100)),
+                "{ facet: { operator: { phrase: { query: 'foo', path: 'ln' } }, facets: { string: { type: 'string', path: 'fn', numBuckets: 100 } } } }");
+            AssertRendered(
+                subject.Facet(
+                    subject.Phrase("foo", "LastName"),
+                    facetBuilder.String("string", "FirstName", 100)),
+                "{ facet: { operator: { phrase: { query: 'foo', path: 'ln' } }, facets: { string: { type: 'string', path: 'fn', numBuckets: 100 } } } }");
         }
 
         [Fact]

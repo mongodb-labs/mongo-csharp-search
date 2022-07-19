@@ -18,13 +18,27 @@ using MongoDB.Bson.Serialization;
 namespace MongoDB.Labs.Search
 {
     /// <summary>
-    /// Base class for search score functions.
+    /// Base class for search facets.
     /// </summary>
     /// <typeparam name="TDocument">The type of the document.</typeparam>
-    public abstract class ScoreFunction<TDocument>
+    public abstract class SearchFacet<TDocument>
     {
         /// <summary>
-        /// Renders the score function to a <see cref="BsonDocument"/>.
+        /// Initializes a new instance of the <see cref="SearchFacet{TDocument}"/> class.
+        /// </summary>
+        /// <param name="name">The name of the facet.</param>
+        protected SearchFacet(string name)
+        {
+            Name = name;
+        }
+
+        /// <summary>
+        /// Gets the name of the facet.
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
+        /// Renders the search facet to a <see cref="BsonDocument"/>.
         /// </summary>
         /// <param name="documentSerializer">The document serializer.</param>
         /// <param name="serializerRegistry">The serializer registry.</param>

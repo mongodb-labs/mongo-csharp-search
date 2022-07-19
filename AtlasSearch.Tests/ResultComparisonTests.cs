@@ -632,6 +632,26 @@ namespace AtlasSearch.Tests
             result.Count.Total.Should().Be(108);
         }
 
+        [Fact]
+        public void TestSearchMeta_Facet()
+        {
+            var coll = GetTestCollection();
+            SearchMetaResult result = coll.Aggregate()
+                .SearchMeta(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Facet(
+                            SearchBuilders<HistoricalDocument>.Search
+                                .Phrase("life, liberty, and the pursuit of happiness", x => x.Body),
+                            SearchBuilders<HistoricalDocument>.Facet
+                                .String("string", x => x.Author, 100)))
+                .Single();
+            result.Should().NotBeNull();
+            result.Facet.Should().NotBeNull().And.ContainKey("string");
+            result.Facet["string"].Buckets.Should().NotBeNull().And.ContainSingle();
+            result.Facet["string"].Buckets[0].Id.Should().Be("machine");
+            result.Facet["string"].Buckets[0].Count.Should().Be(108);
+        }
+
         private static MongoClient GetTestClient()
         {
             var uri = Environment.GetEnvironmentVariable("ATLAS_SEARCH_URI");
@@ -660,6 +680,9 @@ namespace AtlasSearch.Tests
 
             [BsonElement("body")]
             public string Body { get; set; }
+
+            [BsonElement("author")]
+            public string Author { get; set; }
 
             [BsonElement("title")]
             public string Title { get; set; }

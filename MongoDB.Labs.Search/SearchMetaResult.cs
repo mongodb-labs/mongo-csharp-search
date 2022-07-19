@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace MongoDB.Labs.Search
@@ -26,6 +28,12 @@ namespace MongoDB.Labs.Search
         /// </summary>
         [BsonElement("count")]
         public SearchMetaCountResult Count { get; set; }
+
+        /// <summary>
+        /// Gets or sets the facet result sets.
+        /// </summary>
+        [BsonElement("facet")]
+        public Dictionary<string, SearchMetaFacetResult> Facet { get; set; }
     }
 
     /// <summary>
@@ -44,5 +52,35 @@ namespace MongoDB.Labs.Search
         /// </summary>
         [BsonElement("total")]
         public long? Total { get; set; }
+    }
+
+    /// <summary>
+    /// A search facet result set.
+    /// </summary>
+    public class SearchMetaFacetResult
+    {
+        /// <summary>
+        /// Gets or sets a list of bucket result sets.
+        /// </summary>
+        [BsonElement("buckets")]
+        public List<SearchMetaFacetBucketResult> Buckets { get; set; }
+    }
+
+    /// <summary>
+    /// A search facet bucket result set.
+    /// </summary>
+    public class SearchMetaFacetBucketResult
+    {
+        /// <summary>
+        /// Gets or sets the unique identifier that identifies this facet bucket.
+        /// </summary>
+        [BsonId]
+        public BsonValue Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the count of documents in this facet bucket.
+        /// </summary>
+        [BsonElement("count")]
+        public long Count { get; set; }
     }
 }

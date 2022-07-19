@@ -168,6 +168,34 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
+        /// Creates a search definition that groups results by values or ranges in the specified
+        /// faceted fields and returns the count for each of those groups.
+        /// </summary>
+        /// <param name="operator">The operator to use to perform the facet over.</param>
+        /// <param name="facets">Information for bucketing the data for each facet.</param>
+        /// <returns>A facet search definition.</returns>
+        public SearchDefinition<TDocument> Facet(
+            SearchDefinition<TDocument> @operator,
+            IEnumerable<SearchFacet<TDocument>> facets)
+        {
+            return new FacetSearchDefinition<TDocument>(@operator, facets);
+        }
+
+        /// <summary>
+        /// Creates a search definition that groups results by values or ranges in the specified
+        /// faceted fields and returns the count for each of those groups.
+        /// </summary>
+        /// <param name="operator">The operator to use to perform the facet over.</param>
+        /// <param name="facets">Information for bucketing the data for each facet.</param>
+        /// <returns>A facet search definition.</returns>
+        public SearchDefinition<TDocument> Facet(
+            SearchDefinition<TDocument> @operator,
+            params SearchFacet<TDocument>[] facets)
+        {
+            return Facet(@operator, (IEnumerable<SearchFacet<TDocument>>)facets);
+        }
+
+        /// <summary>
         /// Creates a search definition that queries for shapes with a given geometry.
         /// </summary>
         /// <typeparam name="TCoordinates">The type of the coordinates.</typeparam>
@@ -980,6 +1008,30 @@ namespace MongoDB.Labs.Search
             var renderedField = _path.Render(documentSerializer, serializerRegistry);
             var document = new BsonDocument("path", renderedField.FieldName);
             return new BsonDocument("exists", document);
+        }
+    }
+
+    internal sealed class FacetSearchDefinition<TDocument> : SearchDefinition<TDocument>
+    {
+        private readonly SearchDefinition<TDocument> _operator;
+        private readonly IEnumerable<SearchFacet<TDocument>> _facets;
+
+        public FacetSearchDefinition(SearchDefinition<TDocument> @operator, IEnumerable<SearchFacet<TDocument>> facets)
+        {
+            _operator = Ensure.IsNotNull(@operator, nameof(@operator));
+            _facets = Ensure.IsNotNull(facets, nameof(facets));
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var document = new BsonDocument("operator", _operator.Render(documentSerializer, serializerRegistry));
+            var facetsDocument = new BsonDocument();
+            foreach (var facet in _facets)
+            {
+                facetsDocument.Add(facet.Name, facet.Render(documentSerializer, serializerRegistry));
+            }
+            document.Add("facets", facetsDocument);
+            return new BsonDocument("facet", document);
         }
     }
 
