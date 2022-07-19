@@ -14,7 +14,7 @@
 
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace MongoDB.Labs.Search.ObjectModel
+namespace MongoDB.Labs.Search
 {
     /// <summary>
     /// A result set for a search metadata query.

@@ -14,7 +14,6 @@
 
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Misc;
-using MongoDB.Labs.Search.ObjectModel;
 
 namespace MongoDB.Labs.Search
 {
