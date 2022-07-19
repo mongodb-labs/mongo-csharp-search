@@ -613,6 +613,25 @@ namespace AtlasSearch.Tests
             results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
         }
 
+        [Fact]
+        public void TestSearchMeta_Count()
+        {
+            var coll = GetTestCollection();
+            SearchMetaResult result = coll.Aggregate()
+                .SearchMeta(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .Phrase("life, liberty, and the pursuit of happiness", x => x.Body),
+                    "default",
+                    new SearchCountOptions()
+                    {
+                        Type = SearchCountType.Total
+                    })
+                .Single();
+            result.Should().NotBeNull();
+            result.Count.Should().NotBeNull();
+            result.Count.Total.Should().Be(108);
+        }
+
         private static MongoClient GetTestClient()
         {
             var uri = Environment.GetEnvironmentVariable("ATLAS_SEARCH_URI");

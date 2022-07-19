@@ -15,6 +15,7 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Misc;
+using MongoDB.Labs.Search.ObjectModel;
 
 namespace MongoDB.Labs.Search
 {
@@ -69,6 +70,45 @@ namespace MongoDB.Labs.Search
                     }
                     var document = new BsonDocument(operatorName, renderedQuery);
                     return new RenderedPipelineStageDefinition<TInput>(operatorName, document, s);
+                });
+
+            return stage;
+        }
+
+        /// <summary>
+        /// Creates a $searchMeta stage.
+        /// </summary>
+        /// <typeparam name="TInput">The type of the input documents.</typeparam>
+        /// <param name="query">The search definition.</param>
+        /// <param name="indexName">The index name.</param>
+        /// <param name="count">The count options.</param>
+        /// <returns>The stage.</returns>
+        public static PipelineStageDefinition<TInput, SearchMetaResult> SearchMeta<TInput>(
+            SearchDefinition<TInput> query,
+            string indexName = null,
+            SearchCountOptions count = null)
+        {
+            Ensure.IsNotNull(query, nameof(query));
+
+            const string operatorName = "$searchMeta";
+            var stage = new DelegatedPipelineStageDefinition<TInput, SearchMetaResult>(
+                operatorName,
+                (s, sr, linqProvider) =>
+                {
+                    var renderedQuery = query.Render(s, sr);
+                    if (count != null)
+                    {
+                        renderedQuery.Add("count", count.Render());
+                    }
+                    if (indexName != null)
+                    {
+                        renderedQuery.Add("index", indexName);
+                    }
+                    var document = new BsonDocument(operatorName, renderedQuery);
+                    return new RenderedPipelineStageDefinition<SearchMetaResult>(
+                        operatorName,
+                        document,
+                        sr.GetSerializer<SearchMetaResult>());
                 });
 
             return stage;

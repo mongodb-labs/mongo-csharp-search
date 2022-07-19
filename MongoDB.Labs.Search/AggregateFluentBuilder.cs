@@ -14,6 +14,7 @@
 
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Misc;
+using MongoDB.Labs.Search.ObjectModel;
 
 namespace MongoDB.Labs.Search
 {
@@ -46,6 +47,25 @@ namespace MongoDB.Labs.Search
         {
             Ensure.IsNotNull(aggregate, nameof(aggregate));
             return aggregate.AppendStage(PipelineStageDefinitionBuilder.Search(query, highlight, indexName, count, returnStoredSource));
+        }
+
+        /// <summary>
+        /// Appends a $searchMeta stage to the pipeline.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="aggregate">The aggregate.</param>
+        /// <param name="query">The search definition.</param>
+        /// <param name="indexName">The index name.</param>
+        /// <param name="count">The count options.</param>
+        /// <returns>The fluent aggregate interface.</returns>
+        public static IAggregateFluent<SearchMetaResult> SearchMeta<TResult>(
+            this IAggregateFluent<TResult> aggregate,
+            SearchDefinition<TResult> query,
+            string indexName = null,
+            SearchCountOptions count = null)
+        {
+            Ensure.IsNotNull(aggregate, nameof(aggregate));
+            return aggregate.AppendStage(PipelineStageDefinitionBuilder.SearchMeta(query, indexName, count));
         }
     }
 }
