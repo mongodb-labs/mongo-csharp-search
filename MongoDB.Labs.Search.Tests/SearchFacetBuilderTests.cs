@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using FluentAssertions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -45,6 +47,37 @@ namespace MongoDB.Labs.Search.Tests
                 "{ type: 'string', path: 'fn', numBuckets: 100 }");
         }
 
+        [Fact]
+        public void Date()
+        {
+            var subject = CreateSubject<BsonDocument>();
+            var boundaries = new List<DateTime>()
+            {
+                DateTime.MinValue,
+                DateTime.MaxValue
+            };
+
+            AssertRendered(
+                subject.Date("date", "x", boundaries, "foo"),
+                "{ type: 'date', path: 'x', boundaries: [{ $date: '0001-01-01T00:00:00Z' }, { $date: '9999-12-31T23:59:59.9999999Z' }], default: 'foo' }");
+            AssertRendered(
+                subject.Date("date", "x", boundaries),
+                "{ type: 'date', path: 'x', boundaries: [{ $date: '0001-01-01T00:00:00Z' }, { $date: '9999-12-31T23:59:59.9999999Z' }] }");
+        }
+
+        [Fact]
+        public void Date_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.Date("date", x => x.Birthday, DateTime.MinValue, DateTime.MaxValue),
+                "{ type: 'date', path: 'dob', boundaries: [{ $date: '0001-01-01T00:00:00Z' }, { $date: '9999-12-31T23:59:59.9999999Z' }] }");
+            AssertRendered(
+                subject.Date("date", "Birthday", DateTime.MinValue, DateTime.MaxValue),
+                "{ type: 'date', path: 'dob', boundaries: [{ $date: '0001-01-01T00:00:00Z' }, { $date: '9999-12-31T23:59:59.9999999Z' }] }");
+        }
+
         private void AssertRendered<TDocument>(SearchFacet<TDocument> facet, string expected)
         {
             AssertRendered(facet, BsonDocument.Parse(expected));
@@ -70,6 +103,9 @@ namespace MongoDB.Labs.Search.Tests
 
             [BsonElement("ln")]
             public string LastName { get; set; }
+
+            [BsonElement("dob")]
+            public DateTime Birthday { get; set; }
         }
     }
 }

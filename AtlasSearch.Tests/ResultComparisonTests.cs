@@ -643,13 +643,20 @@ namespace AtlasSearch.Tests
                             SearchBuilders<HistoricalDocument>.Search
                                 .Phrase("life, liberty, and the pursuit of happiness", x => x.Body),
                             SearchBuilders<HistoricalDocument>.Facet
-                                .String("string", x => x.Author, 100)))
+                                .String("string", x => x.Author, 100),
+                            SearchBuilders<HistoricalDocument>.Facet
+                                .Date("date", x => x.Date, DateTime.MinValue, DateTime.MaxValue)))
                 .Single();
             result.Should().NotBeNull();
-            result.Facet.Should().NotBeNull().And.ContainKey("string");
+            result.Facet.Should().NotBeNull()
+                .And.ContainKey("string")
+                .And.ContainKey("date");
             result.Facet["string"].Buckets.Should().NotBeNull().And.ContainSingle();
             result.Facet["string"].Buckets[0].Id.Should().Be("machine");
             result.Facet["string"].Buckets[0].Count.Should().Be(108);
+            result.Facet["date"].Buckets.Should().NotBeNull().And.ContainSingle();
+            result.Facet["date"].Buckets[0].Id.Should().Be(DateTime.MinValue);
+            result.Facet["date"].Buckets[0].Count.Should().Be(108);
         }
 
         private static MongoClient GetTestClient()
@@ -692,6 +699,9 @@ namespace AtlasSearch.Tests
 
             [BsonElement("score")]
             public double Score { get; set; }
+
+            [BsonElement("date")]
+            public DateTime Date { get; set; }
 
             [BsonElement("metaResult")]
             public SearchMetaResult MetaResult { get; set; }
