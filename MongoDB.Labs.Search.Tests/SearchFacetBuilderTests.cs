@@ -48,6 +48,38 @@ namespace MongoDB.Labs.Search.Tests
         }
 
         [Fact]
+        public void Number()
+        {
+            var subject = CreateSubject<BsonDocument>();
+            var boundaries = new List<BsonValue>()
+            {
+                0,
+                50,
+                100
+            };
+
+            AssertRendered(
+                subject.Number("number", "x", boundaries, "foo"),
+                "{ type: 'number', path: 'x', boundaries: [0, 50, 100], default: 'foo' }");
+            AssertRendered(
+                subject.Number("number", "x", boundaries),
+                "{ type: 'number', path: 'x', boundaries: [0, 50, 100] }");
+        }
+
+        [Fact]
+        public void Number_Typed()
+        {
+            var subject = CreateSubject<Person>();
+
+            AssertRendered(
+                subject.Number("number", x => x.Age, 0, 18, 65, 120),
+                "{ type: 'number', path: 'age', boundaries: [0, 18, 65, 120] }");
+            AssertRendered(
+                subject.Number("number", "Age", 0, 18, 65, 120),
+                "{ type: 'number', path: 'age', boundaries: [0, 18, 65, 120] }");
+        }
+
+        [Fact]
         public void Date()
         {
             var subject = CreateSubject<BsonDocument>();
@@ -103,6 +135,9 @@ namespace MongoDB.Labs.Search.Tests
 
             [BsonElement("ln")]
             public string LastName { get; set; }
+
+            [BsonElement("age")]
+            public int Age { get; set; }
 
             [BsonElement("dob")]
             public DateTime Birthday { get; set; }

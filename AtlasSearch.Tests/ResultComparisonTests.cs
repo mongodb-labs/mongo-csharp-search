@@ -645,6 +645,8 @@ namespace AtlasSearch.Tests
                             SearchBuilders<HistoricalDocument>.Facet
                                 .String("string", x => x.Author, 100),
                             SearchBuilders<HistoricalDocument>.Facet
+                                .Number("number", x => x.Index, 0, 100),
+                            SearchBuilders<HistoricalDocument>.Facet
                                 .Date("date", x => x.Date, DateTime.MinValue, DateTime.MaxValue)))
                 .Single();
             result.Should().NotBeNull();
@@ -654,6 +656,9 @@ namespace AtlasSearch.Tests
             result.Facet["string"].Buckets.Should().NotBeNull().And.ContainSingle();
             result.Facet["string"].Buckets[0].Id.Should().Be("machine");
             result.Facet["string"].Buckets[0].Count.Should().Be(108);
+            result.Facet["number"].Buckets.Should().NotBeNull().And.ContainSingle();
+            result.Facet["number"].Buckets[0].Id.Should().Be(0);
+            result.Facet["number"].Buckets[0].Count.Should().Be(0);
             result.Facet["date"].Buckets.Should().NotBeNull().And.ContainSingle();
             result.Facet["date"].Buckets[0].Id.Should().Be(DateTime.MinValue);
             result.Facet["date"].Buckets[0].Count.Should().Be(108);
@@ -702,6 +707,9 @@ namespace AtlasSearch.Tests
 
             [BsonElement("date")]
             public DateTime Date { get; set; }
+
+            [BsonElement("index")]
+            public int Index { get; set; }
 
             [BsonElement("metaResult")]
             public SearchMetaResult MetaResult { get; set; }

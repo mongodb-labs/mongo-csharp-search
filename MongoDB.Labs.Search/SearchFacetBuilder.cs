@@ -60,12 +60,95 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
+        /// Creates a facet that determines the frequency of numeric values by breaking the search
+        /// results into separate ranges of numbers.
+        /// </summary>
+        /// <param name="name">The name of the facet.</param>
+        /// <param name="path">The field path to facet on.</param>
+        /// <param name="boundaries">
+        /// A list of numeric values that specify the boundaries for each bucket.
+        /// </param>
+        /// <param name="default">
+        /// The name of an additional bucket that counts documents returned from the operator that
+        /// do not fall within the specified boundaries.
+        /// </param>
+        /// <returns>A number search facet.</returns>
+        public SearchFacet<TDocument> Number(
+            string name,
+            PathDefinition<TDocument> path,
+            IEnumerable<BsonValue> boundaries,
+            string @default = null)
+        {
+            return new NumberSearchFacet<TDocument>(name, path, boundaries, @default);
+        }
+
+        /// <summary>
+        /// Creates a facet that determines the frequency of numeric values by breaking the search
+        /// results into separate ranges of numbers.
+        /// </summary>
+        /// <param name="name">The name of the facet.</param>
+        /// <param name="path">The field path to facet on.</param>
+        /// <param name="boundaries">
+        /// A list of numeric values that specify the boundaries for each bucket.
+        /// </param>
+        /// <returns>A number search facet.</returns>
+        public SearchFacet<TDocument> Number(
+            string name,
+            PathDefinition<TDocument> path,
+            params BsonValue[] boundaries)
+        {
+            return Number(name, path, (IEnumerable<BsonValue>)boundaries);
+        }
+
+        /// <summary>
+        /// Creates a facet that determines the frequency of numeric values by breaking the search
+        /// results into separate ranges of numbers.
+        /// </summary>
+        /// <typeparam name="TField">The type of the field.</typeparam>
+        /// <param name="name">The name of the facet.</param>
+        /// <param name="path">The field path to facet on.</param>
+        /// <param name="boundaries">
+        /// A list of numeric values that specify the boundaries for each bucket.
+        /// </param>
+        /// <param name="default">
+        /// The name of an additional bucket that counts documents returned from the operator that
+        /// do not fall within the specified boundaries.
+        /// </param>
+        /// <returns>A number search facet.</returns>
+        public SearchFacet<TDocument> Number<TField>(
+            string name,
+            Expression<Func<TDocument, TField>> path,
+            IEnumerable<BsonValue> boundaries,
+            string @default = null)
+        {
+            return Number(name, new ExpressionFieldDefinition<TDocument>(path), boundaries, @default);
+        }
+        /// <summary>
+        /// Creates a facet that determines the frequency of numeric values by breaking the search
+        /// results into separate ranges of numbers.
+        /// </summary>
+        /// <typeparam name="TField">The type of the field.</typeparam>
+        /// <param name="name">The name of the facet.</param>
+        /// <param name="path">The field path to facet on.</param>
+        /// <param name="boundaries">
+        /// A list of numeric values that specify the boundaries for each bucket.
+        /// </param>
+        /// <returns>A number search facet.</returns>
+        public SearchFacet<TDocument> Number<TField>(
+            string name,
+            Expression<Func<TDocument, TField>> path,
+            params BsonValue[] boundaries)
+        {
+            return Number(name, new ExpressionFieldDefinition<TDocument>(path), boundaries);
+        }
+
+        /// <summary>
         /// Creates a facet that narrows down search result based on a date.
         /// </summary>
         /// <param name="name">The name of the fact.</param>
         /// <param name="path">The field path to facet on.</param>
         /// <param name="boundaries">
-        /// A list of date values the specify the boundaries for each bucket.
+        /// A list of date values that specify the boundaries for each bucket.
         /// </param>
         /// <param name="default">
         /// The name of an additional bucket that counts documents returned from the operator that
@@ -87,7 +170,7 @@ namespace MongoDB.Labs.Search
         /// <param name="name">The name of the fact.</param>
         /// <param name="path">The field path to facet on.</param>
         /// <param name="boundaries">
-        /// A list of date values the specify the boundaries for each bucket.
+        /// A list of date values that specify the boundaries for each bucket.
         /// </param>
         /// <returns>A date search facet.</returns>
         public SearchFacet<TDocument> Date(
@@ -105,7 +188,7 @@ namespace MongoDB.Labs.Search
         /// <param name="name">The name of the fact.</param>
         /// <param name="path">The field path to facet on.</param>
         /// <param name="boundaries">
-        /// A list of date values the specify the boundaries for each bucket.
+        /// A list of date values that specify the boundaries for each bucket.
         /// </param>
         /// <param name="default">
         /// The name of an additional bucket that counts documents returned from the operator that
@@ -128,7 +211,7 @@ namespace MongoDB.Labs.Search
         /// <param name="name">The name of the fact.</param>
         /// <param name="path">The field path to facet on.</param>
         /// <param name="boundaries">
-        /// A list of date values the specify the boundaries for each bucket.
+        /// A list of date values that specify the boundaries for each bucket.
         /// </param>
         /// <returns>A date search facet.</returns>
         public SearchFacet<TDocument> Date<TField>(
@@ -159,6 +242,33 @@ namespace MongoDB.Labs.Search
             if (_numBuckets != 10)
             {
                 document.Add("numBuckets", _numBuckets);
+            }
+            return document;
+        }
+    }
+
+    internal sealed class NumberSearchFacet<TDocument> : SearchFacet<TDocument>
+    {
+        private readonly PathDefinition<TDocument> _path;
+        private readonly IEnumerable<BsonValue> _boundaries;
+        private readonly string _default;
+
+        public NumberSearchFacet(string name, PathDefinition<TDocument> path, IEnumerable<BsonValue> boundaries, string @default)
+            : base(name)
+        {
+            _path = Ensure.IsNotNull(path, nameof(path));
+            _boundaries = Ensure.IsNotNull(boundaries, nameof(boundaries));
+            _default = @default;
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var document = new BsonDocument("type", "number");
+            document.Add("path", _path.Render(documentSerializer, serializerRegistry));
+            document.Add("boundaries", new BsonArray(_boundaries));
+            if (_default != null)
+            {
+                document.Add("default", _default);
             }
             return document;
         }
