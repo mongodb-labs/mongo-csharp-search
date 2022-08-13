@@ -220,6 +220,24 @@ namespace AtlasSearch.Tests
         }
 
         [Fact]
+        public void TestMoreLikeThis()
+        {
+            var coll = GetTestCollection();
+            List<HistoricalDocument> results = coll.Aggregate()
+                .Search(
+                    SearchBuilders<HistoricalDocument>.Search
+                        .MoreLikeThis(
+                            new HistoricalDocument
+                            {
+                                Title = "Declaration of Independence",
+                                Body = "We hold these truths to be self-evident that all men are created equal..."
+                            }))
+                .Limit(1)
+                .ToList();
+            results.Should().ContainSingle().Which.Title.Should().Be("Declaration of Independence");
+        }
+
+        [Fact]
         public void TestMust()
         {
             var coll = GetTestCollection();

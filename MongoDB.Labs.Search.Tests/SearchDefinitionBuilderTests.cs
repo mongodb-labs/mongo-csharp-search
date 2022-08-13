@@ -335,6 +335,38 @@ namespace MongoDB.Labs.Search.Tests
         }
 
         [Fact]
+        public void MoreLikeThis()
+        {
+            var subject = CreateSubject<BsonDocument>();
+
+            AssertRendered(
+                subject.MoreLikeThis(
+                    new BsonDocument("x", "foo"),
+                    new BsonDocument("x", "bar")),
+                "{ moreLikeThis: { like: [{ x: 'foo' }, { x: 'bar' }] } }");
+        }
+
+        [Fact]
+        public void MoreLikeThis_Typed()
+        {
+            var subject = CreateSubject<SimplePerson>();
+
+            AssertRendered(
+                subject.MoreLikeThis(
+                    new SimplePerson
+                    {
+                        FirstName = "John",
+                        LastName = "Doe"
+                    },
+                    new SimplePerson
+                    {
+                        FirstName = "Jane",
+                        LastName = "Doe"
+                    }),
+                "{ moreLikeThis: { like: [{ fn: 'John', ln: 'Doe' }, { fn: 'Jane', ln: 'Doe' }] } }");
+        }
+
+        [Fact]
         public void Must()
         {
             var subject = CreateSubject<BsonDocument>();
@@ -855,16 +887,19 @@ namespace MongoDB.Labs.Search.Tests
             return new SearchDefinitionBuilder<TDocument>();
         }
 
-        private class Person
+        private class SimplePerson
         {
-            [BsonId]
-            public ObjectId Id { get; set; }
-
             [BsonElement("fn")]
             public string FirstName { get; set; }
 
             [BsonElement("ln")]
             public string LastName { get; set; }
+        }
+
+        private class Person : SimplePerson
+        {
+            [BsonId]
+            public ObjectId Id { get; set; }
 
             [BsonElement("age")]
             public int Age { get; set; }

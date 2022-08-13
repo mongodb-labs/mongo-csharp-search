@@ -376,6 +376,30 @@ namespace MongoDB.Labs.Search
         }
 
         /// <summary>
+        /// Creates a search definition that returns documents similar to the input documents.
+        /// </summary>
+        /// <param name="like">
+        /// One or more documents that Atlas Search uses to extract representative terms for.
+        /// </param>
+        /// <returns>A more like this search definition.</returns>
+        public SearchDefinition<TDocument> MoreLikeThis(IEnumerable<TDocument> like)
+        {
+            return new MoreLikeThisSearchDefinition<TDocument>(like);
+        }
+
+        /// <summary>
+        /// Creates a search definition that returns documents similar to the input documents.
+        /// </summary>
+        /// <param name="like">
+        /// One or more documents that Atlas Search uses to extract representative terms for.
+        /// </param>
+        /// <returns>A more like this search definition.</returns>
+        public SearchDefinition<TDocument> MoreLikeThis(params TDocument[] like)
+        {
+            return MoreLikeThis((IEnumerable<TDocument>)like);
+        }
+
+        /// <summary>
         /// Creates a search definition that supports querying and scoring numeric and date values.
         /// </summary>
         /// <param name="path">The indexed field or fields to search.</param>
@@ -1148,6 +1172,23 @@ namespace MongoDB.Labs.Search
                 document.Add("score", _score.Render(documentSerializer, serializerRegistry));
             }
             return new BsonDocument("geoWithin", document);
+        }
+    }
+
+    internal sealed class MoreLikeThisSearchDefinition<TDocument> : SearchDefinition<TDocument>
+    {
+        private readonly IEnumerable<TDocument> _like;
+
+        public MoreLikeThisSearchDefinition(IEnumerable<TDocument> like)
+        {
+            _like = Ensure.IsNotNull(like, nameof(like));
+        }
+
+        public override BsonDocument Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+            var array = new BsonArray(_like.Select(element => element.ToBsonDocument(documentSerializer)));
+            var document = new BsonDocument("like", array);
+            return new BsonDocument("moreLikeThis", document);
         }
     }
 
