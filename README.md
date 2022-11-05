@@ -132,6 +132,23 @@ List<Person> results = coll.Aggregate()
     .ToList();
 ```
 
+### More Like This Operator
+
+Search for instances of `Person` similar to the specified instance.
+
+```C#
+List<Person> results = coll.Aggregate()
+    .Search(
+        SearchBuilders<Person>.Search
+            .MoreLikeThis(
+                new Person
+                {
+                    FirstName = "John",
+                    LastName = "Doe"
+                }))
+    .ToList();
+```
+
 ### Near Operator
 
 Search for instances of `Person` in which the `Age` field is near 18 with a pivot of 1.
