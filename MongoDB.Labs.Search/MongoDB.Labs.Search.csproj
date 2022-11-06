@@ -11,7 +11,7 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>mongodb;mongo;nosql;atlas;search</PackageTags>
-    <Version>1.1.0-beta1</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <PropertyGroup>
